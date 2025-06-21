@@ -3,7 +3,7 @@
     --primary-color-dark: #4c1d95; /* violet-800 */
     --secondary-color: #14b8a6; /* teal-500 */
     --background-color: #f8fafc; /* slate-50 */
-    --panel-bg: rgba(255, 255, 255, 0.8);
+    --panel-bg: rgba(241, 246, 254, 0.8);
     --text-dark: #1e293b; /* slate-800 */
     --text-medium: #475569; /* slate-600 */
     --text-light: #64748b; /* slate-500 */
@@ -13,8 +13,6 @@
 body {
     font-family: 'Poppins', sans-serif;
     background-color: var(--background-color);
-    background-image: url("imagem\ do\ fundo.png");
-    background-size: 150px;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
@@ -33,7 +31,7 @@ main {
 }
 
 .app-logo {
-    width: 280px;
+    width: 800px;
     margin-bottom: 1.0rem;
 }
 

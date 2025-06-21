@@ -13,10 +13,11 @@
     
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="flex flex-col items-center min-h-screen py-6 sm:py-10">
+<body class="flex flex-col items-center min-h-screen py-6 sm:py-10 bg-gradient-to-br from-violet-100 via-purple-50 to-teal-100">
     <main class="container mx-auto p-4 sm:p-6 bg-transparent w-full max-w-4xl">
-        <header class="mb-8 text-center">
+        <header class="mb-10 text-center">
             <div class="header-container">
+                <!-- Dynamic SVG Logo for better scalability and styling -->
                 <svg class="app-logo" viewBox="0 0 300 60" xmlns="http://www.w3.org/2000/svg">
                   <defs>
                     <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -24,10 +25,11 @@
                       <stop offset="100%" style="stop-color:#14b8a6;" />
                     </linearGradient>
                   </defs>
-                  <text x="17" y="40" font-family="'Playfair Display', serif" font-size="30" font-weight="500" fill="#5b21b6">Rhythmic & Creator</text>
+                  <!-- Text with gradient fill for modern look -->
+                  <text x="17" y="40" font-family="'Playfair Display', serif" font-size="26" font-weight="700" fill="url(#logo-gradient)">Leitor Rítmico Criativo</text>
                 </svg>
             </div>
-            <p class="text-md text-slate-500 -mt-2" >Crie, pratique lições e inspire-se com a IA!</p>
+            <p class="text-md text-slate-600 -mt-8 font-medium" >Pratique as lições e crie ritmos!</p>
         </header>
 
         <div class="panel mb-8">
@@ -106,12 +108,12 @@
             </div>
         </div>
 
-        <div id="countdown-display" class="text-center mb-4"></div>
-        <div id="rhythm-display-container" class="p-4 border-2 border-dashed border-slate-300 rounded-xl min-h-[220px] bg-white/80 backdrop-blur-sm shadow-inner overflow-x-auto mb-8">
-            <div id="rhythm-display" class="flex items-end flex-wrap">
-                <p class="text-slate-500 text-center w-full text-lg self-center">Selecione uma lição ou mude para Criação Livre.</p>
-            </div>
-        </div>
+<div id="countdown-display" class="text-center mb-2"></div>
+<div id="rhythm-display-container" class="mt-0 p-4 border-2 border-dashed border-slate-300 rounded-xl min-h-[220px] bg-white/20 backdrop-blur-sm shadow-inner overflow-x-auto mb-10">
+    <div id="rhythm-display" class="flex items-end flex-wrap">
+        <p class="text-slate-500 text-center w-full text-lg self-center">Selecione uma lição ou mude para Criação Livre.</p>
+    </div>
+</div>
 
         <div id="figure-legend-container" class="figure-legend hidden">
             <h4 class="legend-title">Figuras na Lição Atual:</h4>
@@ -123,7 +125,7 @@
     </main>
 
     <footer class="w-full text-center py-4 mt-auto">
-        <p> © 2025 Professor Alesson Queiroz.</p>
+        <p> © 2025 QTech Soluções Tecnológicas. Todos os direitos reservados.</p>
     </footer>
 
     <script src="data.js"></script>
