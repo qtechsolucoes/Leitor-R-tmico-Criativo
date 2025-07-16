@@ -2,10 +2,10 @@
 
 import { AppState } from './state.js';
 import { updateActivePatternAndTimeSignature, handlePaletteFigureClick, handleFigureSelectionForEditing } from './core.js';
-import { switchMode, renderRhythm, updateMessage, populateFigurePalette } from './ui.js';
+import { switchMode, renderRhythm, updateMessage, populateFigurePalette, updateLoginUI } from './ui.js';
 import { startCountdownAndPlay, pauseRhythmExecution, resumeRhythmExecution, stopRhythmExecution } from './audio.js';
 
-// --- Elementos do DOM (apenas os que precisam de listeners) ---
+// --- Elementos do DOM ---
 const modeSelect = document.getElementById('mode-select');
 const lessonSelect = document.getElementById('lesson-select');
 const timeSignatureBeats = document.getElementById('time-signature-beats');
@@ -17,8 +17,6 @@ const deleteSelectedFigureButton = document.getElementById('delete-selected-figu
 const clearCustomRhythmButton = document.getElementById('clear-custom-rhythm');
 const tempoIncreaseButton = document.getElementById('tempo-increase');
 const tempoDecreaseButton = document.getElementById('tempo-decrease');
-const figurePaletteDiv = document.getElementById('figure-palette');
-const rhythmDisplayEl = document.getElementById('rhythm-display');
 
 // Adicionando elementos do DOM para as novas funcionalidades
 const loginButton = document.getElementById('login-button');
@@ -27,6 +25,76 @@ const saveRhythmButton = document.getElementById('save-rhythm-button');
 const loadRhythmsButton = document.getElementById('load-rhythms-button');
 const exportPdfButton = document.getElementById('export-pdf-button');
 const exportWavButton = document.getElementById('export-wav-button');
+
+// --- Funções de Mock (Simulação) ---
+function loginUser(username = "Usuário Padrão") {
+    AppState.user.currentUser = { username };
+    updateMessage(`Login como ${username}.`);
+    updateLoginUI();
+}
+
+function logoutUser() {
+    AppState.user.currentUser = null;
+    updateMessage("Logout efetuado.");
+    updateLoginUI();
+}
+
+function saveCurrentRhythm() {
+    if (!AppState.user.currentUser) {
+        updateMessage("Faça login para salvar.");
+        return;
+    }
+    const rhythmName = prompt("Dê um nome para o seu ritmo:");
+    if (rhythmName) {
+        const username = AppState.user.currentUser.username;
+        if (!AppState.user.savedRhythms[username]) {
+            AppState.user.savedRhythms[username] = [];
+        }
+        AppState.user.savedRhythms[username].push({
+            name: rhythmName,
+            pattern: AppState.customPattern,
+            timeSignature: AppState.activeTimeSignature
+        });
+        updateMessage(`Ritmo "${rhythmName}" salvo.`);
+    }
+}
+
+function loadSavedRhythm() {
+    if (!AppState.user.currentUser) {
+        updateMessage("Faça login para carregar.");
+        return;
+    }
+    const username = AppState.user.currentUser.username;
+    const userRhythms = AppState.user.savedRhythms[username];
+
+    if (!userRhythms || userRhythms.length === 0) {
+        updateMessage("Nenhum ritmo salvo.");
+        return;
+    }
+
+    const rhythmNames = userRhythms.map((r, i) => `${i + 1}. ${r.name}`).join('\n');
+    const choice = prompt(`Escolha um ritmo:\n${rhythmNames}\nDigite o número:`);
+    const index = parseInt(choice) - 1;
+
+    if (!isNaN(index) && index >= 0 && index < userRhythms.length) {
+        const rhythm = userRhythms[index];
+        AppState.customPattern = JSON.parse(JSON.stringify(rhythm.pattern));
+        document.getElementById('time-signature-beats').value = rhythm.timeSignature.beats;
+        document.getElementById('time-signature-type').value = rhythm.timeSignature.beatType;
+        switchMode('freeCreate'); // Garante que estamos no modo correto
+        updateActivePatternAndTimeSignature();
+        renderRhythm();
+        updateMessage(`Ritmo "${rhythm.name}" carregado.`);
+    } else {
+        updateMessage("Seleção inválida.");
+    }
+}
+
+function exportToPDF() {
+    updateMessage("Funcionalidade de exportar para PDF ainda não implementada com bibliotecas externas.");
+    // A implementação real com jsPDF e html2canvas seria complexa e está além do escopo de um único arquivo.
+    console.log("Simulando exportação para PDF...");
+}
 
 
 /**
@@ -41,11 +109,14 @@ export function setupEventListeners() {
         AppState.currentLessonIndex = parseInt(e.target.value);
         updateActivePatternAndTimeSignature();
         renderRhythm();
+        populateFigureLegend(); // Atualiza a legenda ao trocar de lição
     });
 
     [timeSignatureBeats, timeSignatureType].forEach(el => el.addEventListener('change', () => {
-        updateActivePatternAndTimeSignature();
-        renderRhythm();
+        if(AppState.currentMode === 'freeCreate') {
+            updateActivePatternAndTimeSignature();
+            renderRhythm();
+        }
     }));
 
     tempoDecreaseButton.addEventListener('click', () => {
@@ -95,39 +166,12 @@ export function setupEventListeners() {
         updateMessage("Figura apagada.");
     });
     
-    // Listeners para a paleta e display são delegados (configurados em ui.js, mas chamam funções do core)
-    // A configuração é feita na função que cria os elementos, como populateFigurePalette
-    // e renderRhythm. O importante é que as funções chamadas (handle...) sejam importadas corretamente aqui.
-    
     // --- Novos Event Listeners ---
-    if(loginButton) loginButton.addEventListener('click', () => {
-        // A lógica de login/logout estaria em um módulo de autenticação.
-        // Por agora, simulamos:
-        console.log("Botão de login clicado");
-        updateMessage("Funcionalidade de login a ser implementada.");
-    });
-
-    if(logoutButton) logoutButton.addEventListener('click', () => {
-        console.log("Botão de logout clicado");
-        updateMessage("Funcionalidade de logout a ser implementada.");
-    });
-
-    if(saveRhythmButton) saveRhythmButton.addEventListener('click', () => {
-        // A lógica de salvar estaria em um módulo de dados/API.
-        console.log("Botão de salvar clicado");
-        updateMessage("Funcionalidade de salvar a ser implementada.");
-    });
-
-    if(loadRhythmsButton) loadRhythmsButton.addEventListener('click', () => {
-        console.log("Botão de carregar clicado");
-        updateMessage("Funcionalidade de carregar a ser implementada.");
-    });
-
-    if(exportPdfButton) exportPdfButton.addEventListener('click', () => {
-        // A lógica de exportação estaria em um módulo de utilidades/exportação.
-        console.log("Botão de exportar PDF clicado");
-        updateMessage("Funcionalidade de exportar PDF a ser implementada.");
-    });
+    if(loginButton) loginButton.addEventListener('click', loginUser);
+    if(logoutButton) logoutButton.addEventListener('click', logoutUser);
+    if(saveRhythmButton) saveRhythmButton.addEventListener('click', saveCurrentRhythm);
+    if(loadRhythmsButton) loadRhythmsButton.addEventListener('click', loadSavedRhythm);
+    if(exportPdfButton) exportPdfButton.addEventListener('click', exportToPDF);
 
     if(exportWavButton) exportWavButton.addEventListener('click', async () => {
         if (!AppState.isPlaying && !AppState.isCountingDown) {

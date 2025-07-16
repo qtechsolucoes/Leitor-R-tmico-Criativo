@@ -12,54 +12,50 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="flex flex-col items-center min-h-screen py-6 sm:py-10 bg-gradient-to-br from-violet-100 via-purple-50 to-teal-100">
-    <main class="container mx-auto p-4 sm:p-6 bg-transparent w-full max-w-4xl">
+<body>
+    <div class="background-blurs">
+        <div class="blur-1"></div>
+        <div class="blur-2"></div>
+        <div class="blur-3"></div>
+    </div>
+
+    <main class="container mx-auto p-4 sm:p-6 bg-transparent w-full max-w-5xl">
         <header class="mb-10 text-center">
-            <div class="header-container">
-                <svg class="app-logo" viewBox="0 0 300 60" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" style="stop-color:#5b21b6;" />
-                            <stop offset="100%" style="stop-color:#14b8a6;" />
-                        </linearGradient>
-                    </defs>
-                    <text x="17" y="40" font-family="'Playfair Display', serif" font-size="26" font-weight="700" fill="url(#logo-gradient)">Leitor Rítmico Criativo</text>
-                </svg>
-            </div>
-            <p class="text-md text-slate-600 -mt-8 font-medium" >Pratique as lições e crie ritmos!</p>
+            <h1 class="text-4xl sm:text-5xl font-bold text-slate-100 tracking-wider app-title">Leitor Rítmico Criativo</h1>
+            <p class="text-md text-slate-400 mt-2 font-medium">Pratique as lições e crie ritmos do futuro.</p>
         </header>
 
         <div class="panel mb-8">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div>
-                    <label for="mode-select" class="block text-sm font-medium text-slate-700 mb-1">Modo de Prática:</label>
-                    <select id="mode-select" class="w-full p-3 border border-slate-300 rounded-lg shadow-sm focus:ring-purple-500 focus:border-purple-500 text-base">
+                    <label for="mode-select" class="block text-sm font-medium text-slate-300 mb-2">Modo de Prática:</label>
+                    <select id="mode-select" class="control-input">
                         <option value="lessons" selected>Praticar Lições</option>
                         <option value="freeCreate">Criação Livre</option>
                     </select>
                 </div>
                 <div id="lesson-selector-container">
-                    <label for="lesson-select" class="block text-sm font-medium text-slate-700 mb-1">Escolha a Lição:</label>
-                    <select id="lesson-select" class="w-full p-3 border border-slate-300 rounded-lg shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-base"></select>
+                    <label for="lesson-select" class="block text-sm font-medium text-slate-300 mb-2">Escolha a Lição:</label>
+                    <select id="lesson-select" class="control-input"></select>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
                 <div class="flex flex-col">
-                    <label class="text-sm font-medium text-slate-700 mb-1">Fórmula de Compasso:</label>
-                    <span id="time-signature-display" class="w-full p-3 border border-slate-200 bg-slate-50 rounded-lg text-base text-center font-semibold text-slate-700">4/4</span>
+                    <label class="text-sm font-medium text-slate-300 mb-2 text-center md:text-left">Fórmula de Compasso:</label>
+                    <span id="time-signature-display" class="w-full p-3 bg-slate-900/50 rounded-lg text-2xl text-center font-semibold text-cyan-300 border border-slate-700">4/4</span>
                 </div>
 
                 <div class="flex flex-col items-center">
-                    <div class="text-sm font-medium text-slate-700 mb-1">Tempo (BPM)</div>
+                    <div class="text-sm font-medium text-slate-300 mb-2">Tempo (BPM)</div>
                     <div class="flex items-center space-x-2">
-                        <button id="tempo-decrease" class="px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 active:bg-pink-700 transition-colors text-xl font-bold shadow-md">-</button>
-                        <span id="tempo-display" class="text-2xl font-semibold text-slate-800 w-20 text-center bg-white border border-slate-300 rounded-lg py-1.5">100</span>
-                        <button id="tempo-increase" class="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 active:bg-teal-700 transition-colors text-xl font-bold shadow-md">+</button>
+                        <button id="tempo-decrease" class="btn-tempo">-</button>
+                        <span id="tempo-display" class="text-3xl font-semibold text-slate-100 w-24 text-center bg-transparent py-1.5">100</span>
+                        <button id="tempo-increase" class="btn-tempo">+</button>
                     </div>
                 </div>
 
-                <div class="flex space-x-3 justify-center md:justify-end">
+                <div class="flex space-x-3 justify-center md:justify-end mt-4 md:mt-0">
                     <button id="play-pause-button" class="btn-action btn-play w-32">Tocar</button>
                     <button id="reset-button" class="btn-action btn-reset w-32">Resetar</button>
                 </div>
@@ -67,11 +63,11 @@
         </div>
 
         <div id="custom-rhythm-creator" class="panel mb-8 hidden">
-            <h3 class="text-xl font-semibold text-purple-700 mb-4 text-center">Monte seu Ritmo (Livre):</h3>
+            <h3 class="text-xl font-semibold text-purple-300 mb-4 text-center">Painel de Criação</h3>
             <div class="grid grid-cols-2 gap-4 mb-4">
                 <div>
-                    <label for="time-signature-beats" class="text-sm font-medium text-slate-700 mb-1">Tempos por Compasso:</label>
-                    <select id="time-signature-beats" class="w-full p-3 border border-slate-300 rounded-lg shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-base">
+                    <label for="time-signature-beats" class="text-sm font-medium text-slate-300 mb-2">Pulsos por Compasso:</label>
+                    <select id="time-signature-beats" class="control-input">
                         <option value="2">2</option>
                         <option value="3">3</option>
                         <option value="4" selected>4</option>
@@ -84,8 +80,8 @@
                     </select>
                 </div>
                 <div>
-                    <label for="time-signature-type" class="text-sm font-medium text-slate-700 mb-1">Unidade de tempo / Denominador:</label>
-                    <select id="time-signature-type" class="w-full p-3 border border-slate-300 rounded-lg shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-base">
+                    <label for="time-signature-type" class="text-sm font-medium text-slate-300 mb-2">Unidade de Pulso:</label>
+                    <select id="time-signature-type" class="control-input">
                         <option value="1">Semibreve (𝅝)</option>
                         <option value="2">Mínima (𝅗𝅥)</option>
                         <option value="4" selected>Semínima (♩)</option>
@@ -96,21 +92,21 @@
                     </select>
                 </div>
             </div>
-            <div id="figure-palette" class="flex flex-wrap gap-2 sm:gap-3 mb-5 justify-center"></div>
+            <div id="figure-palette" class="flex flex-wrap gap-2 sm:gap-3 mb-5 justify-center p-3 bg-slate-900/50 rounded-lg border border-slate-700"></div>
             <div class="flex flex-wrap gap-3 justify-center">
-                <button id="clear-custom-rhythm" class="btn-action btn-clear">Limpar Ritmo</button>
-                <button id="delete-selected-figure-button" class="btn-action btn-delete-fig hidden">Apagar Selecionada</button>
+                <button id="clear-custom-rhythm" class="btn-action btn-clear">Limpar</button>
+                <button id="delete-selected-figure-button" class="btn-action btn-delete-fig hidden">Apagar</button>
             </div>
             <div class="flex flex-wrap gap-3 justify-center mt-4">
-                <button id="save-rhythm-button" class="btn-action bg-blue-500 hover:bg-blue-600 hidden">Salvar Criação</button>
-                <button id="load-rhythms-button" class="btn-action bg-gray-500 hover:bg-gray-600 hidden">Minhas Criações</button>
+                <button id="save-rhythm-button" class="btn-action btn-save hidden">Salvar</button>
+                <button id="load-rhythms-button" class="btn-action btn-load hidden">Carregar</button>
             </div>
         </div>
-
+        
         <div id="countdown-display" class="text-center mb-2"></div>
-        <div id="rhythm-display-container" class="mt-0 p-4 border-2 border-dashed border-slate-300 rounded-xl min-h-[220px] bg-white/20 backdrop-blur-sm shadow-inner overflow-x-auto mb-10">
+        <div id="rhythm-display-container">
             <div id="rhythm-display" class="flex items-end flex-wrap">
-                <p class="text-slate-500 text-center w-full text-lg self-center">Selecione uma lição ou mude para Criação Livre.</p>
+                <p class="text-slate-400 text-center w-full text-lg self-center">Selecione uma lição ou mude para o modo de Criação Livre.</p>
             </div>
         </div>
 
@@ -119,19 +115,19 @@
             <div id="figure-legend-content"></div>
         </div>
 
-        <div id="message-area" class="mt-5 text-center text-sm text-purple-700 h-6 font-medium"></div>
+        <div id="message-area" class="mt-5 text-center text-sm text-purple-300 h-6 font-medium"></div>
 
         <div class="panel mt-8 flex flex-wrap gap-3 justify-center">
-            <button id="login-button" class="btn-action bg-indigo-600 hover:bg-indigo-700">Login</button>
-            <button id="logout-button" class="btn-action bg-red-600 hover:bg-red-700 hidden">Logout</button>
-            <button id="export-pdf-button" class="btn-action bg-orange-500 hover:bg-orange-600">Exportar PDF</button>
-            <button id="export-wav-button" class="btn-action bg-green-500 hover:bg-green-600">Exportar WAV</button>
+            <button id="login-button" class="btn-action btn-login">Login</button>
+            <button id="logout-button" class="btn-action btn-logout hidden">Logout</button>
+            <button id="export-pdf-button" class="btn-action btn-export">Exportar PDF</button>
+            <button id="export-wav-button" class="btn-action btn-export">Exportar WAV</button>
         </div>
 
     </main>
 
     <footer class="w-full text-center py-4 mt-auto">
-        <p> © 2025 QTech Soluções Tecnológicas. Todos os direitos reservados.</p>
+        <p class="text-slate-500 text-xs">© 2025 QTech Soluções Tecnológicas. Todos os direitos reservados.</p>
     </footer>
 
 <script type="module" src="src/main.js"></script>

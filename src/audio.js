@@ -64,11 +64,7 @@ async function stopAndDownloadRecording() {
     if (recorder && recorder.state === 'recording') {
         try {
             const recording = await recorder.stop();
-            audioChunks.push(recording);
-            updateMessage("Gravação parada.");
-            
-            // Cria e baixa o arquivo de áudio
-            const blob = new Blob(audioChunks, { type: 'audio/wav' });
+            const blob = new Blob([recording], { type: 'audio/wav' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             document.body.appendChild(a);
@@ -114,8 +110,8 @@ export function stopRhythmExecution(fromPause = false) {
     if (!fromPause) {
         updateMessage("Reprodução parada.");
     }
-
-    // Para a gravação se ela estiver ativa
+    
+    // Para a gravação se ela estava ativa, e baixa o arquivo
     stopAndDownloadRecording();
 }
 
@@ -127,7 +123,10 @@ export function pauseRhythmExecution() {
         Tone.Transport.pause();
         AppState.isPlaying = false;
         updatePlaybackButtons(false);
-        enableAllControls();
+        enableAllControls(); // Reabilita controles no modo pausa
+        // Deixa os botões de play e reset ativos
+        document.getElementById('play-pause-button').disabled = false;
+        document.getElementById('reset-button').disabled = false;
         updateMessage("Pausado.");
     }
 }
@@ -137,9 +136,12 @@ export function pauseRhythmExecution() {
  */
 export function resumeRhythmExecution() {
     if (!AppState.isPlaying && Tone.Transport.state === 'paused') {
+        disablePlaybackControls(); // Desabilita os outros controles
+        document.getElementById('play-pause-button').disabled = false;
+        document.getElementById('reset-button').disabled = false;
+        
         AppState.isPlaying = true;
         updatePlaybackButtons(true);
-        disablePlaybackControls();
         Tone.Transport.start();
         updateMessage("Tocando...");
     }
@@ -151,20 +153,17 @@ export function resumeRhythmExecution() {
 export async function startCountdownAndPlay() {
     if (AppState.isPlaying || AppState.isCountingDown) return;
 
-    disablePlaybackControls();
+    disablePlaybackControls(); // Desabilita tudo inicialmente
 
     try {
         if (Tone.context.state !== 'running') await Tone.start();
         initializeSynths();
-        if (!AppState.synths.noteSynth || !AppState.synths.metronomeSynth) {
-            throw new Error("Sintetizadores não iniciados.");
-        }
-
-        await startRecording(); // Inicia a gravação
+        
+        await startRecording();
 
         AppState.isCountingDown = true;
         updateMessage("Preparando...");
-        stopRhythmExecution(true); // Limpa agendamentos anteriores sem parar a gravação
+        stopRhythmExecution(true); // Limpa agendamentos anteriores
 
         const userInputBpm = parseInt(document.getElementById('tempo-display').textContent);
         const { beats, beatType } = AppState.activeTimeSignature;
@@ -192,8 +191,8 @@ export async function startCountdownAndPlay() {
                 AppState.isCountingDown = false;
                 AppState.isPlaying = true;
                 updatePlaybackButtons(true);
-                // Habilita apenas os botões de pause e reset durante a execução
-                playPauseButton.disabled = false;
+                // Reabilita apenas os botões de pause e reset durante a execução
+                document.getElementById('play-pause-button').disabled = false;
                 document.getElementById('reset-button').disabled = false;
                 updateMessage("Tocando...");
             }, t);
@@ -218,10 +217,9 @@ function processPatternForPlayback(pattern) {
     let repeatSection = [];
     let inRepeat = false;
 
-    // Faz uma cópia profunda para poder modificar com segurança
     const patternCopy = JSON.parse(JSON.stringify(pattern));
 
-    // Primeiro, calcula as durações das ligaduras
+    // Primeiro, calcula as durações totais das ligaduras
     for (let i = 0; i < patternCopy.length; i++) {
         const item = patternCopy[i];
         if (item.tiedToNext) {
@@ -235,21 +233,21 @@ function processPatternForPlayback(pattern) {
         }
     }
     
-    // Agora, processa repetições
+    // Agora, processa as repetições
     patternCopy.forEach((item, index) => {
         const event = { item, originalIndex: index };
 
         if (item.type === 'repeat_start') {
             inRepeat = true;
-            repeatSection = [];
-            return;
+            repeatSection = []; // Começa a gravar a seção de repetição
+            return; // Não adiciona o símbolo de início à fila de playback
         }
 
         if (item.type === 'repeat_end') {
-            playbackQueue.push(...repeatSection);
+            playbackQueue.push(...repeatSection); // Adiciona a seção gravada à fila
             inRepeat = false;
             repeatSection = [];
-            return;
+            return; // Não adiciona o símbolo de fim à fila
         }
         
         playbackQueue.push(event);
@@ -269,30 +267,50 @@ function processPatternForPlayback(pattern) {
 function schedulePlayback(offset = 0) {
     const playbackQueue = processPatternForPlayback(AppState.activePattern);
     let currentTime = offset;
+    const tolerance = 0.001;
+    const singleBeatDuration = Tone.Time(`${AppState.activeTimeSignature.beatType}n`).toSeconds();
 
     playbackQueue.forEach(event => {
         const { item, originalIndex } = event;
+        const beatValue = getBeatValue(item.duration, AppState.activeTimeSignature);
+        const baseDurationSeconds = singleBeatDuration * beatValue;
 
-        // Pula agendamento de áudio para notas que são continuação de ligadura
         if (item.isTiedContinuation) {
-            return;
-        }
-        
-        const baseDurationSeconds = Tone.Time(`${AppState.activeTimeSignature.beatType}n`).toSeconds() * getBeatValue(item.duration, AppState.activeTimeSignature);
-        const soundDurationSeconds = Tone.Time(`${AppState.activeTimeSignature.beatType}n`).toSeconds() * getBeatValue(item.totalTiedDuration || item.duration, AppState.activeTimeSignature);
-        
-        // Agenda o destaque visual
-        AppState.transportEventIds.push(Tone.Transport.scheduleOnce(t => {
-            Tone.Draw.schedule(() => highlightActiveVisualElement(originalIndex), t);
-        }, currentTime));
-
-        // Agenda o som da nota
-        if (item.type === 'note') {
+            // Para a continuação de uma ligadura, agendamos apenas o destaque visual do elemento.
+            // O som já foi iniciado pela nota original da ligadura.
             AppState.transportEventIds.push(Tone.Transport.scheduleOnce(t => {
-                AppState.synths.noteSynth.triggerAttackRelease("C4", soundDurationSeconds, t);
+                Tone.Draw.schedule(() => highlightActiveVisualElement(originalIndex, null), t);
             }, currentTime));
+        } else {
+            // Para uma nota normal ou o início de uma ligadura
+
+            // Agenda o som da nota
+            const soundDurationSeconds = singleBeatDuration * getBeatValue(item.totalTiedDuration || item.duration, AppState.activeTimeSignature);
+            if (item.type === 'note') {
+                AppState.transportEventIds.push(Tone.Transport.scheduleOnce(t => {
+                    AppState.synths.noteSynth.triggerAttackRelease("C4", soundDurationSeconds, t);
+                }, currentTime));
+            }
+            
+            // Agenda o destaque para cada tempo individual dentro da nota
+            if (beatValue >= 1 && Math.abs(beatValue - Math.round(beatValue)) < tolerance) {
+                const numBeats = Math.round(beatValue);
+                for (let i = 0; i < numBeats; i++) {
+                    const beatTime = currentTime + (i * singleBeatDuration);
+                    AppState.transportEventIds.push(Tone.Transport.scheduleOnce(t => {
+                        // Passa o índice do padrão e o índice do tempo dentro da figura
+                        Tone.Draw.schedule(() => highlightActiveVisualElement(originalIndex, i), t);
+                    }, beatTime));
+                }
+            } else {
+                // Para notas com menos de 1 tempo, acende o primeiro (e único) número (índice 0)
+                 AppState.transportEventIds.push(Tone.Transport.scheduleOnce(t => {
+                    Tone.Draw.schedule(() => highlightActiveVisualElement(originalIndex, 0), t);
+                }, currentTime));
+            }
         }
         
+        // Avança o tempo de agendamento pela duração base da figura atual
         currentTime += baseDurationSeconds;
     });
 
@@ -317,8 +335,13 @@ function scheduleMetronome() {
     for (let i = 0; i < beats; i++) {
         const time = Tone.Time(beatDurationNotation).toSeconds() * i;
         let note = "C5"; // Click fraco
+
         if (isCompound) {
-            if (i % 3 === 0) note = "G5"; // Click forte no tempo principal
+            if (i % 3 === 0) {
+                note = "G5"; // Click forte no tempo principal
+            } else {
+                note = "C4"; // Click de subdivisão
+            }
         } else {
             if (i === 0) note = "G5"; // Click forte no tempo 1
         }

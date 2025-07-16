@@ -41,33 +41,50 @@ export function updatePlaybackButtons(isPlaying) {
     playPauseButton.classList.toggle('btn-pause', isPlaying);
 }
 
+// CORRIGIDO: Funções de controle dos botões
 export function enableAllControls() {
     document.querySelectorAll('button, select').forEach(el => el.disabled = false);
     deleteSelectedFigureButton.classList.toggle('hidden', AppState.selectedIndexForEditing === null);
-    updateLoginUI(); // Reavalia os botões de login
+    updateLoginUI();
 }
 
 export function disablePlaybackControls() {
     document.querySelectorAll('button, select').forEach(el => el.disabled = true);
-    // Botões que permanecem ativos durante o playback
-    if (playPauseButton) playPauseButton.disabled = false;
-    if (resetButton) resetButton.disabled = false;
 }
 
-export function highlightActiveVisualElement(patternIndex) {
-    document.querySelectorAll('.figure-container[data-pattern-index]').forEach(el => el.classList.remove('highlight'));
+
+export function highlightActiveVisualElement(patternIndex, activeBeatIndex = null) {
+    // Limpa destaques anteriores
+    document.querySelectorAll('.figure-container.highlight').forEach(el => el.classList.remove('highlight'));
+    document.querySelectorAll('.beat-active').forEach(el => el.classList.remove('beat-active'));
+
     if (patternIndex !== null) {
         const currentFigureContainer = document.querySelector(`.figure-container[data-pattern-index="${patternIndex}"]`);
         if (currentFigureContainer) {
             currentFigureContainer.classList.add('highlight');
-            currentFigureContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            
+            // NOVO: Ativa o número do tempo específico
+            if (activeBeatIndex !== null) {
+                const beatSpan = currentFigureContainer.querySelector(`span[data-beat-index="${activeBeatIndex}"]`);
+                if (beatSpan) {
+                    beatSpan.classList.add('beat-active');
+                }
+            }
+            
+            // Só faz scroll se o elemento não estiver visível
+            const rect = currentFigureContainer.getBoundingClientRect();
+            const rhythmDisplayRect = rhythmDisplayEl.parentElement.getBoundingClientRect();
+            if (rect.left < rhythmDisplayRect.left || rect.right > rhythmDisplayRect.right) {
+                 currentFigureContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
         }
     }
 }
 
+
 export function renderRhythm() {
-    rhythmDisplayEl.className = 'flex items-end flex-wrap';
     rhythmDisplayEl.innerHTML = '';
+    rhythmDisplayEl.className = 'flex items-end flex-wrap';
 
     const tsContainer = document.createElement('div');
     tsContainer.className = 'figure-container';
@@ -75,8 +92,8 @@ export function renderRhythm() {
     rhythmDisplayEl.appendChild(tsContainer);
 
     if (AppState.activePattern.length === 0) {
-        rhythmDisplayEl.className = 'flex justify-center items-center h-full min-h-[150px]';
-        rhythmDisplayEl.innerHTML = `<p class="text-slate-500 text-lg">Selecione uma lição ou comece a criar.</p>`;
+        rhythmDisplayEl.className += ' justify-center items-center';
+        rhythmDisplayEl.innerHTML = `<p class="text-slate-400 text-lg">Selecione uma lição ou comece a criar.</p>`;
         deleteSelectedFigureButton.classList.add('hidden');
         return;
     }
@@ -94,8 +111,6 @@ export function renderRhythm() {
 
         if (item.isControl) {
             figureContainer.dataset.isControl = "true";
-            if (item.type === 'final_barline') figureContainer.classList.add('final-barline-visual-style');
-            else if (item.type === 'repeat_start' || item.type === 'repeat_end') figureContainer.classList.add('repeat-barline-visual-style');
         }
 
         if (AppState.selectedIndexForEditing === index) figureContainer.classList.add('selected-for-edit');
@@ -105,24 +120,32 @@ export function renderRhythm() {
 
         const beatCounterElement = document.createElement('div');
         beatCounterElement.className = 'beat-counter-text';
+
+        // NOVO: Lógica para renderizar spans individuais para os números
         if (!item.isControl) {
             const startBeat = currentBeatsInMeasure + 1;
             if (beatValue >= 1 && Math.abs(beatValue - Math.round(beatValue)) < tolerance) {
                 const beatsArray = Array.from({ length: Math.round(beatValue) }, (_, i) => Math.floor(startBeat) + i);
-                beatCounterElement.textContent = beatsArray.join(' ');
+                let beatSpansHTML = '';
+                beatsArray.forEach((beatNum, beatIndex) => {
+                    beatSpansHTML += `<span data-beat-index="${beatIndex}">${beatNum}</span>`;
+                });
+                beatCounterElement.innerHTML = beatSpansHTML;
             } else {
-                const beatNumber = Math.floor(currentBeatsInMeasure) + 1;
-                const subBeatPosition = currentBeatsInMeasure - Math.floor(currentBeatsInMeasure);
-                if (subBeatPosition < tolerance) beatCounterElement.textContent = beatNumber;
-                else if (Math.abs(subBeatPosition - 0.25) < tolerance) beatCounterElement.textContent = 'e';
-                else if (Math.abs(subBeatPosition - 0.5) < tolerance) beatCounterElement.textContent = '+';
-                else if (Math.abs(subBeatPosition - 0.75) < tolerance) beatCounterElement.textContent = 'a';
-                else beatCounterElement.textContent = beatNumber;
+                 const beatNumber = Math.floor(currentBeatsInMeasure) + 1;
+                 const subBeatPosition = currentBeatsInMeasure - Math.floor(currentBeatsInMeasure);
+                 if (subBeatPosition < tolerance) beatCounterElement.innerHTML = `<span data-beat-index="0">${beatNumber}</span>`;
+                 else if (Math.abs(subBeatPosition - 0.25) < tolerance) beatCounterElement.textContent = 'e';
+                 else if (Math.abs(subBeatPosition - 0.5) < tolerance) beatCounterElement.textContent = '+';
+                 else if (Math.abs(subBeatPosition - 0.75) < tolerance) beatCounterElement.textContent = 'a';
+                 else beatCounterElement.innerHTML = `<span data-beat-index="0">${beatNumber}</span>`;
             }
+        } else {
+             beatCounterElement.innerHTML = '&nbsp;';
         }
 
         const noteItemElement = document.createElement('div');
-        noteItemElement.className = `note-item p-3 sm:p-4 rounded-lg shadow min-w-[45px] sm:min-w-[55px] ${item.type === 'note' ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-700'}`;
+        noteItemElement.className = `note-item ${item.type === 'note' ? 'bg-blue-500' : 'bg-gray-300'}`;
         noteItemElement.textContent = item.symbol;
 
         const syllableElement = document.createElement('div');
@@ -130,13 +153,6 @@ export function renderRhythm() {
         syllableElement.innerHTML = item.syllable || '&nbsp;';
 
         figureContainer.append(beatCounterElement, noteItemElement, syllableElement);
-
-        if (item.tiedToNext) {
-            const tieArc = document.createElement('div');
-            tieArc.className = 'tie-arc'; // Classe para estilizar a ligadura no CSS
-            figureContainer.appendChild(tieArc);
-        }
-
         rhythmDisplayEl.appendChild(figureContainer);
 
         if (!item.isControl) currentBeatsInMeasure += beatValue;

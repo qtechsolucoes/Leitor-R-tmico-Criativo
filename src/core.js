@@ -45,11 +45,16 @@ function assignSyllablesToPattern(pattern) {
             i++;
             continue;
         }
+
+        if (currentFig.type === 'rest') {
+            currentFig.syllable = 'Silêncio';
+            i++;
+            continue;
+        }
         
-        // Lógica de sílabas para notas longas e pausas
+        // Lógica de sílabas para notas longas
         if (currentFig.duration >= 1) {
-            if (currentFig.type === 'rest') currentFig.syllable = '&nbsp;'; // Pausas não têm sílaba
-            else if (currentFig.duration === 4) currentFig.syllable = 'Tá-a-a-a';
+            if (currentFig.duration === 4) currentFig.syllable = 'Tá-a-a-a';
             else if (currentFig.duration === 3) currentFig.syllable = 'Tá-a-a';
             else if (currentFig.duration === 2) currentFig.syllable = 'Tá-a';
             else if (currentFig.duration === 1.5) currentFig.syllable = 'Tā-a';
@@ -77,14 +82,16 @@ function assignSyllablesToPattern(pattern) {
             i = j;
         } else {
              if (currentFig.type === 'note' && !currentFig.syllable) {
-                currentFig.syllable = 'Tá';
+                if (currentFig.duration === 0.75) currentFig.syllable = 'Tā-i';
+                else if (currentFig.duration === 0.5) currentFig.syllable = 'Ta';
+                else if (currentFig.duration === 0.25) currentFig.syllable = 'Ti';
+                else currentFig.syllable = 'Tá';
              }
              i++;
         }
     }
     return newPattern;
 }
-
 
 /**
  * Função central que atualiza o padrão rítmico ativo e a fórmula de compasso.
@@ -107,7 +114,7 @@ export function updateActivePatternAndTimeSignature() {
     
     document.getElementById('time-signature-display').textContent = `${AppState.activeTimeSignature.beats}/${AppState.activeTimeSignature.beatType}`;
     
-    // As chamadas de renderização e legenda agora são feitas pelo event handler
+    // As chamadas de renderização e legenda são feitas pelo event handler/switchMode
 }
 
 /**
@@ -155,6 +162,11 @@ export function handlePaletteFigureClick(figure) {
     const tempPattern = JSON.parse(JSON.stringify(AppState.customPattern));
 
     if (AppState.selectedIndexForEditing !== null) {
+        // Se a nota substituída era uma ligadura, a próxima deve perder o status de continuação
+        const oldItem = tempPattern[AppState.selectedIndexForEditing];
+        if (oldItem.tiedToNext && (AppState.selectedIndexForEditing + 1) < tempPattern.length) {
+            tempPattern[AppState.selectedIndexForEditing + 1].isTiedContinuation = false;
+        }
         tempPattern.splice(AppState.selectedIndexForEditing, 1, figure);
     } else {
         tempPattern.push(figure);
