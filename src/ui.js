@@ -5,11 +5,6 @@ import { rhythmicFigures, lessons } from './config.js';
 import { getBeatValue, getDurationText, handlePaletteFigureClick, handleFigureSelectionForEditing } from './core.js';
 
 // --- Elementos do DOM ---
-const modeSelect = document.getElementById('mode-select');
-const lessonSelect = document.getElementById('lesson-select');
-const timeSignatureDisplay = document.getElementById('time-signature-display');
-const playPauseButton = document.getElementById('play-pause-button');
-const resetButton = document.getElementById('reset-button');
 const rhythmDisplayEl = document.getElementById('rhythm-display');
 const customRhythmCreatorDiv = document.getElementById('custom-rhythm-creator');
 const lessonSelectorContainer = document.getElementById('lesson-selector-container');
@@ -18,12 +13,17 @@ const deleteSelectedFigureButton = document.getElementById('delete-selected-figu
 const messageArea = document.getElementById('message-area');
 const countdownDisplay = document.getElementById('countdown-display');
 const figureLegendContainer = document.getElementById('figure-legend-container');
-
-// Elementos para login e exportação
+const playPauseButton = document.getElementById('play-pause-button');
 const loginButton = document.getElementById('login-button');
 const logoutButton = document.getElementById('logout-button');
 const saveRhythmButton = document.getElementById('save-rhythm-button');
 const loadRhythmsButton = document.getElementById('load-rhythms-button');
+
+// Esconde o select nativo que serve de fallback
+const nativeLessonSelect = document.getElementById('lesson-select');
+if (nativeLessonSelect) {
+    nativeLessonSelect.classList.add('hidden-native-select');
+}
 
 // --- Funções de Manipulação da UI Exportadas ---
 
@@ -36,25 +36,38 @@ export function updateCountdownDisplay(text) {
 }
 
 export function updatePlaybackButtons(isPlaying) {
-    playPauseButton.textContent = isPlaying ? 'Pausar' : 'Tocar';
-    playPauseButton.classList.toggle('btn-play', !isPlaying);
-    playPauseButton.classList.toggle('btn-pause', isPlaying);
+    if (isPlaying) {
+        playPauseButton.innerHTML = `<i class="fas fa-pause"></i> Pausar`;
+        playPauseButton.classList.remove('btn-play');
+        playPauseButton.classList.add('btn-pause');
+    } else {
+        playPauseButton.innerHTML = `<i class="fas fa-play"></i> Tocar`;
+        playPauseButton.classList.remove('btn-pause');
+        playPauseButton.classList.add('btn-play');
+    }
 }
 
-// CORRIGIDO: Funções de controle dos botões
 export function enableAllControls() {
-    document.querySelectorAll('button, select').forEach(el => el.disabled = false);
+    document.querySelectorAll('button, select, input').forEach(el => el.disabled = false);
     deleteSelectedFigureButton.classList.toggle('hidden', AppState.selectedIndexForEditing === null);
     updateLoginUI();
 }
 
-export function disablePlaybackControls() {
-    document.querySelectorAll('button, select').forEach(el => el.disabled = true);
+export function disablePlaybackControls(keepPlaybackButtonsEnabled = false) {
+    document.querySelectorAll('button, select, input').forEach(el => {
+        // Mantém os controlos principais de reprodução e tempo sempre ativos se `keepPlaybackButtonsEnabled` for verdadeiro
+        if (keepPlaybackButtonsEnabled && (el.id === 'play-pause-button' || el.id === 'reset-button' || el.id.includes('tempo'))) {
+            el.disabled = false;
+        } else {
+            el.disabled = true;
+        }
+    });
+    // Garante que os botões de play/pause/reset sejam reativados após a contagem
+    playPauseButton.disabled = false;
+    document.getElementById('reset-button').disabled = false;
 }
 
-
 export function highlightActiveVisualElement(patternIndex, activeBeatIndex = null) {
-    // Limpa destaques anteriores
     document.querySelectorAll('.figure-container.highlight').forEach(el => el.classList.remove('highlight'));
     document.querySelectorAll('.beat-active').forEach(el => el.classList.remove('beat-active'));
 
@@ -63,56 +76,57 @@ export function highlightActiveVisualElement(patternIndex, activeBeatIndex = nul
         if (currentFigureContainer) {
             currentFigureContainer.classList.add('highlight');
             
-            // NOVO: Ativa o número do tempo específico
             if (activeBeatIndex !== null) {
                 const beatSpan = currentFigureContainer.querySelector(`span[data-beat-index="${activeBeatIndex}"]`);
-                if (beatSpan) {
-                    beatSpan.classList.add('beat-active');
-                }
+                if (beatSpan) beatSpan.classList.add('beat-active');
             }
             
-            // Só faz scroll se o elemento não estiver visível
             const rect = currentFigureContainer.getBoundingClientRect();
             const rhythmDisplayRect = rhythmDisplayEl.parentElement.getBoundingClientRect();
-            if (rect.left < rhythmDisplayRect.left || rect.right > rhythmDisplayRect.right) {
-                 currentFigureContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            if (rect.top < rhythmDisplayRect.top || rect.bottom > rhythmDisplayRect.bottom) {
+                 currentFigureContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         }
     }
 }
 
+function drawTie(startEl, endEl) {
+    const tie = document.createElement('div');
+    tie.className = 'tie';
+    const startRect = startEl.getBoundingClientRect();
+    const endRect = endEl.getBoundingClientRect();
+    const displayRect = rhythmDisplayEl.getBoundingClientRect();
+    const left = startRect.left - displayRect.left + (startRect.width / 2);
+    const width = endRect.left - startRect.left;
+    tie.style.left = `${left}px`;
+    tie.style.width = `${width}px`;
+    rhythmDisplayEl.appendChild(tie);
+}
 
 export function renderRhythm() {
     rhythmDisplayEl.innerHTML = '';
-    rhythmDisplayEl.className = 'flex items-end flex-wrap';
-
-    const tsContainer = document.createElement('div');
-    tsContainer.className = 'figure-container';
-    tsContainer.innerHTML = `<div class="beat-counter-text">&nbsp;</div><div class="time-signature-item p-2 sm:p-3 text-3xl sm:text-4xl font-bold text-slate-700 flex flex-col justify-center items-center"><span>${AppState.activeTimeSignature.beats}</span><span>${AppState.activeTimeSignature.beatType}</span></div><div>&nbsp;</div>`;
-    rhythmDisplayEl.appendChild(tsContainer);
-
-    if (AppState.activePattern.length === 0) {
-        rhythmDisplayEl.className += ' justify-center items-center';
-        rhythmDisplayEl.innerHTML = `<p class="text-slate-400 text-lg">Selecione uma lição ou comece a criar.</p>`;
+    
+    if (AppState.activePattern.length === 0 && AppState.currentMode === 'freeCreate') {
+        rhythmDisplayEl.innerHTML = `<p class="text-slate-400 text-center w-full text-lg self-center">Comece a adicionar figuras no Painel de Criação.</p>`;
         deleteSelectedFigureButton.classList.add('hidden');
         return;
     }
 
     let currentBeatsInMeasure = 0;
+    const timeSig = AppState.activeTimeSignature;
+    const totalMeasureBeats = parseFloat(timeSig.beats);
+    const beatUnit = 4 / timeSig.beatType;
     const tolerance = 0.001;
 
     AppState.activePattern.forEach((item, index) => {
         if (item.isTiedContinuation) return;
 
-        const beatValue = getBeatValue(item.duration, AppState.activeTimeSignature);
+        const beatValue = getBeatValue(item.duration, timeSig);
         const figureContainer = document.createElement('div');
         figureContainer.className = 'figure-container';
         figureContainer.dataset.patternIndex = index;
 
-        if (item.isControl) {
-            figureContainer.dataset.isControl = "true";
-        }
-
+        if (item.isControl) figureContainer.dataset.isControl = "true";
         if (AppState.selectedIndexForEditing === index) figureContainer.classList.add('selected-for-edit');
         if (AppState.currentMode === 'freeCreate') {
             figureContainer.addEventListener('click', () => handleFigureSelectionForEditing(index));
@@ -121,7 +135,6 @@ export function renderRhythm() {
         const beatCounterElement = document.createElement('div');
         beatCounterElement.className = 'beat-counter-text';
 
-        // NOVO: Lógica para renderizar spans individuais para os números
         if (!item.isControl) {
             const startBeat = currentBeatsInMeasure + 1;
             if (beatValue >= 1 && Math.abs(beatValue - Math.round(beatValue)) < tolerance) {
@@ -135,9 +148,9 @@ export function renderRhythm() {
                  const beatNumber = Math.floor(currentBeatsInMeasure) + 1;
                  const subBeatPosition = currentBeatsInMeasure - Math.floor(currentBeatsInMeasure);
                  if (subBeatPosition < tolerance) beatCounterElement.innerHTML = `<span data-beat-index="0">${beatNumber}</span>`;
-                 else if (Math.abs(subBeatPosition - 0.25) < tolerance) beatCounterElement.textContent = 'e';
-                 else if (Math.abs(subBeatPosition - 0.5) < tolerance) beatCounterElement.textContent = '+';
-                 else if (Math.abs(subBeatPosition - 0.75) < tolerance) beatCounterElement.textContent = 'a';
+                 else if (Math.abs(subBeatPosition - 0.25) < tolerance) beatCounterElement.innerHTML = `<span data-beat-index="0">e</span>`;
+                 else if (Math.abs(subBeatPosition - 0.5) < tolerance) beatCounterElement.innerHTML = `<span data-beat-index="0">+</span>`;
+                 else if (Math.abs(subBeatPosition - 0.75) < tolerance) beatCounterElement.innerHTML = `<span data-beat-index="0">a</span>`;
                  else beatCounterElement.innerHTML = `<span data-beat-index="0">${beatNumber}</span>`;
             }
         } else {
@@ -145,25 +158,38 @@ export function renderRhythm() {
         }
 
         const noteItemElement = document.createElement('div');
+        noteItemElement.id = `figure-${index}`;
         noteItemElement.className = `note-item ${item.type === 'note' ? 'bg-blue-500' : 'bg-gray-300'}`;
         noteItemElement.textContent = item.symbol;
 
         const syllableElement = document.createElement('div');
         syllableElement.className = 'syllable-text';
         syllableElement.innerHTML = item.syllable || '&nbsp;';
-
+        
         figureContainer.append(beatCounterElement, noteItemElement, syllableElement);
         rhythmDisplayEl.appendChild(figureContainer);
 
         if (!item.isControl) currentBeatsInMeasure += beatValue;
 
-        if (Math.abs(currentBeatsInMeasure - AppState.activeTimeSignature.beats) < tolerance) {
+        if (Math.abs(currentBeatsInMeasure - totalMeasureBeats) < tolerance) {
              if (index < AppState.activePattern.length - 1 && !AppState.activePattern[index + 1]?.isControl) {
                  rhythmDisplayEl.insertAdjacentHTML('beforeend', `<div class="barline-container"><div class="barline-item"></div></div>`);
              }
              currentBeatsInMeasure = 0;
-        } else if (currentBeatsInMeasure > AppState.activeTimeSignature.beats + tolerance) {
-             currentBeatsInMeasure %= AppState.activeTimeSignature.beats;
+        } else if (currentBeatsInMeasure > totalMeasureBeats + tolerance) {
+             currentBeatsInMeasure %= totalMeasureBeats;
+        }
+    });
+
+    AppState.activePattern.forEach((item, index) => {
+        if (item.tiedToNext && index + 1 < AppState.activePattern.length) {
+            const startEl = document.getElementById(`figure-${index}`);
+            let nextVisibleIndex = index + 1;
+            while (AppState.activePattern[nextVisibleIndex] && AppState.activePattern[nextVisibleIndex].isTiedContinuation) {
+                nextVisibleIndex++;
+            }
+            const endEl = document.getElementById(`figure-${nextVisibleIndex}`);
+            if (startEl && endEl) drawTie(startEl, endEl);
         }
     });
 
@@ -175,46 +201,64 @@ export function switchMode(mode) {
     AppState.selectedIndexForEditing = null;
     const isLessonMode = mode === 'lessons';
     
-    lessonSelectorContainer.classList.toggle('hidden', !isLessonMode);
+    lessonSelectorContainer.style.display = isLessonMode ? 'block' : 'none';
     customRhythmCreatorDiv.classList.toggle('hidden', isLessonMode);
     figureLegendContainer.classList.toggle('hidden', !isLessonMode);
     rhythmDisplayEl.classList.toggle('edit-mode', !isLessonMode);
     
-    updateMessage(isLessonMode ? "Modo de Lições. Escolha uma lição." : "Modo de Criação Livre.");
+    updateMessage(isLessonMode ? "Selecione uma lição na lista." : "Modo de Criação Livre ativado.");
+    //stopRhythmExecution();
     updateActivePatternAndTimeSignature();
     renderRhythm();
-    if(isLessonMode) populateFigureLegend();
+    if (isLessonMode) {
+        populateFigureLegend();
+    }
 }
 
-export function populateLessonSelect() {
-    lessonSelect.innerHTML = ''; 
+export function populateCustomLessonDropdown() {
+    const customOptionsContainer = document.querySelector('.custom-options');
+    if (!customOptionsContainer) return;
+    customOptionsContainer.innerHTML = '';
     lessons.forEach((lesson, index) => {
-        const option = document.createElement('option');
-        option.value = index;
-        option.textContent = lesson.name;
-        lessonSelect.appendChild(option);
+        const optionEl = document.createElement('span');
+        optionEl.className = 'custom-option';
+        optionEl.textContent = lesson.name;
+        optionEl.dataset.value = index;
+        customOptionsContainer.appendChild(optionEl);
     });
+}
+
+export function updateCustomDropdownTrigger(text) {
+    const trigger = document.querySelector('.custom-select-trigger');
+    if (trigger) trigger.textContent = text;
 }
 
 export function populateFigureLegend() {
     const content = document.getElementById('figure-legend-content');
     if (!content) return;
     content.innerHTML = '';
-    const uniqueFigures = [...new Map(AppState.activePattern.filter(item => !item.isControl).map(item => [JSON.stringify([item.symbol, item.duration]), item])).values()];
+    const uniqueFigures = [...new Map(AppState.activePattern.filter(item => !item.isControl && !item.isTiedContinuation).map(item => [JSON.stringify([item.symbol, item.duration]), item])).values()];
     
     uniqueFigures.forEach(fig => {
         const figureDef = rhythmicFigures.find(rf => rf.symbol === fig.symbol && rf.duration === fig.duration);
         if(!figureDef) return;
         const beatValue = getBeatValue(fig.duration, AppState.activeTimeSignature);
-        content.insertAdjacentHTML('beforeend', `<div class="legend-item"><span class="legend-symbol">${fig.symbol}</span><span class="legend-name">${figureDef.name} - Dura ${getDurationText(beatValue)}</span></div>`);
+        content.insertAdjacentHTML('beforeend', `<div class="legend-item"><span class="legend-symbol">${fig.symbol}</span><span class="legend-name">${figureDef.name} - ${getDurationText(beatValue)}</span></div>`);
     });
 }
 
 export function populateFigurePalette() {
-    figurePaletteDiv.innerHTML = ''; 
+    figurePaletteDiv.innerHTML = '';
+    const tieButton = document.createElement('button');
+    tieButton.className = 'figure-button';
+    tieButton.innerHTML = '&#9900;';
+    tieButton.title = 'Ligadura';
+    tieButton.addEventListener('click', () => handlePaletteFigureClick({name: 'Ligadura'}));
+    figurePaletteDiv.appendChild(tieButton);
+
     rhythmicFigures.forEach(fig => {
         const button = document.createElement('button');
-        button.className = 'figure-button p-2.5 sm:p-3 rounded-lg shadow text-2xl sm:text-3xl transition-all duration-150 ease-in-out';
+        button.className = 'figure-button';
         if (fig.isControl) button.classList.add('figure-button-control');
         button.textContent = fig.symbol;
         button.title = fig.name;
@@ -225,8 +269,8 @@ export function populateFigurePalette() {
 
 export function updateLoginUI() {
     const isLoggedIn = !!AppState.user.currentUser;
-    if (loginButton) loginButton.classList.toggle('hidden', isLoggedIn);
-    if (logoutButton) logoutButton.classList.toggle('hidden', !isLoggedIn);
-    if (saveRhythmButton) saveRhythmButton.classList.toggle('hidden', !isLoggedIn);
-    if (loadRhythmsButton) loadRhythmsButton.classList.toggle('hidden', !isLoggedIn);
+    loginButton.classList.toggle('hidden', isLoggedIn);
+    logoutButton.classList.toggle('hidden', !isLoggedIn);
+    saveRhythmButton.classList.toggle('hidden', !isLoggedIn || AppState.currentMode !== 'freeCreate');
+    loadRhythmsButton.classList.toggle('hidden', !isLoggedIn || AppState.currentMode !== 'freeCreate');
 }

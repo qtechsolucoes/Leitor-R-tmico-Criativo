@@ -2,8 +2,8 @@
 
 import { AppState } from './state.js';
 import { updateActivePatternAndTimeSignature, handlePaletteFigureClick, handleFigureSelectionForEditing } from './core.js';
-import { switchMode, renderRhythm, updateMessage, populateFigurePalette, updateLoginUI } from './ui.js';
-import { startCountdownAndPlay, pauseRhythmExecution, resumeRhythmExecution, stopRhythmExecution } from './audio.js';
+import { switchMode, renderRhythm, updateMessage, populateFigureLegend, updateLoginUI } from './ui.js';
+import { startCountdownAndPlay, togglePauseResume, stopRhythmExecution, exportWavOffline } from './audio.js';
 
 // --- Elementos do DOM ---
 const modeSelect = document.getElementById('mode-select');
@@ -17,8 +17,6 @@ const deleteSelectedFigureButton = document.getElementById('delete-selected-figu
 const clearCustomRhythmButton = document.getElementById('clear-custom-rhythm');
 const tempoIncreaseButton = document.getElementById('tempo-increase');
 const tempoDecreaseButton = document.getElementById('tempo-decrease');
-
-// Adicionando elementos do DOM para as novas funcionalidades
 const loginButton = document.getElementById('login-button');
 const logoutButton = document.getElementById('logout-button');
 const saveRhythmButton = document.getElementById('save-rhythm-button');
@@ -26,15 +24,21 @@ const loadRhythmsButton = document.getElementById('load-rhythms-button');
 const exportPdfButton = document.getElementById('export-pdf-button');
 const exportWavButton = document.getElementById('export-wav-button');
 
-// --- Funções de Mock (Simulação) ---
-function loginUser(username = "Usuário Padrão") {
-    AppState.user.currentUser = { username };
-    updateMessage(`Login como ${username}.`);
-    updateLoginUI();
+// --- Funções de Autenticação e Persistência com localStorage ---
+
+function loginUser() {
+    const username = prompt("Digite seu nome de usuário:", "Usuário Padrão");
+    if(username) {
+        AppState.user.currentUser = { username };
+        localStorage.setItem('lrc_currentUser', JSON.stringify(AppState.user.currentUser));
+        updateMessage(`Login como ${username}.`);
+        updateLoginUI();
+    }
 }
 
 function logoutUser() {
     AppState.user.currentUser = null;
+    localStorage.removeItem('lrc_currentUser');
     updateMessage("Logout efetuado.");
     updateLoginUI();
 }
@@ -47,14 +51,18 @@ function saveCurrentRhythm() {
     const rhythmName = prompt("Dê um nome para o seu ritmo:");
     if (rhythmName) {
         const username = AppState.user.currentUser.username;
-        if (!AppState.user.savedRhythms[username]) {
-            AppState.user.savedRhythms[username] = [];
+        // Carrega os ritmos salvos do localStorage
+        const savedRhythms = JSON.parse(localStorage.getItem('lrc_savedRhythms')) || {};
+        if (!savedRhythms[username]) {
+            savedRhythms[username] = [];
         }
-        AppState.user.savedRhythms[username].push({
+        savedRhythms[username].push({
             name: rhythmName,
             pattern: AppState.customPattern,
             timeSignature: AppState.activeTimeSignature
         });
+        // Salva de volta no localStorage
+        localStorage.setItem('lrc_savedRhythms', JSON.stringify(savedRhythms));
         updateMessage(`Ritmo "${rhythmName}" salvo.`);
     }
 }
@@ -65,7 +73,8 @@ function loadSavedRhythm() {
         return;
     }
     const username = AppState.user.currentUser.username;
-    const userRhythms = AppState.user.savedRhythms[username];
+    const savedRhythms = JSON.parse(localStorage.getItem('lrc_savedRhythms')) || {};
+    const userRhythms = savedRhythms[username];
 
     if (!userRhythms || userRhythms.length === 0) {
         updateMessage("Nenhum ritmo salvo.");
@@ -73,7 +82,7 @@ function loadSavedRhythm() {
     }
 
     const rhythmNames = userRhythms.map((r, i) => `${i + 1}. ${r.name}`).join('\n');
-    const choice = prompt(`Escolha um ritmo:\n${rhythmNames}\nDigite o número:`);
+    const choice = prompt(`Escolha um ritmo para carregar:\n${rhythmNames}\n\nDigite o número:`);
     const index = parseInt(choice) - 1;
 
     if (!isNaN(index) && index >= 0 && index < userRhythms.length) {
@@ -81,7 +90,9 @@ function loadSavedRhythm() {
         AppState.customPattern = JSON.parse(JSON.stringify(rhythm.pattern));
         document.getElementById('time-signature-beats').value = rhythm.timeSignature.beats;
         document.getElementById('time-signature-type').value = rhythm.timeSignature.beatType;
-        switchMode('freeCreate'); // Garante que estamos no modo correto
+        
+        switchMode('freeCreate'); 
+        
         updateActivePatternAndTimeSignature();
         renderRhythm();
         updateMessage(`Ritmo "${rhythm.name}" carregado.`);
@@ -91,29 +102,27 @@ function loadSavedRhythm() {
 }
 
 function exportToPDF() {
-    updateMessage("Funcionalidade de exportar para PDF ainda não implementada com bibliotecas externas.");
-    // A implementação real com jsPDF e html2canvas seria complexa e está além do escopo de um único arquivo.
+    updateMessage("Funcionalidade de exportar para PDF ainda não implementada.");
     console.log("Simulando exportação para PDF...");
 }
-
 
 /**
  * Configura todos os event listeners da aplicação.
  */
 export function setupEventListeners() {
-    modeSelect.addEventListener('change', (e) => {
-        switchMode(e.target.value);
-    });
+    modeSelect.addEventListener('change', (e) => switchMode(e.target.value));
 
     lessonSelect.addEventListener('change', (e) => {
         AppState.currentLessonIndex = parseInt(e.target.value);
+        stopRhythmExecution();
         updateActivePatternAndTimeSignature();
         renderRhythm();
-        populateFigureLegend(); // Atualiza a legenda ao trocar de lição
+        populateFigureLegend();
     });
 
     [timeSignatureBeats, timeSignatureType].forEach(el => el.addEventListener('change', () => {
-        if(AppState.currentMode === 'freeCreate') {
+        if (AppState.currentMode === 'freeCreate') {
+            stopRhythmExecution();
             updateActivePatternAndTimeSignature();
             renderRhythm();
         }
@@ -121,17 +130,17 @@ export function setupEventListeners() {
 
     tempoDecreaseButton.addEventListener('click', () => {
         tempoDisplay.textContent = Math.max(30, parseInt(tempoDisplay.textContent) - 5);
+        if(AppState.isPlaying) Tone.Transport.bpm.rampTo(parseInt(tempoDisplay.textContent), 0.1);
     });
 
     tempoIncreaseButton.addEventListener('click', () => {
         tempoDisplay.textContent = Math.min(280, parseInt(tempoDisplay.textContent) + 5);
+        if(AppState.isPlaying) Tone.Transport.bpm.rampTo(parseInt(tempoDisplay.textContent), 0.1);
     });
 
     playPauseButton.addEventListener('click', () => {
-        if (AppState.isPlaying) {
-            pauseRhythmExecution();
-        } else if (Tone.Transport.state === 'paused') {
-            resumeRhythmExecution();
+        if (AppState.isPlaying || Tone.Transport.state === 'paused') {
+            togglePauseResume();
         } else {
             startCountdownAndPlay();
         }
@@ -139,7 +148,6 @@ export function setupEventListeners() {
 
     resetButton.addEventListener('click', () => {
         stopRhythmExecution();
-        updateMessage("Ritmo resetado.");
     });
 
     clearCustomRhythmButton.addEventListener('click', () => {
@@ -147,38 +155,34 @@ export function setupEventListeners() {
         AppState.selectedIndexForEditing = null;
         updateActivePatternAndTimeSignature();
         renderRhythm();
-        updateMessage("Ritmo limpo.");
+        updateMessage("Padrão limpo.");
     });
 
     deleteSelectedFigureButton.addEventListener('click', () => {
         if (AppState.selectedIndexForEditing === null) return;
         
-        const deletedItem = AppState.customPattern[AppState.selectedIndexForEditing];
-        // Se a figura apagada estava ligada, a próxima perde o status de continuação
-        if (deletedItem.tiedToNext && (AppState.selectedIndexForEditing + 1) < AppState.customPattern.length) {
-            AppState.customPattern[AppState.selectedIndexForEditing + 1].isTiedContinuation = false;
+        AppState.customPattern.splice(AppState.selectedIndexForEditing, 1);
+        
+        // CORRIGIDO: Se a nota apagada era a origem de uma ligadura, a próxima nota perde o status de continuação.
+        if (AppState.customPattern[AppState.selectedIndexForEditing]?.isTiedContinuation) {
+            delete AppState.customPattern[AppState.selectedIndexForEditing].isTiedContinuation;
+        }
+        // Remove a propriedade `tiedToNext` da nota anterior se a nota apagada era o destino.
+        if(AppState.selectedIndexForEditing > 0 && AppState.customPattern[AppState.selectedIndexForEditing - 1].tiedToNext) {
+             delete AppState.customPattern[AppState.selectedIndexForEditing - 1].tiedToNext;
         }
 
-        AppState.customPattern.splice(AppState.selectedIndexForEditing, 1);
         AppState.selectedIndexForEditing = null;
         updateActivePatternAndTimeSignature();
         renderRhythm();
         updateMessage("Figura apagada.");
     });
     
-    // --- Novos Event Listeners ---
-    if(loginButton) loginButton.addEventListener('click', loginUser);
-    if(logoutButton) logoutButton.addEventListener('click', logoutUser);
-    if(saveRhythmButton) saveRhythmButton.addEventListener('click', saveCurrentRhythm);
-    if(loadRhythmsButton) loadRhythmsButton.addEventListener('click', loadSavedRhythm);
-    if(exportPdfButton) exportPdfButton.addEventListener('click', exportToPDF);
-
-    if(exportWavButton) exportWavButton.addEventListener('click', async () => {
-        if (!AppState.isPlaying && !AppState.isCountingDown) {
-            updateMessage("Iniciando gravação para WAV...");
-            await startCountdownAndPlay();
-        } else {
-            updateMessage("A reprodução já está em andamento. O WAV será gerado no final.");
-        }
-    });
+    // --- Event Listeners para Login, Save/Load e Exportação ---
+    loginButton.addEventListener('click', loginUser);
+    logoutButton.addEventListener('click', logoutUser);
+    saveRhythmButton.addEventListener('click', saveCurrentRhythm);
+    loadRhythmsButton.addEventListener('click', loadSavedRhythm);
+    exportPdfButton.addEventListener('click', exportToPDF);
+    exportWavButton.addEventListener('click', exportWavOffline);
 }

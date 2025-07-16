@@ -1,10 +1,5 @@
 // state.js
 
-/**
- * Contém todo o estado dinâmico da aplicação.
- * Qualquer variável que precise ser compartilhada e modificada
- * entre os diferentes módulos deve residir aqui.
- */
 export const AppState = {
     // Estado do modo e conteúdo
     currentMode: 'lessons', // 'lessons' ou 'freeCreate'
@@ -17,6 +12,7 @@ export const AppState = {
     // Estado do playback de áudio
     isPlaying: false,
     isCountingDown: false,
+    metronomeOnlyMode: false, // Flag para o modo metrônomo
     transportEventIds: [],
     metronomeEventId: null,
 
@@ -32,9 +28,9 @@ export const AppState = {
         audioChunks: []
     },
 
-    // Estado de autenticação e dados do usuário (para funcionalidades futuras)
+    // Estado de autenticação e dados do utilizador
     user: {
-        currentUser: null, // Ex: { username: 'nome_do_usuario' }
-        savedRhythms: {}    // Ex: { 'nome_do_usuario': [{ name: 'Meu Ritmo', pattern: [...] }] }
+        currentUser: null,
+        savedRhythms: {}
     }
 };

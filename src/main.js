@@ -1,30 +1,40 @@
 // main.js
 
 import { setupEventListeners } from './events.js';
-import { populateLessonSelect, populateFigurePalette, renderRhythm, switchMode, updateLoginUI } from './ui.js';
-import { updateActivePatternAndTimeSignature } from './core.js';
+import { populateCustomLessonDropdown, switchMode, updateLoginUI, updateCustomDropdownTrigger } from './ui.js';
+import { initializeSynths } from './audio.js';
+import { lessons } from './config.js';
 
 /**
  * Função principal que inicializa toda a aplicação.
  */
 function init() {
-    // 1. Preenche os elementos da UI com dados iniciais (lições, figuras).
-    populateLessonSelect();
-    populateFigurePalette();
-
-    // 2. Configura todos os event listeners para a interação do usuário.
-    setupEventListeners();
-
-    // 3. Define o estado inicial da UI para o modo de login.
-    updateLoginUI(); // Garante que botões de login/logout estejam no estado correto.
+    // Popula o dropdown personalizado em vez do nativo
+    populateCustomLessonDropdown();
     
-    // 4. Define o modo inicial da aplicação como 'lessons'.
+    // Configura todos os event listeners para a interação do utilizador.
+    setupEventListeners();
+    
+    // Inicializa os componentes de áudio.
+    initializeSynths(); 
+
+    // Define o estado inicial da UI para o modo de login.
+    updateLoginUI(); 
+    
+    // Define o modo inicial da aplicação como 'lessons'.
     switchMode('lessons');
 
-    // 5. Exibe a mensagem inicial de boas-vindas.
-    document.getElementById('message-area').textContent = "Bem-vindo! Selecione uma lição ou mude o modo para criar.";
+    // Define a primeira lição como padrão no dropdown personalizado
+    if (lessons.length > 0) {
+        updateCustomDropdownTrigger(lessons[0].name);
+        // Adiciona a classe 'selected' à primeira opção
+        const firstOption = document.querySelector('.custom-option[data-value="0"]');
+        if (firstOption) {
+            firstOption.classList.add('selected');
+        }
+    }
     
-    console.log("Aplicação modularizada inicializada.");
+    console.log("Aplicação 'Leitor Rítmico Criativo' (Versão Final) inicializada.");
 }
 
 // Inicia a aplicação quando o script for carregado
