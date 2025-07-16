@@ -12,7 +12,7 @@ export const AppState = {
     // Estado do playback de áudio
     isPlaying: false,
     isCountingDown: false,
-    metronomeOnlyMode: false, // Flag para o modo metrônomo
+    // A flag metronomeOnlyMode foi REMOVIDA
     transportEventIds: [],
     metronomeEventId: null,
 
@@ -20,12 +20,6 @@ export const AppState = {
     synths: {
         noteSynth: null,
         metronomeSynth: null
-    },
-
-    // Estado relacionado à gravação de áudio
-    recording: {
-        recorder: null,
-        audioChunks: []
     },
 
     // Estado de autenticação e dados do utilizador

@@ -36,13 +36,6 @@
                     <button id="play-pause-button" class="btn-action btn-play btn-main-action"><i class="fas fa-play"></i> Tocar</button>
                     <button id="reset-button" class="btn-action btn-reset btn-main-action"><i class="fas fa-undo"></i> Resetar</button>
                 </div>
-                <div class="metronome-toggle-container">
-                    <label for="metronome-only-toggle" class="text-sm">Apenas Metrônomo</label>
-                    <label class="switch">
-                        <input type="checkbox" id="metronome-only-toggle">
-                        <span class="slider round"></span>
-                    </label>
-                </div>
             </div>
 
             <div class="panel">
@@ -58,16 +51,11 @@
                     <div class="custom-select-wrapper">
                         <div id="custom-lesson-select" class="custom-select">
                             <span class="custom-select-trigger">Selecione uma lição</span>
-                            <div class="custom-options">
-                                </div>
+                            <div class="custom-options"></div>
                         </div>
                     </div>
                 </div>
-                 <div class="mb-2">
-                    <div class="block text-sm font-medium text-slate-300 mb-2 text-center">Fórmula de Compasso</div>
-                    <span id="time-signature-display" class="control-input text-center font-semibold text-cyan-300 bg-transparent py-1.5 cursor-default">4/4</span>
-                </div>
-            </div>
+                 </div>
 
             <div id="custom-rhythm-creator" class="panel hidden">
                 <h3 class="panel-title">Painel de Criação</h3>
@@ -91,30 +79,27 @@
                     <button id="delete-selected-figure-button" class="btn-action btn-delete-fig hidden">Apagar</button>
                 </div>
             </div>
-            
-            <div id="figure-legend-container" class="figure-legend panel hidden">
-                 <h4 class="panel-title">Figuras na Lição</h4>
-                 <div id="figure-legend-content"></div>
-            </div>
              
             <div class="panel user-actions">
-                 <button id="login-button" class="btn-action btn-login">Login</button>
-                <button id="logout-button" class="btn-action btn-logout hidden">Logout</button>
-                <button id="save-rhythm-button" class="btn-action btn-save hidden">Salvar Ritmo</button>
-                <button id="load-rhythms-button" class="btn-action btn-load hidden">Carregar Ritmo</button>
-                <button id="export-wav-button" class="btn-action btn-export">Exportar WAV</button>
+                 <button id="login-button" class="btn-action">Login</button>
+                <button id="logout-button" class="btn-action hidden">Logout</button>
+                <button id="save-rhythm-button" class="btn-action hidden">Salvar Ritmo</button>
+                <button id="load-rhythms-button" class="btn-action hidden">Carregar Ritmo</button>
+                <button id="export-wav-button" class="btn-action">Exportar WAV</button>
             </div>
         </aside>
 
         <main class="main-display">
             <div id="message-area" class="text-center text-lg text-purple-300 h-8 font-medium my-2"></div>
             
+            <div id="figure-focus-display" class="panel">
+                </div>
+            
             <div id="countdown-display" class="text-center mb-2"></div>
 
             <div id="rhythm-display-container">
                 <div id="rhythm-display">
-                    <p class="text-slate-400 text-center w-full text-lg self-center">Bem-vindo! Selecione uma lição para começar.</p>
-                </div>
+                    </div>
             </div>
 
              <footer class="main-footer">

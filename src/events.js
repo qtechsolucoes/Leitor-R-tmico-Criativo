@@ -2,36 +2,21 @@
 
 import { AppState } from './state.js';
 import { updateActivePatternAndTimeSignature, handlePaletteFigureClick, handleFigureSelectionForEditing } from './core.js';
-import { switchMode, renderRhythm, updateMessage, populateFigureLegend, updateLoginUI } from './ui.js';
+import { switchMode, renderRhythm, updateMessage, populateFigurePalette, updateLoginUI } from './ui.js';
 import { startCountdownAndPlay, togglePauseResume, stopRhythmExecution, exportWavOffline } from './audio.js';
 
 // --- Elementos do DOM ---
 const modeSelect = document.getElementById('mode-select');
-const lessonSelect = document.getElementById('lesson-select');
-const timeSignatureBeats = document.getElementById('time-signature-beats');
-const timeSignatureType = document.getElementById('time-signature-type');
-const tempoDisplay = document.getElementById('tempo-display');
-const playPauseButton = document.getElementById('play-pause-button');
-const resetButton = document.getElementById('reset-button');
-const deleteSelectedFigureButton = document.getElementById('delete-selected-figure-button');
-const clearCustomRhythmButton = document.getElementById('clear-custom-rhythm');
-const tempoIncreaseButton = document.getElementById('tempo-increase');
-const tempoDecreaseButton = document.getElementById('tempo-decrease');
-const loginButton = document.getElementById('login-button');
-const logoutButton = document.getElementById('logout-button');
-const saveRhythmButton = document.getElementById('save-rhythm-button');
-const loadRhythmsButton = document.getElementById('load-rhythms-button');
-const exportPdfButton = document.getElementById('export-pdf-button');
-const exportWavButton = document.getElementById('export-wav-button');
+const customLessonSelect = document.getElementById('custom-lesson-select');
 
-// --- Funções de Autenticação e Persistência com localStorage ---
+// --- Funções de Persistência ---
 
 function loginUser() {
-    const username = prompt("Digite seu nome de usuário:", "Usuário Padrão");
+    const username = prompt("Digite o seu nome de utilizador:", "músico");
     if(username) {
         AppState.user.currentUser = { username };
         localStorage.setItem('lrc_currentUser', JSON.stringify(AppState.user.currentUser));
-        updateMessage(`Login como ${username}.`);
+        updateMessage(`Login como ${username}.`, "success");
         updateLoginUI();
     }
 }
@@ -45,13 +30,16 @@ function logoutUser() {
 
 function saveCurrentRhythm() {
     if (!AppState.user.currentUser) {
-        updateMessage("Faça login para salvar.");
+        updateMessage("Faça login para salvar.", "error");
+        return;
+    }
+    if(!AppState.customPattern || AppState.customPattern.length === 0) {
+        updateMessage("Não há ritmo para salvar.", "error");
         return;
     }
     const rhythmName = prompt("Dê um nome para o seu ritmo:");
     if (rhythmName) {
         const username = AppState.user.currentUser.username;
-        // Carrega os ritmos salvos do localStorage
         const savedRhythms = JSON.parse(localStorage.getItem('lrc_savedRhythms')) || {};
         if (!savedRhythms[username]) {
             savedRhythms[username] = [];
@@ -61,15 +49,14 @@ function saveCurrentRhythm() {
             pattern: AppState.customPattern,
             timeSignature: AppState.activeTimeSignature
         });
-        // Salva de volta no localStorage
         localStorage.setItem('lrc_savedRhythms', JSON.stringify(savedRhythms));
-        updateMessage(`Ritmo "${rhythmName}" salvo.`);
+        updateMessage(`Ritmo "${rhythmName}" salvo.`, "success");
     }
 }
 
 function loadSavedRhythm() {
     if (!AppState.user.currentUser) {
-        updateMessage("Faça login para carregar.");
+        updateMessage("Faça login para carregar.", "error");
         return;
     }
     const username = AppState.user.currentUser.username;
@@ -77,7 +64,7 @@ function loadSavedRhythm() {
     const userRhythms = savedRhythms[username];
 
     if (!userRhythms || userRhythms.length === 0) {
-        updateMessage("Nenhum ritmo salvo.");
+        updateMessage("Nenhum ritmo salvo.", "error");
         return;
     }
 
@@ -92,19 +79,15 @@ function loadSavedRhythm() {
         document.getElementById('time-signature-type').value = rhythm.timeSignature.beatType;
         
         switchMode('freeCreate'); 
-        
         updateActivePatternAndTimeSignature();
         renderRhythm();
-        updateMessage(`Ritmo "${rhythm.name}" carregado.`);
-    } else {
-        updateMessage("Seleção inválida.");
+        updateMessage(`Ritmo "${rhythm.name}" carregado.`, "success");
+
+    } else if (choice) {
+        updateMessage("Seleção inválida.", "error");
     }
 }
 
-function exportToPDF() {
-    updateMessage("Funcionalidade de exportar para PDF ainda não implementada.");
-    console.log("Simulando exportação para PDF...");
-}
 
 /**
  * Configura todos os event listeners da aplicação.
@@ -112,33 +95,48 @@ function exportToPDF() {
 export function setupEventListeners() {
     modeSelect.addEventListener('change', (e) => switchMode(e.target.value));
 
-    lessonSelect.addEventListener('change', (e) => {
-        AppState.currentLessonIndex = parseInt(e.target.value);
-        stopRhythmExecution();
-        updateActivePatternAndTimeSignature();
-        renderRhythm();
-        populateFigureLegend();
+    // LÓGICA CORRIGIDA PARA O DROPDOWN DE LIÇÕES
+    const lessonPanel = customLessonSelect.closest('.panel');
+    customLessonSelect.addEventListener('click', () => {
+        const isOpen = customLessonSelect.classList.toggle('open');
+        lessonPanel.classList.toggle('panel-on-top', isOpen);
     });
 
-    [timeSignatureBeats, timeSignatureType].forEach(el => el.addEventListener('change', () => {
+    document.addEventListener('click', (e) => {
+        if (!customLessonSelect.contains(e.target)) {
+            if (customLessonSelect.classList.contains('open')) {
+                customLessonSelect.classList.remove('open');
+                lessonPanel.classList.remove('panel-on-top');
+            }
+        }
+    });
+
+    document.getElementById('time-signature-beats').addEventListener('change', () => {
         if (AppState.currentMode === 'freeCreate') {
             stopRhythmExecution();
             updateActivePatternAndTimeSignature();
             renderRhythm();
         }
-    }));
-
-    tempoDecreaseButton.addEventListener('click', () => {
-        tempoDisplay.textContent = Math.max(30, parseInt(tempoDisplay.textContent) - 5);
-        if(AppState.isPlaying) Tone.Transport.bpm.rampTo(parseInt(tempoDisplay.textContent), 0.1);
     });
 
-    tempoIncreaseButton.addEventListener('click', () => {
-        tempoDisplay.textContent = Math.min(280, parseInt(tempoDisplay.textContent) + 5);
-        if(AppState.isPlaying) Tone.Transport.bpm.rampTo(parseInt(tempoDisplay.textContent), 0.1);
+    document.getElementById('time-signature-type').addEventListener('change', () => {
+        if (AppState.currentMode === 'freeCreate') {
+            stopRhythmExecution();
+            updateActivePatternAndTimeSignature();
+            renderRhythm();
+        }
     });
 
-    playPauseButton.addEventListener('click', () => {
+    const tempoDisplay = document.getElementById('tempo-display');
+    const updateTempo = (newTempo) => {
+        tempoDisplay.textContent = newTempo;
+        if(AppState.isPlaying) Tone.Transport.bpm.rampTo(newTempo, 0.1);
+    };
+
+    document.getElementById('tempo-decrease').addEventListener('click', () => updateTempo(Math.max(30, parseInt(tempoDisplay.textContent) - 5)));
+    document.getElementById('tempo-increase').addEventListener('click', () => updateTempo(Math.min(280, parseInt(tempoDisplay.textContent) + 5)));
+
+    document.getElementById('play-pause-button').addEventListener('click', () => {
         if (AppState.isPlaying || Tone.Transport.state === 'paused') {
             togglePauseResume();
         } else {
@@ -146,43 +144,37 @@ export function setupEventListeners() {
         }
     });
 
-    resetButton.addEventListener('click', () => {
-        stopRhythmExecution();
+    document.getElementById('reset-button').addEventListener('click', stopRhythmExecution);
+
+    document.getElementById('clear-custom-rhythm').addEventListener('click', () => {
+        if(confirm("Tem a certeza que deseja limpar o padrão atual?")) {
+            AppState.customPattern = [];
+            AppState.selectedIndexForEditing = null;
+            updateActivePatternAndTimeSignature();
+            renderRhythm();
+            updateMessage("Padrão limpo.");
+        }
     });
 
-    clearCustomRhythmButton.addEventListener('click', () => {
-        AppState.customPattern = [];
-        AppState.selectedIndexForEditing = null;
-        updateActivePatternAndTimeSignature();
-        renderRhythm();
-        updateMessage("Padrão limpo.");
-    });
-
-    deleteSelectedFigureButton.addEventListener('click', () => {
+    document.getElementById('delete-selected-figure-button').addEventListener('click', () => {
         if (AppState.selectedIndexForEditing === null) return;
         
-        AppState.customPattern.splice(AppState.selectedIndexForEditing, 1);
-        
-        // CORRIGIDO: Se a nota apagada era a origem de uma ligadura, a próxima nota perde o status de continuação.
-        if (AppState.customPattern[AppState.selectedIndexForEditing]?.isTiedContinuation) {
-            delete AppState.customPattern[AppState.selectedIndexForEditing].isTiedContinuation;
-        }
-        // Remove a propriedade `tiedToNext` da nota anterior se a nota apagada era o destino.
-        if(AppState.selectedIndexForEditing > 0 && AppState.customPattern[AppState.selectedIndexForEditing - 1].tiedToNext) {
-             delete AppState.customPattern[AppState.selectedIndexForEditing - 1].tiedToNext;
-        }
+        const indexToDelete = AppState.selectedIndexForEditing;
+        AppState.customPattern.splice(indexToDelete, 1);
 
+        if(indexToDelete > 0 && AppState.customPattern[indexToDelete - 1]?.tiedToNext) {
+             delete AppState.customPattern[indexToDelete - 1].tiedToNext;
+        }
+        
         AppState.selectedIndexForEditing = null;
         updateActivePatternAndTimeSignature();
         renderRhythm();
         updateMessage("Figura apagada.");
     });
     
-    // --- Event Listeners para Login, Save/Load e Exportação ---
-    loginButton.addEventListener('click', loginUser);
-    logoutButton.addEventListener('click', logoutUser);
-    saveRhythmButton.addEventListener('click', saveCurrentRhythm);
-    loadRhythmsButton.addEventListener('click', loadSavedRhythm);
-    exportPdfButton.addEventListener('click', exportToPDF);
-    exportWavButton.addEventListener('click', exportWavOffline);
+    document.getElementById('login-button').addEventListener('click', loginUser);
+    document.getElementById('logout-button').addEventListener('click', logoutUser);
+    document.getElementById('save-rhythm-button').addEventListener('click', saveCurrentRhythm);
+    document.getElementById('load-rhythms-button').addEventListener('click', loadSavedRhythm);
+    document.getElementById('export-wav-button').addEventListener('click', exportWavOffline);
 }
