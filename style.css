@@ -20,7 +20,7 @@ body {
 }
 
 main {
-    flex-grow: 1; 
+    flex-grow: 1;
 }
 
 .header-container {
@@ -100,9 +100,9 @@ main {
 }
 
 #rhythm-display-container {
-     display: flex;
-     align-items: flex-end;
-     flex-wrap: wrap;
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
 }
 
 .panel {
@@ -150,7 +150,21 @@ footer { text-align: center; padding: 1.5rem; color: var(--text-light); font-siz
 .repeat-barline-visual-style { color: var(--text-dark); font-size: 4.5rem; font-weight: normal; }
 .figure-container[data-is-control="true"] .syllable-text, .figure-container[data-is-control="true"] .beat-counter-text { display: none; }
 
-/* Regra para centralizar as barras */
+/* New: Tie Arc (Conceptual/Simplified) */
+.tie-arc {
+    position: absolute;
+    bottom: -15px; /* Adjust as needed */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%; /* Will be adjusted by JS based on tied notes */
+    height: 20px; /* Arc height */
+    border: 2px solid #5b21b6; /* Primary color for the tie */
+    border-radius: 0 0 100% 100% / 0 0 20px 20px; /* Creates a bottom arc */
+    pointer-events: none; /* Allows clicks to pass through to the figure */
+    z-index: 10;
+}
+
+/* Rule for centering barlines */
 .figure-container[data-is-control="true"] {
     align-self: center;
     margin-bottom: 0;
