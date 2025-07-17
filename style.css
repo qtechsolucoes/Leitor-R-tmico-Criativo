@@ -103,11 +103,9 @@ html::-webkit-scrollbar-thumb:hover {
     margin-bottom: 1rem;
 }
 
-/* LARGURA DOS SELETORES DE COMPASSO */
 #custom-rhythm-creator .grid-cols-2 {
-    grid-template-columns: 1fr 2fr; /* Pulsos ocupa 1 parte, Unidade ocupa 2 partes */
+    grid-template-columns: 1fr 2fr;
 }
-
 
 .control-input {
     width: 100%;
@@ -125,7 +123,6 @@ html::-webkit-scrollbar-thumb:hover {
     background-position: right 1rem center;
 }
 .control-input:focus { outline: none; border-color: var(--glow-cyan); box-shadow: 0 0 8px var(--glow-cyan); }
-
 
 .custom-select-wrapper { position: relative; }
 .custom-select { position: relative; cursor: pointer; }
@@ -228,7 +225,7 @@ html::-webkit-scrollbar-thumb:hover {
     text-shadow: 0 0 20px var(--glow-yellow);
     text-align: center;
     height: 90px;
-    margin-bottom: 1rem; /* ESPAÇO PARA NÃO INVADIR A PAUTA */
+    margin-bottom: 1rem;
 }
 #countdown-display:empty {
     height: 0;
@@ -241,6 +238,7 @@ html::-webkit-scrollbar-thumb:hover {
     border-radius: 1rem;
     padding: 1.5rem;
     border: 1px solid var(--panel-border);
+    position: relative;
 }
 #rhythm-display {
     display: flex;
@@ -250,7 +248,7 @@ html::-webkit-scrollbar-thumb:hover {
 .rhythm-row {
     display: flex;
     flex-wrap: nowrap;
-    align-items: flex-end; /* Alinha os containers na base */
+    align-items: flex-end;
     gap: 4px;
     position: relative;
 }
@@ -260,7 +258,7 @@ html::-webkit-scrollbar-thumb:hover {
     align-items: center;
     justify-content: flex-end;
     position: relative;
-    min-height: 120px; /* Aumenta a altura mínima para acomodar tudo */
+    min-height: 120px;
     padding-top: 35px;
 }
 .note-item { font-size: 2.8rem; border-radius: 0.5rem; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; }
@@ -270,35 +268,23 @@ html::-webkit-scrollbar-thumb:hover {
 .beat-counter-text { position: absolute; top: 0; font-size: 0.9rem; font-weight: 600; color: var(--glow-cyan); opacity: 0.7; white-space: nowrap; }
 .beat-counter-text .beat-active { color: var(--glow-yellow); text-shadow: 0 0 12px var(--glow-yellow); transform: scale(1.3); opacity: 1; animation: beat-pulse 0.5s ease-in-out; }
 @keyframes beat-pulse { 50% { transform: scale(1.4); } }
-.time-signature-main { display: flex; flex-direction: column; justify-content: center; font-size: 2.8rem; font-family: 'Playfair Display', serif; color: var(--text-primary); width: 60px; height: 100px; /* Altura ajustada */ margin-right: 1rem; text-align: center; flex-shrink: 0; }
-.barline-container { height: 100px; /* Altura ajustada */ display: flex; align-items: flex-end; padding-bottom: 20px; margin: 0 0.5rem; }
+.time-signature-main { display: flex; flex-direction: column; justify-content: center; font-size: 2.8rem; font-family: 'Playfair Display', serif; color: var(--text-primary); width: 60px; height: 100px; margin-right: 1rem; text-align: center; flex-shrink: 0; }
+.barline-container { height: 100px; display: flex; align-items: flex-end; padding-bottom: 20px; margin: 0 0.5rem; }
 .barline-item { width: 2px; height: 60px; background-color: rgba(139, 92, 246, 0.4); }
-.final-barline-container {
-    height: 100px; /* Altura ajustada */
-    display: flex;
-    align-items: flex-end;
-    padding-bottom: 20px;
-    margin: 0 0.5rem;
-}
-.final-barline-item {
-    height: 60px;
-    display: flex;
-    align-items: center;
-    gap: 3px;
-}
+.final-barline-container { height: 100px; display: flex; align-items: flex-end; padding-bottom: 20px; margin: 0 0.5rem; }
+.final-barline-item { height: 60px; display: flex; align-items: center; gap: 3px; }
 .final-barline-item .thin-bar { width: 2px; height: 100%; background-color: rgba(139, 92, 246, 0.6); }
 .final-barline-item .thick-bar { width: 6px; height: 100%; background-color: rgba(139, 92, 246, 0.8); }
-.figure-container.highlight .note-item { transform: scale(1.15); box-shadow: 0 0 20px var(--glow-yellow), 0 0 35px var(--glow-yellow); background: var(--glow-yellow); color: var(--text-dark) !important; }
+.figure-container.highlight .note-item, .figure-container.selected-for-edit .note-item { transform: scale(1.15); box-shadow: 0 0 20px var(--glow-yellow), 0 0 35px var(--glow-yellow); background: var(--glow-yellow); color: var(--text-dark) !important; }
 .main-footer { flex-shrink: 0; text-align: center; padding: 1rem 0 0 0; }
 
-/* ========= NOVA CLASSE PARA SÍLABAS ========= */
 .syllable-text {
     min-height: 20px;
     margin-top: 0.5rem;
     font-size: 0.9rem;
     color: var(--text-secondary);
     text-align: center;
-    white-space: nowrap; /* Impede a quebra de linha */
+    white-space: nowrap;
     width: 100%;
 }
 
@@ -380,7 +366,7 @@ html::-webkit-scrollbar-thumb:hover {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    padding-right: 0.5rem; /* Para a barra de scroll */
+    padding-right: 0.5rem;
 }
 .load-item-button {
     width: 100%;
@@ -397,9 +383,8 @@ html::-webkit-scrollbar-thumb:hover {
     background-color: var(--glow-purple);
 }
 
-/* ========= ESTILOS DO MODAL DE ERRO ========= */
 .modal-error {
-    border-color: #f72585; /* Cor de erro do tema */
+    border-color: #f72585;
 }
 .modal-title-error {
     color: #f72585;
@@ -408,9 +393,11 @@ html::-webkit-scrollbar-thumb:hover {
     margin-right: 0.5rem;
 }
 
-/* ========= ESTILOS DO POPOVER DE EDIÇÃO ========= */
+/* ==========================================================================
+   ESTILOS DO POPOVER E LIGADURA
+   ========================================================================== */
 .edit-popover {
-    position: absolute; /* Será posicionado via JavaScript */
+    position: absolute;
     z-index: 30;
     display: flex;
     gap: 0.5rem;
@@ -421,13 +408,11 @@ html::-webkit-scrollbar-thumb:hover {
     box-shadow: 0 4px 20px rgba(0,0,0,0.4);
     transition: opacity 0.2s, transform 0.2s;
 }
-
 .edit-popover.hidden {
     opacity: 0;
     transform: translateY(10px);
-    pointer-events: none; /* Impede interação quando escondido */
+    pointer-events: none;
 }
-
 .popover-button {
     width: 40px;
     height: 40px;
@@ -442,16 +427,25 @@ html::-webkit-scrollbar-thumb:hover {
     transition: all 0.2s;
     font-size: 1.2rem;
 }
-
 .popover-button:hover {
     background-color: var(--glow-purple);
     transform: scale(1.1);
 }
-
 .popover-button .fa-trash-alt {
-    color: #f72585; /* Cor rosa para o ícone de apagar */
+    color: #f72585;
 }
-
 .popover-button:hover .fa-trash-alt {
     color: white;
+}
+
+.tie {
+    position: absolute;
+    height: 20px; 
+    border-bottom: 2px solid var(--text-secondary);
+    border-left: 2px solid transparent;
+    border-right: 2px solid transparent;
+    border-radius: 0 0 50% 50%;
+    transform: translateY(35px);
+    box-sizing: border-box;
+    z-index: -1;
 }

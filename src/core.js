@@ -4,6 +4,16 @@ import { AppState } from './state.js';
 import { lessons, rhythmicFigures } from './config.js';
 
 /**
+ * Arredonda um número para um número específico de casas decimais para evitar imprecisões de ponto flutuante.
+ * @param {number} value - O número a ser arredondado.
+ * @param {number} decimals - O número de casas decimais.
+ * @returns {number} - O número arredondado.
+ */
+function round(value, decimals = 5) {
+    return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+}
+
+/**
  * Calcula o valor de uma figura em tempos, com base na fórmula de compasso ativa.
  */
 export function getBeatValue(figureDuration, timeSig) {
@@ -79,7 +89,7 @@ function processPattern(pattern) {
 }
 
 /**
- * Atualiza o padrão rítmico ativo e a fórmula de compasso.
+ * Atualiza o padrão rítmico ativo, a fórmula de compasso e sincroniza com o motor de áudio.
  */
 export function updateActivePatternAndTimeSignature() {
     let rawPattern;
@@ -95,14 +105,15 @@ export function updateActivePatternAndTimeSignature() {
             beatType: parseInt(document.getElementById('time-signature-type').value)
         };
     }
-    // Adicionado: Sincroniza a fórmula de compasso com o Tone.Transport.
+    
+    // Sincroniza a fórmula de compasso com o Tone.Transport para o metrônomo.
     if (typeof Tone !== 'undefined' && Tone.Transport) {
         const { beats, beatType } = AppState.activeTimeSignature;
         Tone.Transport.timeSignature = [beats, beatType];
     }
+
     AppState.activePattern = processPattern(rawPattern);
 }
-
 
 /**
  * Valida se um padrão rítmico respeita as regras de compasso de forma estrita.
@@ -116,30 +127,25 @@ function isPatternValid(pattern) {
     let currentBeatsInMeasure = 0;
 
     for (const item of pattern) {
-        // Ignora elementos de controle (barras de repetição, etc.) e notas que são continuação de ligadura
+        // Ignora elementos de controle e notas que são continuação de ligadura
         if (item.isControl || item.isTiedContinuation) continue;
         
         const itemBeatValue = getBeatValue(item.duration, timeSig);
         
         // Verifica se a adição da figura ultrapassa o limite do compasso atual
-        if (currentBeatsInMeasure + itemBeatValue > totalMeasureBeats + tolerance) {
+        if (round(currentBeatsInMeasure + itemBeatValue) > totalMeasureBeats + tolerance) {
             return false; // Inválido: A figura não cabe no compasso.
         }
 
-        currentBeatsInMeasure += itemBeatValue;
+        currentBeatsInMeasure = round(currentBeatsInMeasure + itemBeatValue);
 
         // Se o compasso está completo, zera para o próximo
         if (Math.abs(currentBeatsInMeasure - totalMeasureBeats) < tolerance) {
             currentBeatsInMeasure = 0;
         }
     }
-
-    // Após verificar todas as figuras, se o último compasso não estiver completo, o padrão é inválido.
-    // (A menos que estejamos no meio da construção, mas para o clique, a validação deve ser do compasso atual)
-    // Esta lógica é inerente ao fluxo acima: a validação falhará no momento em que uma figura exceder o compasso.
-    // Não é necessário um check final, pois a validação é feita a cada adição.
     
-    return true; // Se o loop terminar sem retornar false, o padrão é válido até o momento.
+    return true; // Se o loop terminar sem retornar false, o padrão é válido.
 }
 
 /**
@@ -163,9 +169,6 @@ export function handlePaletteFigureClick(figure) {
                     delete selectedItem.tiedToNext;
                 }
                 
-                // Valida o padrão após a alteração. Uma ligadura pode tornar um padrão inválido se a nota seguinte for uma pausa, por exemplo.
-                // Esta validação é um passo extra para garantir a consistência.
-                // (Para simplificar, vamos assumir que o usuário sabe o que faz ao adicionar uma ligadura)
                 return { success: true, message: selectedItem.tiedToNext ? "Ligadura adicionada." : "Ligadura removida." };
             }
         }

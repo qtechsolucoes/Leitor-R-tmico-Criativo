@@ -41,10 +41,16 @@
             <div class="panel">
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-slate-300 mb-2">Modo:</label>
-                    <select id="mode-select" class="control-input">
-                        <option value="lessons" selected>Praticar Lições</option>
-                        <option value="freeCreate">Criação Livre</option>
-                    </select>
+                    <div class="custom-select-wrapper">
+                        <div id="custom-mode-select" class="custom-select">
+                            <span class="custom-select-trigger">Praticar Lições</span>
+                            <div class="custom-options">
+                                <div class="custom-option selected" data-value="lessons">Praticar Lições</div>
+                                <div class="custom-option" data-value="freeCreate">Criação Livre</div>
+                            </div>
+                        </div>
+                    </div>
+                    <select id="mode-select" class="control-input hidden"></select>
                 </div>
                 <div id="lesson-selector-container" class="mb-4">
                     <label class="block text-sm font-medium text-slate-300 mb-2">Lição:</label>

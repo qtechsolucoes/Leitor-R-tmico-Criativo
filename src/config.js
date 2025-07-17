@@ -556,324 +556,325 @@ export const lessons = [
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
-    {
-        name: "Módulo IV - Lição 40: Desafio Final de Unidades de Tempo",
-        timeSignature: { beats: 3, beatType: 2 }, // Desafio final em 3/2
-        tempo: 90,
-        pattern: [
-            { type: 'note', duration: 4, symbol: '𝅝' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' }, // Semibreve e mínima
-            { type: 'rest', duration: 2, symbol: '𝄼' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' }, // Pausa de mínima, duas mínimas
-            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, // Seis semínimas (equivale a 3 mínimas)
-            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, // Duas mínimas pontuadas
-            {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
-        ]
-    },
-
+  
     // Módulo V - Lições 41 a 50: Ligaduras de Prolongamento
     // Adicionar um atributo `tiedToNext: true` para indicar que a nota está ligada à próxima
     // O próximo elemento na sequência será a nota ligada, mas sua duração não será contada no compasso
-    {
-        name: "Módulo V - Lição 41: Ligadura Simples no Mesmo Compasso (4/4)",
+   {
+        name: "Módulo V - Lição 41: Ligadura Simples no Mesmo Compasso",
         timeSignature: { beats: 4, beatType: 4 },
         tempo: 70,
         pattern: [
-            { type: 'note', duration: 2, symbol: '𝅗𝅥', tiedToNext: true }, { type: 'note', duration: 1, symbol: '♩' }, // Mínima ligada a semínima
-            { type: 'note', duration: 1, symbol: '♩' }, // Semínima (complementa o compasso)
-            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩', tiedToNext: true }, { type: 'note', duration: 2, symbol: '𝅗𝅥' }, // Semínima, semínima ligada a mínima
-            { type: 'note', duration: 4, symbol: '𝅝' }, // Semibreve
+            { type: 'note', duration: 2, symbol: '𝅗𝅥', tiedToNext: true }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩', tiedToNext: true }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮', tiedToNext: true }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 1, symbol: '♩', tiedToNext: true }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1, symbol: '♩' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
     {
-        name: "Módulo V - Lição 42: Ligadura Atravessando o Compasso (4/4)",
+        name: "Módulo V - Lição 42: Ligadura Atravessando o Compasso",
         timeSignature: { beats: 4, beatType: 4 },
         tempo: 75,
         pattern: [
-            { type: 'note', duration: 3, symbol: '𝅗𝅥.', tiedToNext: true }, // Mínima pontuada (continua no próximo compasso)
-            { type: 'note', duration: 1, symbol: '♩' }, // Semínima (complementa a ligadura do compasso anterior)
-            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' }, // Duas mínimas
-            { type: 'note', duration: 4, symbol: '𝅝' }, // Semibreve
+            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 2, symbol: '𝅗𝅥', tiedToNext: true },
+            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 3, symbol: '𝅗𝅥.', tiedToNext: true },
+            { type: 'note', duration: 4, symbol: '𝅝' },
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, { type: 'note', duration: 1, symbol: '♩', tiedToNext: true },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
     {
-        name: "Módulo V - Lição 43: Ligaduras com Colcheias (3/4)",
+        name: "Módulo V - Lição 43: Ligaduras com Colcheias em 3/4",
         timeSignature: { beats: 3, beatType: 4 },
         tempo: 80,
         pattern: [
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮', tiedToNext: true }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, // Colcheia ligada, semínima, semínima
-            { type: 'note', duration: 1, symbol: '♩', tiedToNext: true }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, // Semínima ligada, duas colcheias, semínima
-            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, // Mínima pontuada
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮', tiedToNext: true }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 1, symbol: '♩', tiedToNext: true }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩', tiedToNext: true }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
     {
-        name: "Módulo V - Lição 44: Múltiplas Ligaduras no Mesmo Compasso (4/4)",
+        name: "Módulo V - Lição 44: Múltiplas Ligaduras e Semicolcheias",
         timeSignature: { beats: 4, beatType: 4 },
         tempo: 85,
         pattern: [
-            { type: 'note', duration: 1, symbol: '♩', tiedToNext: true }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮', tiedToNext: true }, { type: 'note', duration: 2, symbol: '𝅗𝅥' }, // Semínima ligada a colcheia, colcheia ligada a mínima
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮', tiedToNext: true }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 1, symbol: '♩', tiedToNext: true }, { type: 'note', duration: 2, symbol: '𝅗𝅥' }, // Colcheia ligada a semicolcheia, semicolcheia, semínima ligada a mínima
+            { type: 'note', duration: 1, symbol: '♩', tiedToNext: true }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮', tiedToNext: true }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮', tiedToNext: true }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 1, symbol: '♩', tiedToNext: true }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 1, symbol: '♩', tiedToNext: true }, { type: 'note', duration: 1, symbol: '♩', tiedToNext: true }, { type: 'note', duration: 1, symbol: '♩', tiedToNext: true }, { type: 'note', duration: 1, symbol: '♩' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
     {
-        name: "Módulo V - Lição 45: Ligaduras com Pausas (4/4) - Conceitual",
+        name: "Módulo V - Lição 45: Ligaduras e Pausas (Síncope)",
         timeSignature: { beats: 4, beatType: 4 },
         tempo: 90,
         pattern: [
-            // NOTA: Pausas não são ligadas no sentido tradicional.
-            // Para simular "ligar" uma nota a uma pausa, a nota simplesmente para no início da pausa.
-            // Para simular "ligar" uma pausa a uma nota, a nota começaria após a pausa.
-            // Este exercício foca em combinação de notas e pausas onde a duração é estendida,
-            // mas não através de uma "ligadura" literal para a pausa.
-            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'rest', duration: 2, symbol: '𝄼' }, // Mínima, pausa de mínima
-            { type: 'note', duration: 1, symbol: '♩' }, { type: 'rest', duration: 1, symbol: '𝄽' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' }, // Semínima, pausa de semínima, mínima
-            { type: 'note', duration: 4, symbol: '𝅝' }, // Semibreve
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩', tiedToNext: true }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'rest', duration: 1, symbol: '𝄽' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩', tiedToNext: true }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮', tiedToNext: true }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'rest', duration: 1, symbol: '𝄽' },
+            { type: 'note', duration: 4, symbol: '𝅝' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
     {
-        name: "Módulo V - Lição 46: Ligadura de Colcheia Pontuada (3/4)",
+        name: "Módulo V - Lição 46: Ligadura de Colcheia Pontuada",
         timeSignature: { beats: 3, beatType: 4 },
         tempo: 95,
         pattern: [
-            { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.', tiedToNext: true }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, // Colcheia pontuada ligada a semicolcheia, duas semínimas
-            { type: 'note', duration: 1.5, symbol: '♩.', tiedToNext: true }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, // Semínima pontuada ligada a colcheia, semínima
-            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, // Mínima pontuada
+            { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯', tiedToNext: true }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 1.5, symbol: '♩.', tiedToNext: true }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮', tiedToNext: true }, { type: 'note', duration: 1.5, symbol: '♩.' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
     {
-        name: "Módulo V - Lição 47: Frases com Ligaduras e Sincopados (4/4)",
+        name: "Módulo V - Lição 47: Frases com Ligaduras e Síncopes",
         timeSignature: { beats: 4, beatType: 4 },
         tempo: 100,
         pattern: [
-            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩', tiedToNext: true }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, // Semínima, semínima ligada a colcheia, colcheia, semínima
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮', tiedToNext: true }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'rest', duration: 1, symbol: '𝄽' }, { type: 'note', duration: 1, symbol: '♩' }, // Colcheia ligada a semínima pontuada, pausa de semínima, semínima
-            { type: 'note', duration: 4, symbol: '𝅝' }, // Semibreve
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩', tiedToNext: true }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮', tiedToNext: true }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'rest', duration: 1, symbol: '𝄽' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 2, symbol: '𝅗𝅥', tiedToNext: true }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'rest', duration: 1, symbol: '𝄽' },
+            { type: 'note', duration: 4, symbol: '𝅝' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
     {
-        name: "Módulo V - Lição 48: Ligaduras Múltiplas e Contratempo (2/4)",
+        name: "Módulo V - Lição 48: Ligaduras Múltiplas e Contratempo",
         timeSignature: { beats: 2, beatType: 4 },
         tempo: 105,
         pattern: [
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮', tiedToNext: true }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Colcheia ligada a colcheia
-            { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮', tiedToNext: true }, { type: 'note', duration: 1, symbol: '♩' }, // Pausa, colcheia ligada a semínima
-            { type: 'note', duration: 2, symbol: '𝅗𝅥', tiedToNext: true }, // Mínima ligada (continua no próximo compasso)
-            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, // Semínima (complementa a ligadura), semínima
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮', tiedToNext: true }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
+            { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮', tiedToNext: true },
+            { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 2, symbol: '𝅗𝅥', tiedToNext: true },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
     {
-        name: "Módulo V - Lição 49: Desafio de Leitura com Ligaduras (3/4)",
+        name: "Módulo V - Lição 49: Desafio de Leitura com Ligaduras",
         timeSignature: { beats: 3, beatType: 4 },
         tempo: 110,
         pattern: [
-            { type: 'note', duration: 1, symbol: '♩', tiedToNext: true }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Semínima ligada a semínima pontuada, colcheia
-            { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.', tiedToNext: true }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'rest', duration: 1, symbol: '𝄽' }, { type: 'note', duration: 1, symbol: '♩' }, // Colcheia pontuada ligada a semicolcheia, pausa de semínima, semínima
-            { type: 'note', duration: 3, symbol: '𝅗𝅥.', tiedToNext: true }, // Mínima pontuada ligada
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Três colcheias (complementam a ligadura e preenchem o compasso)
+            { type: 'note', duration: 1, symbol: '♩', tiedToNext: true }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
+            { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯', tiedToNext: true }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'rest', duration: 1, symbol: '𝄽' },
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.', tiedToNext: true },
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1.5, symbol: '♩.' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
     {
-        name: "Módulo V - Lição 50: Ligaduras Cruzando Compasso e Múltiplas Figuras (4/4)",
+        name: "Módulo V - Lição 50: Ligaduras Cruzando Compasso e Múltiplas Figuras",
         timeSignature: { beats: 4, beatType: 4 },
         tempo: 115,
         pattern: [
-            { type: 'note', duration: 2, symbol: '𝅗𝅥', tiedToNext: true }, // Mínima ligada
-            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, // Semínima e semínima (complementam e preenchem)
-            { type: 'note', duration: 1, symbol: '♩', tiedToNext: true }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, // Semínima ligada a colcheia, pausa de colcheia, duas semínimas
-            { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.', tiedToNext: true }, // Colcheia pontuada ligada
-            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 4, symbol: '𝅝' }, // Semicolcheia (complementa) e semibreve
+            { type: 'note', duration: 2, symbol: '𝅗𝅥', tiedToNext: true }, 
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
+            { type: 'note', duration: 1, symbol: '♩', tiedToNext: true }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.', tiedToNext: true },
+            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 1, symbol: '♩' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
 
     // Módulo VI - Lições 51 a 60: Compassos Compostos (6/8)
-    {
-        name: "Módulo VI - Lição 51: Introdução ao Compasso 6/8 (Colcheias)",
-        timeSignature: { beats: 6, beatType: 8 }, // 6 colcheias por compasso, divididas em dois grupos de 3
-        tempo: 60, // A batida principal é a semínima pontuada, mas o tempo é para a colcheia
+        {
+        name: "Módulo VI - Lição 51: Introdução ao Compasso 6/8",
+        timeSignature: { beats: 6, beatType: 8 },
+        tempo: 100, // O pulso é a colcheia
         pattern: [
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Primeiro grupo de 3 colcheias
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Segundo grupo de 3 colcheias
-            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, // Duas semínimas pontuadas
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
-            { type: 'note', duration: 1.5, symbol: '♩.' }, // Três colcheias e uma semínima pontuada
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
+            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' },
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
     {
         name: "Módulo VI - Lição 52: Semínimas e Colcheias em 6/8",
         timeSignature: { beats: 6, beatType: 8 },
-        tempo: 65,
+        tempo: 110,
         pattern: [
-            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Semínima, colcheia, semínima, colcheia
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Seis colcheias
-            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Semínima pontuada, três colcheias
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1.5, symbol: '♩.' },
+            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1.5, symbol: '♩.' },
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
     {
-        name: "Módulo VI - Lição 53: Adicionando Mínimas Pontuadas (6/8)",
+        name: "Módulo VI - Lição 53: Mínima Pontuada em 6/8",
         timeSignature: { beats: 6, beatType: 8 },
-        tempo: 70,
+        tempo: 115,
         pattern: [
-            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, // Mínima pontuada, duas semínimas pontuadas
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Seis colcheias
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
+            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' },
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
+            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
     {
-        name: "Módulo VI - Lição 54: Pausas em 6/8 (Colcheia e Semínima)",
-        timeSignature: { beats: 6, beatType: 8 },
-        tempo: 75,
-        pattern: [
-            { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Pausa, duas colcheias
-            { type: 'rest', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, // Pausa de semínima pontuada, semínima pontuada
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Colcheia, pausa, colcheia, colcheia, pausa, colcheia
-            {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
-        ]
-    },
-    {
-        name: "Módulo VI - Lição 55: Colcheias, Semínimas e Pausas Combinadas (6/8)",
-        timeSignature: { beats: 6, beatType: 8 },
-        tempo: 80,
-        pattern: [
-            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Semínima pontuada, pausa, quatro colcheias
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Colcheia, semínima, pausa, três colcheias
-            {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
-        ]
-    },
-    {
-        name: "Módulo VI - Lição 56: Pausa de Mínima em 6/8",
-        timeSignature: { beats: 6, beatType: 8 },
-        tempo: 85,
-        pattern: [
-            { type: 'rest', duration: 3, symbol: '𝄼.' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Pausa de mínima pontuada, três colcheias
-            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'rest', duration: 1.5, symbol: '♩.' }, // Semínima pontuada, pausa de semínima pontuada
-            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, // Mínima pontuada
-            {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
-        ]
-    },
-    {
-        name: "Módulo VI - Lição 57: Ritmos Sincopados em 6/8",
-        timeSignature: { beats: 6, beatType: 8 },
-        tempo: 90,
-        pattern: [
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Colcheia, semínima, colcheia, três colcheias
-            { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Pausa de colcheia, semínima pontuada, três colcheias
-            {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
-        ]
-    },
-    {
-        name: "Módulo VI - Lição 58: Semicolcheias em 6/8",
+        name: "Módulo VI - Lição 54: Pausas em 6/8",
         timeSignature: { beats: 6, beatType: 8 },
         tempo: 100,
         pattern: [
-            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, // Quatro semicolcheias (equivalente a uma semínima)
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Três colcheias
-            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, // Semínima pontuada, quatro semicolcheias
+            { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1.5, symbol: '♩.' },
+            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'rest', duration: 1.5, symbol: '𝄽.' },
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
+            { type: 'rest', duration: 3, symbol: '𝄼.' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
     {
-        name: "Módulo VI - Lição 59: Pausa de Semicolcheia em 6/8",
+        name: "Módulo VI - Lição 55: Pausas e Síncopes em 6/8",
         timeSignature: { beats: 6, beatType: 8 },
-        tempo: 105,
+        tempo: 110,
         pattern: [
-            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'rest', duration: 0.25, symbol: '𝄿' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' },
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Semicolcheia, pausa, duas semicolcheias, três colcheias
-            { type: 'rest', duration: 0.25, symbol: '𝄿' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 1.5, symbol: '♩.' }, // Pausa, semicolcheia, pausa de colcheia, semínima pontuada
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 1, symbol: '𝄽' }, { type: 'note', duration: 1.5, symbol: '♩.' },
+            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
+            {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
+        ]
+    },
+    {
+        name: "Módulo VI - Lição 56: Semicolcheias em 6/8",
+        timeSignature: { beats: 6, beatType: 8 },
+        tempo: 120,
+        pattern: [
+            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 1.5, symbol: '♩.' },
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
+            {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
+        ]
+    },
+    {
+        name: "Módulo VI - Lição 57: Padrões Rítmicos Complexos em 6/8",
+        timeSignature: { beats: 6, beatType: 8 },
+        tempo: 125,
+        pattern: [
+            { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1.5, symbol: '♩.' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.25, symbol: '𝄿' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
+            {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
+        ]
+    },
+    {
+        name: "Módulo VI - Lição 58: Pausa de Semicolcheia em 6/8",
+        timeSignature: { beats: 6, beatType: 8 },
+        tempo: 130,
+        pattern: [
+            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'rest', duration: 0.25, symbol: '𝄿' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'rest', duration: 0.25, symbol: '𝄿' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
+            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
+            {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
+        ]
+    },
+    {
+        name: "Módulo VI - Lição 59: Exercício de Leitura em 6/8",
+        timeSignature: { beats: 6, beatType: 8 },
+        tempo: 120,
+        pattern: [
+            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
+            { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, { rest: 0.5, symbol: '𝄾' },
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
     {
         name: "Módulo VI - Lição 60: Revisão Geral em 6/8",
         timeSignature: { beats: 6, beatType: 8 },
+        tempo: 110,
+        pattern: [
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
+            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 1.5, symbol: '𝄽.' },
+            { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 1, symbol: '♩' }, { note: 1, symbol: '♩' },
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1.5, symbol: '♩.' },
+            {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
+        ]
+    },
+    // Módulo VII - Lições 61 a 70: Compassos Compostos (9/8 e 12/8)
+        {
+        name: "Módulo VII - Lição 61: Introdução ao Compasso 9/8",
+        timeSignature: { beats: 9, beatType: 8 },
+        tempo: 90,
+        pattern: [
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' },
+            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1.5, symbol: '♩.' },
+            { type: 'note', duration: 4.5, symbol: '𝅗𝅥..' }, // Mínima duplamente pontuada
+            {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
+        ]
+    },
+    {
+        name: "Módulo VII - Lição 62: Mínima Pontuada em 9/8",
+        timeSignature: { beats: 9, beatType: 8 },
         tempo: 95,
         pattern: [
-            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Mínima pontuada, três colcheias
-            { type: 'rest', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, // Pausa de semínima pontuada, quatro semicolcheias
-            { type: 'note', duration: 1, symbol: '♩' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Semínima, pausa de colcheia, três colcheias
-            {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
-        ]
-    },
-
-    // Módulo VII - Lições 61 a 70: Compassos Compostos (9/8 e 12/8)
-    {
-        name: "Módulo VII - Lição 61: Introdução ao Compasso 9/8 (Colcheias)",
-        timeSignature: { beats: 9, beatType: 8 }, // 9 colcheias por compasso, divididas em três grupos de 3
-        tempo: 60,
-        pattern: [
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Grupo 1
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Grupo 2
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Grupo 3
-            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, // Três semínimas pontuadas
-            {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
-        ]
-    },
-    {
-        name: "Módulo VII - Lição 62: Semínimas e Mínimas Pontuadas em 9/8",
-        timeSignature: { beats: 9, beatType: 8 },
-        tempo: 65,
-        pattern: [
-            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, // Três semínimas pontuadas
-            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, // Mínima pontuada, duas semínimas pontuadas
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, { type: 'note', duration: 1.5, symbol: '♩.' },
+            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
+            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' },
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
     {
         name: "Módulo VII - Lição 63: Pausas Variadas em 9/8",
         timeSignature: { beats: 9, beatType: 8 },
-        tempo: 70,
+        tempo: 100,
         pattern: [
-            { type: 'rest', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'rest', duration: 1.5, symbol: '♩.' }, // Pausa, semínima pontuada, pausa
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Colcheia, pausa, colcheia, colcheia, pausa, colcheia
+            { type: 'rest', duration: 1.5, symbol: '𝄽.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' },
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
+            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'rest', duration: 3, symbol: '𝄼.' },
+            { type: 'note', duration: 4.5, symbol: '𝅗𝅥..' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
     {
-        name: "Módulo VII - Lição 64: Introdução ao Compasso 12/8 (Colcheias)",
-        timeSignature: { beats: 12, beatType: 8 }, // 12 colcheias por compasso, divididas em quatro grupos de 3
-        tempo: 60,
-        pattern: [
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Grupo 1
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Grupo 2
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Grupo 3
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Grupo 4
-            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, // Quatro semínimas pontuadas
-            {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
-        ]
-    },
-    {
-        name: "Módulo VII - Lição 65: Semínimas Pontuadas e Mínimas Pontuadas em 12/8",
+        name: "Módulo VII - Lição 64: Introdução ao Compasso 12/8",
         timeSignature: { beats: 12, beatType: 8 },
-        tempo: 65,
+        tempo: 100,
         pattern: [
-            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, // Quatro semínimas pontuadas
-            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, // Duas mínimas pontuadas
-            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, // Duas semínimas pontuadas, uma mínima pontuada
+            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' },
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1.5, symbol: '♩.' },
+            { type: 'note', duration: 6, symbol: '𝅝.' },
+            {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
+        ]
+    },
+    {
+        name: "Módulo VII - Lição 65: Mínimas Pontuadas em 12/8",
+        timeSignature: { beats: 12, beatType: 8 },
+        tempo: 105,
+        pattern: [
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' },
+            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
+            { type: 'note', duration: 6, symbol: '𝅝.' },
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
     {
         name: "Módulo VII - Lição 66: Pausas Complexas em 12/8",
         timeSignature: { beats: 12, beatType: 8 },
-        tempo: 70,
+        tempo: 95,
         pattern: [
-            { type: 'rest', duration: 3, symbol: '𝄼.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'rest', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'rest', duration: 1.5, symbol: '♩.' }, // Pausa de mínima pontuada, semínima pontuada, pausa, semínima, pausa
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Grupos de colcheias e pausas
+            { type: 'rest', duration: 3, symbol: '𝄼.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' },
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
+            { type: 'rest', duration: 6, symbol: '𝄻.' }, // Pausa de semibreve pontuada
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
@@ -882,9 +883,9 @@ export const lessons = [
         timeSignature: { beats: 9, beatType: 8 },
         tempo: 120,
         pattern: [
-            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, // 1 tempo de semínima
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // 3 colcheias
-            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, // Semínima pontuada, 4 semicolcheias
+            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1.5, symbol: '♩.' },
+            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, { type: 'note', duration: 1.5, symbol: '♩.' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
@@ -893,57 +894,58 @@ export const lessons = [
         timeSignature: { beats: 12, beatType: 8 },
         tempo: 100,
         pattern: [
-            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Semínima pontuada, 3 colcheias
-            { type: 'rest', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, // Pausa de semínima pontuada, semínima pontuada
-            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, // Mínima pontuada, duas semínimas pontuadas
+            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
+            { type: 'rest', duration: 1.5, symbol: '𝄽.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
+            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
     {
-        name: "Módulo VII - Lição 69: Exercício de Sincopado em 9/8",
+        name: "Módulo VII - Lição 69: Exercício de Síncope em 9/8",
         timeSignature: { beats: 9, beatType: 8 },
         tempo: 110,
         pattern: [
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Colcheia, semínima, colcheia
-            { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1.5, symbol: '♩.' }, // Pausa, colcheia, semínima pontuada
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 1.5, symbol: '♩.' }, // Três colcheias, pausa, semínima pontuada
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' },
+            { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' },
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
     {
-        name: "Módulo VII - Lição 70: Revisão dos Compassos Compostos (9/8 e 12/8)",
+        name: "Módulo VII - Lição 70: Revisão dos Compassos Compostos",
         timeSignature: { beats: 12, beatType: 8 },
         tempo: 95,
         pattern: [
-            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, // Duas mínimas pontuadas
-            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'rest', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, // Semínima pontuada, pausa, duas semínimas pontuadas
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
-            { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Três colcheias, pausa, duas colcheias
-            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' },
-            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'rest', duration: 0.25, symbol: '𝄿' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, // Oito semicolcheias
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
+            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'rest', duration: 1.5, symbol: '𝄽.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' },
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
+            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 1, symbol: '𝄽' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
 
     // Módulo VIII - Lições 71 a 80: Ligaduras de Prolongamento em Compassos Compostos
-    {
+      {
         name: "Módulo VIII - Lição 71: Ligaduras Simples em 6/8",
         timeSignature: { beats: 6, beatType: 8 },
         tempo: 70,
         pattern: [
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮', tiedToNext: true }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Colcheia ligada a colcheia, colcheia
-            { type: 'note', duration: 1.5, symbol: '♩.', tiedToNext: true }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Semínima pontuada ligada a colcheia, duas colcheias
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮', tiedToNext: true }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1.5, symbol: '♩.' },
+            { type: 'note', duration: 1.5, symbol: '♩.', tiedToNext: true }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮', tiedToNext: true }, { type: 'note', duration: 1.5, symbol: '♩.' },
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
     {
-        name: "Módulo VIII - Lição 72: Ligaduras Cruzando Grupos em 6/8",
+        name: "Módulo VIII - Lição 72: Ligaduras Cruzando Pulsos em 6/8",
         timeSignature: { beats: 6, beatType: 8 },
         tempo: 75,
         pattern: [
-            { type: 'note', duration: 1, symbol: '♩', tiedToNext: true }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Semínima ligada a colcheia (atravessa o grupo)
-            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Semínima pontuada, duas colcheias
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮', tiedToNext: true }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1.5, symbol: '♩.' }, // Colcheia ligada a semínima, semínima pontuada
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮', tiedToNext: true },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1.5, symbol: '♩.' },
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮', tiedToNext: true }, { type: 'note', duration: 2.5, symbol: '♩.' }, // Duração irregular para cruzar pulso
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
@@ -952,9 +954,11 @@ export const lessons = [
         timeSignature: { beats: 9, beatType: 8 },
         tempo: 80,
         pattern: [
-            { type: 'note', duration: 1.5, symbol: '♩.', tiedToNext: true }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, // Semínima pontuada ligada, duas semínimas pontuadas
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮', tiedToNext: true }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮', tiedToNext: true }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Colcheia ligada, duas colcheias, colcheia ligada, duas colcheias
+            { type: 'note', duration: 1.5, symbol: '♩.', tiedToNext: true }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' },
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, { type: 'note', duration: 1.5, symbol: '♩.', tiedToNext: true },
+            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' },
+            { type: 'note', duration: 4.5, symbol: '𝅗𝅥..', tiedToNext: true },
+            { type: 'note', duration: 4.5, symbol: '𝅗𝅥..' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
@@ -963,9 +967,10 @@ export const lessons = [
         timeSignature: { beats: 9, beatType: 8 },
         tempo: 85,
         pattern: [
-            { type: 'note', duration: 3, symbol: '𝅗𝅥.', tiedToNext: true }, // Mínima pontuada ligada (continua no próximo compasso)
-            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, // Semínima pontuada (complementa ligadura), 3 semínimas pontuadas
-            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, // Três semínimas pontuadas
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, { type: 'note', duration: 1.5, symbol: '♩.', tiedToNext: true },
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, { type: 'note', duration: 1.5, symbol: '♩.' },
+            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.', tiedToNext: true },
+            { type: 'note', duration: 4.5, symbol: '𝅗𝅥..' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
@@ -974,33 +979,31 @@ export const lessons = [
         timeSignature: { beats: 12, beatType: 8 },
         tempo: 70,
         pattern: [
-            { type: 'note', duration: 1.5, symbol: '♩.', tiedToNext: true }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, // Semínima pontuada ligada, 3 semínimas pontuadas
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮', tiedToNext: true }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮', tiedToNext: true }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮', tiedToNext: true }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Colcheias ligadas
+            { type: 'note', duration: 1.5, symbol: '♩.', tiedToNext: true }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, { type: 'note', duration: 1.5, symbol: '♩.', tiedToNext: true }, { type: 'note', duration: 1.5, symbol: '♩.' },
+            { type: 'note', duration: 6, symbol: '𝅝.' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
     {
-        name: "Módulo VIII - Lição 76: Ligaduras com Pausas em 12/8",
+        name: "Módulo VIII - Lição 76: Ligaduras com Semicolcheias em 12/8",
         timeSignature: { beats: 12, beatType: 8 },
         tempo: 75,
         pattern: [
-            { type: 'note', duration: 3, symbol: '𝅗𝅥.', tiedToNext: true }, { type: 'rest', duration: 3, symbol: '𝄼.' }, // Mínima pontuada ligada a pausa de mínima pontuada
-            { type: 'note', duration: 1.5, symbol: '♩.', tiedToNext: true }, { type: 'rest', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'rest', duration: 1.5, symbol: '♩.' }, // Semínima pontuada ligada a pausa, semínima pontuada ligada a pausa
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮', tiedToNext: true }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Colcheia ligada a pausa, colcheia
-            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, // Duas semínimas pontuadas
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮', tiedToNext: true }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
+            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮', tiedToNext: true }, { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
+            { type: 'note', duration: 6, symbol: '𝅝.' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
     {
-        name: "Módulo VIII - Lição 77: Ritmos Síncopados com Ligaduras em 6/8",
+        name: "Módulo VIII - Lição 77: Ritmos Sincopados com Ligaduras em 6/8",
         timeSignature: { beats: 6, beatType: 8 },
         tempo: 80,
         pattern: [
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮', tiedToNext: true }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Colcheia, colcheia ligada a colcheia
-            { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 1.5, symbol: '♩.', tiedToNext: true }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Pausa, semínima pontuada ligada a colcheia, duas colcheias
-            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, // Duas semínimas pontuadas
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩', tiedToNext: true }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
+            { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮', tiedToNext: true },
+            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
@@ -1009,9 +1012,8 @@ export const lessons = [
         timeSignature: { beats: 9, beatType: 8 },
         tempo: 110,
         pattern: [
-            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯', tiedToNext: true }, // Grupo de semicolcheias, última ligada
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Colcheia (complementa ligadura), duas colcheias
-            { type: 'note', duration: 1.5, symbol: '♩.', tiedToNext: true }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, // Semínima pontuada ligada a semicolcheia, 3 semicolcheias
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯', tiedToNext: true }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
+            { type: 'note', duration: 1.5, symbol: '♩.', tiedToNext: true }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 1.5, symbol: '♩.' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
@@ -1020,11 +1022,9 @@ export const lessons = [
         timeSignature: { beats: 12, beatType: 8 },
         tempo: 100,
         pattern: [
-            { type: 'note', duration: 1.5, symbol: '♩.', tiedToNext: true }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Semínima pontuada ligada a pausa, duas colcheias
-            { type: 'note', duration: 3, symbol: '𝅗𝅥.', tiedToNext: true }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, // Mínima pontuada ligada, duas semínimas pontuadas
-            { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮', tiedToNext: true }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, // Pausa, colcheia, colcheia, colcheia ligada a colcheia, pausa
-            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, // Duas semínimas pontuadas
+            { type: 'note', duration: 1.5, symbol: '♩.', tiedToNext: true }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, { type: 'note', duration: 1.5, symbol: '♩.', tiedToNext: true },
+            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'rest', duration: 1.5, symbol: '𝄽.' }, { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
@@ -1033,11 +1033,10 @@ export const lessons = [
         timeSignature: { beats: 12, beatType: 8 },
         tempo: 90,
         pattern: [
-            { type: 'note', duration: 3, symbol: '𝅗𝅥.', tiedToNext: true }, // Mínima pontuada ligada
-            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, // Semínima pontuada (complementa), duas semínimas pontuadas
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮', tiedToNext: true }, // Três colcheias, última ligada
-            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, // Semicolcheia (complementa), 3 semicolcheias
-            { type: 'rest', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, // Pausa de semínima pontuada, semínima pontuada, mínima pontuada
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.', tiedToNext: true },
+            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 6, symbol: '𝅝.' },
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩', tiedToNext: true }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
+            { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 1.5, symbol: '♩.', tiedToNext: true }, { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     }

@@ -1,9 +1,8 @@
 // events.js
-
+import { startCountdownAndPlay, togglePauseResume, stopRhythmExecution, exportWavOffline } from './audio.js';
 import { AppState } from './state.js';
 import { updateActivePatternAndTimeSignature, handlePaletteFigureClick, handleFigureSelectionForEditing } from './core.js';
 import { switchMode, renderRhythm, updateMessage, populateFigurePalette, updateLoginUI, showModal, hideAllModals, populateLoadRhythmModal, hideEditPopover } from './ui.js';
-import { startCountdownAndPlay, togglePauseResume, stopRhythmExecution, exportWavOffline } from './audio.js';
 
 // --- Elementos do DOM ---
 const modeSelect = document.getElementById('mode-select');
@@ -99,7 +98,40 @@ function handleLoadRhythm(index) {
  * Configura todos os event listeners da aplicação.
  */
 export function setupEventListeners() {
-    modeSelect.addEventListener('change', (e) => switchMode(e.target.value));
+    // REMOVIDO: O event listener antigo para o select.
+    // modeSelect.addEventListener('change', (e) => switchMode(e.target.value));
+
+    // --- NOVO: Lógica para o seletor de MODO customizado ---
+    const customModeSelect = document.getElementById('custom-mode-select');
+    const modePanel = customModeSelect.closest('.panel');
+    
+    customModeSelect.addEventListener('click', (e) => {
+        // Abre e fecha o dropdown
+        const isOpen = customModeSelect.classList.toggle('open');
+        modePanel.classList.toggle('panel-on-top', isOpen);
+    });
+
+    customModeSelect.querySelectorAll('.custom-option').forEach(option => {
+        option.addEventListener('click', (e) => {
+            e.stopPropagation(); // Impede que o clique feche o menu imediatamente
+            const selectedValue = option.dataset.value;
+            const selectedText = option.textContent;
+
+            // Remove a seleção anterior e adiciona à nova
+            customModeSelect.querySelector('.custom-option.selected').classList.remove('selected');
+            option.classList.add('selected');
+
+            // Atualiza o texto do gatilho
+            customModeSelect.querySelector('.custom-select-trigger').textContent = selectedText;
+
+            // Fecha o dropdown
+            customModeSelect.classList.remove('open');
+            modePanel.classList.remove('panel-on-top');
+            
+            // Chama a função original para trocar o modo
+            switchMode(selectedValue);
+        });
+    });
 
     const lessonPanel = customLessonSelect.closest('.panel');
     customLessonSelect.addEventListener('click', () => {
@@ -112,6 +144,13 @@ export function setupEventListeners() {
             if (customLessonSelect.classList.contains('open')) {
                 customLessonSelect.classList.remove('open');
                 lessonPanel.classList.remove('panel-on-top');
+            }
+        }
+        // --- NOVO: Lógica para fechar o dropdown de MODO ao clicar fora ---
+        if (!customModeSelect.contains(e.target)) {
+            if (customModeSelect.classList.contains('open')) {
+                customModeSelect.classList.remove('open');
+                modePanel.classList.remove('panel-on-top');
             }
         }
     });
@@ -155,6 +194,7 @@ export function setupEventListeners() {
         if(confirm("Tem a certeza que deseja limpar o padrão atual?")) {
             AppState.customPattern = [];
             AppState.selectedIndexForEditing = null;
+            hideEditPopover(); // LINHA ADICIONADA PARA GARANTIA EXTRA
             updateActivePatternAndTimeSignature();
             renderRhythm();
             updateMessage("Padrão limpo.");

@@ -63,23 +63,15 @@ export function populateLoadRhythmModal(userRhythms) {
     });
 }
 
-/**
- * Esconde o popover de edição.
- */
 export function hideEditPopover() {
     editPopover.classList.add('hidden');
 }
 
-/**
- * Mostra e posiciona o popover de edição acima da figura selecionada.
- * @param {HTMLElement} figureElement - O elemento .figure-container que foi clicado.
- */
 export function showEditPopover(figureElement) {
     const displayContainer = document.getElementById('rhythm-display-container');
     const containerRect = displayContainer.getBoundingClientRect();
     const figureRect = figureElement.getBoundingClientRect();
 
-    // Calcula a posição do topo e do centro do elemento da figura
     const top = figureRect.top - containerRect.top + displayContainer.scrollTop - editPopover.offsetHeight - 10;
     const left = figureRect.left - containerRect.left + displayContainer.scrollLeft + (figureRect.width / 2) - (editPopover.offsetWidth / 2);
 
@@ -87,7 +79,6 @@ export function showEditPopover(figureElement) {
     editPopover.style.left = `${left}px`;
     editPopover.classList.remove('hidden');
 }
-
 
 export function updateMessage(text, type = 'info') {
     messageArea.textContent = text;
@@ -160,7 +151,6 @@ export function highlightActiveVisualElement(patternIndex, activeBeatIndex = 0) 
     }
 }
 
-
 function updateFigureFocusDisplay(item) {
     if (!figureFocusDisplayEl) return;
 
@@ -187,7 +177,6 @@ function updateFigureFocusDisplay(item) {
     }
 }
 
-
 function drawTie(row, startEl, endEl) {
     const tie = document.createElement('div');
     tie.className = 'tie';
@@ -204,8 +193,10 @@ function drawTie(row, startEl, endEl) {
     tie.style.left = `${left}px`;
     tie.style.width = `${width}px`;
     
-    const noteItemHeight = startEl.querySelector('.note-item')?.offsetHeight || 60;
-    tie.style.bottom = `${noteItemHeight - 50}px`;
+    const noteItem = startEl.querySelector('.note-item');
+    if (noteItem) {
+        tie.style.top = `${noteItem.offsetTop}px`;
+    }
 
     row.appendChild(tie);
 }
@@ -213,7 +204,7 @@ function drawTie(row, startEl, endEl) {
 export function renderRhythm() {
     rhythmDisplayEl.innerHTML = '';
     updateFigureFocusDisplay(null);
-    hideEditPopover(); // Garante que o popover seja escondido a cada nova renderização
+    hideEditPopover();
     
     if (!AppState.activePattern || AppState.activePattern.length === 0) {
         const message = AppState.currentMode === 'freeCreate'
@@ -246,8 +237,7 @@ export function renderRhythm() {
     addTimeSignature(currentRow);
 
     AppState.activePattern.forEach((item, index) => {
-        if (item.type === 'final_barline') return;
-        if (item.isTiedContinuation) return;
+        if (item.type === 'final_barline' || item.isTiedContinuation) return;
         
         const figureWidth = 70;
         
@@ -268,11 +258,9 @@ export function renderRhythm() {
         
         if (AppState.currentMode === 'freeCreate' && !item.isControl) {
             figureContainer.addEventListener('click', (e) => {
-                e.stopPropagation(); // Impede que o clique se propague para o display e feche o popover
+                e.stopPropagation();
                 handleFigureSelectionForEditing(index);
-                // Re-renderiza para mostrar o item selecionado e esconde o popover antigo
-                renderRhythm(); 
-                // Mostra o novo popover sobre o elemento recém-renderizado
+                renderRhythm();
                 const newFigureElement = rhythmDisplayEl.querySelector(`.figure-container[data-pattern-index="${index}"]`);
                 if(newFigureElement && AppState.selectedIndexForEditing === index) {
                     showEditPopover(newFigureElement);
@@ -285,7 +273,6 @@ export function renderRhythm() {
         
         const beatCounterElement = document.createElement('div');
         beatCounterElement.className = 'beat-counter-text';
-        
         const beatValue = getBeatValue(item.duration, timeSig);
 
         if (!item.isControl) {
@@ -310,10 +297,7 @@ export function renderRhythm() {
         const noteItemElement = document.createElement('div');
         noteItemElement.className = `note-item ${item.type === 'note' ? 'bg-blue-500' : 'bg-gray-300'}`;
         noteItemElement.textContent = item.symbol;
-        
-        if(item.isControl) {
-            noteItemElement.classList.add('control-item');
-        }
+        if(item.isControl) noteItemElement.classList.add('control-item');
 
         const syllableElement = document.createElement('div');
         syllableElement.className = 'syllable-text';
@@ -323,13 +307,10 @@ export function renderRhythm() {
         currentRow.appendChild(figureContainer);
         currentRowWidth += figureWidth;
 
-        if (!item.isControl) {
-            currentBeatsInMeasure += beatValue;
-        }
+        if (!item.isControl) currentBeatsInMeasure += beatValue;
         
         if (Math.abs(currentBeatsInMeasure - totalMeasureBeats) < tolerance) {
             const hasMoreMusic = AppState.activePattern.slice(index + 1).some(fig => !fig.isControl);
-
             if (hasMoreMusic) {
                  const barlineWidth = 20;
                  if (currentRowWidth + barlineWidth > containerWidth) {
@@ -384,9 +365,7 @@ export function switchMode(mode) {
     
     updateMessage(isLessonMode ? "Selecione uma lição na lista." : "Modo de Criação Livre ativado.");
     
-    if(isLessonMode) {
-        AppState.customPattern = [];
-    }
+    if(isLessonMode) AppState.customPattern = [];
 
     updateActivePatternAndTimeSignature();
     setTimeout(renderRhythm, 50); 
@@ -432,9 +411,6 @@ export function populateFigurePalette() {
     if (!figurePaletteDiv) return;
     figurePaletteDiv.innerHTML = '';
     
-    // O botão de ligadura foi removido da paleta principal pois agora está no popover.
-    // Pode-se optar por mantê-lo aqui como uma alternativa, se desejado.
-
     rhythmicFigures.forEach(fig => {
         const button = document.createElement('button');
         button.className = 'figure-button';
