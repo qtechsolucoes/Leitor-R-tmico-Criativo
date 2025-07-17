@@ -2,22 +2,34 @@
 
 import { AppState } from './state.js';
 import { updateActivePatternAndTimeSignature, handlePaletteFigureClick, handleFigureSelectionForEditing } from './core.js';
-import { switchMode, renderRhythm, updateMessage, populateFigurePalette, updateLoginUI } from './ui.js';
+import { switchMode, renderRhythm, updateMessage, populateFigurePalette, updateLoginUI, showModal, hideAllModals, populateLoadRhythmModal, hideEditPopover } from './ui.js';
 import { startCountdownAndPlay, togglePauseResume, stopRhythmExecution, exportWavOffline } from './audio.js';
 
 // --- Elementos do DOM ---
 const modeSelect = document.getElementById('mode-select');
 const customLessonSelect = document.getElementById('custom-lesson-select');
 
+// --- Elementos do Modal ---
+const loginModal = document.getElementById('login-modal');
+const saveRhythmModal = document.getElementById('save-rhythm-modal');
+const loadRhythmModal = document.getElementById('load-rhythm-modal');
+const usernameInput = document.getElementById('username-input');
+const rhythmNameInput = document.getElementById('rhythm-name-input');
+
+
 // --- Funções de Persistência ---
 
-function loginUser() {
-    const username = prompt("Digite o seu nome de utilizador:", "músico");
+function handleLogin() {
+    const username = usernameInput.value.trim();
     if(username) {
         AppState.user.currentUser = { username };
         localStorage.setItem('lrc_currentUser', JSON.stringify(AppState.user.currentUser));
         updateMessage(`Login como ${username}.`, "success");
         updateLoginUI();
+        hideAllModals();
+        usernameInput.value = '';
+    } else {
+        updateMessage("Por favor, insira um nome de utilizador.", "error");
     }
 }
 
@@ -28,16 +40,18 @@ function logoutUser() {
     updateLoginUI();
 }
 
-function saveCurrentRhythm() {
+function handleSaveRhythm() {
     if (!AppState.user.currentUser) {
         updateMessage("Faça login para salvar.", "error");
+        hideAllModals();
         return;
     }
     if(!AppState.customPattern || AppState.customPattern.length === 0) {
         updateMessage("Não há ritmo para salvar.", "error");
+        hideAllModals();
         return;
     }
-    const rhythmName = prompt("Dê um nome para o seu ritmo:");
+    const rhythmName = rhythmNameInput.value.trim();
     if (rhythmName) {
         const username = AppState.user.currentUser.username;
         const savedRhythms = JSON.parse(localStorage.getItem('lrc_savedRhythms')) || {};
@@ -51,26 +65,17 @@ function saveCurrentRhythm() {
         });
         localStorage.setItem('lrc_savedRhythms', JSON.stringify(savedRhythms));
         updateMessage(`Ritmo "${rhythmName}" salvo.`, "success");
+        hideAllModals();
+        rhythmNameInput.value = '';
+    } else {
+        updateMessage("Por favor, dê um nome para o seu ritmo.", "error");
     }
 }
 
-function loadSavedRhythm() {
-    if (!AppState.user.currentUser) {
-        updateMessage("Faça login para carregar.", "error");
-        return;
-    }
+function handleLoadRhythm(index) {
     const username = AppState.user.currentUser.username;
     const savedRhythms = JSON.parse(localStorage.getItem('lrc_savedRhythms')) || {};
     const userRhythms = savedRhythms[username];
-
-    if (!userRhythms || userRhythms.length === 0) {
-        updateMessage("Nenhum ritmo salvo.", "error");
-        return;
-    }
-
-    const rhythmNames = userRhythms.map((r, i) => `${i + 1}. ${r.name}`).join('\n');
-    const choice = prompt(`Escolha um ritmo para carregar:\n${rhythmNames}\n\nDigite o número:`);
-    const index = parseInt(choice) - 1;
 
     if (!isNaN(index) && index >= 0 && index < userRhythms.length) {
         const rhythm = userRhythms[index];
@@ -82,8 +87,9 @@ function loadSavedRhythm() {
         updateActivePatternAndTimeSignature();
         renderRhythm();
         updateMessage(`Ritmo "${rhythm.name}" carregado.`, "success");
+        hideAllModals();
 
-    } else if (choice) {
+    } else {
         updateMessage("Seleção inválida.", "error");
     }
 }
@@ -95,7 +101,6 @@ function loadSavedRhythm() {
 export function setupEventListeners() {
     modeSelect.addEventListener('change', (e) => switchMode(e.target.value));
 
-    // LÓGICA CORRIGIDA PARA O DROPDOWN DE LIÇÕES
     const lessonPanel = customLessonSelect.closest('.panel');
     customLessonSelect.addEventListener('click', () => {
         const isOpen = customLessonSelect.classList.toggle('open');
@@ -155,26 +160,75 @@ export function setupEventListeners() {
             updateMessage("Padrão limpo.");
         }
     });
+    
+    document.getElementById('login-button').addEventListener('click', () => showModal(loginModal));
+    document.getElementById('logout-button').addEventListener('click', logoutUser);
+    document.getElementById('save-rhythm-button').addEventListener('click', () => showModal(saveRhythmModal));
+    document.getElementById('load-rhythms-button').addEventListener('click', () => {
+        const username = AppState.user.currentUser.username;
+        const savedRhythms = JSON.parse(localStorage.getItem('lrc_savedRhythms')) || {};
+        const userRhythms = savedRhythms[username];
+        populateLoadRhythmModal(userRhythms);
+        showModal(loadRhythmModal);
+    });
 
-    document.getElementById('delete-selected-figure-button').addEventListener('click', () => {
+    document.getElementById('export-wav-button').addEventListener('click', exportWavOffline);
+
+    // --- Eventos dos Modais ---
+    document.getElementById('login-confirm-button').addEventListener('click', handleLogin);
+    document.getElementById('login-cancel-button').addEventListener('click', hideAllModals);
+    document.getElementById('save-confirm-button').addEventListener('click', handleSaveRhythm);
+    document.getElementById('save-cancel-button').addEventListener('click', hideAllModals);
+    document.getElementById('load-cancel-button').addEventListener('click', hideAllModals);
+    document.getElementById('error-ok-button').addEventListener('click', hideAllModals);
+
+    document.getElementById('load-rhythm-list').addEventListener('click', (e) => {
+        if (e.target && e.target.classList.contains('load-item-button')) {
+            const index = parseInt(e.target.dataset.index);
+            handleLoadRhythm(index);
+        }
+    });
+
+    usernameInput.addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') handleLogin();
+    });
+    rhythmNameInput.addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') handleSaveRhythm();
+    });
+
+    // Adiciona listener para fechar o popover ao clicar em qualquer lugar no display
+    document.getElementById('rhythm-display-container').addEventListener('click', () => {
+        if (AppState.selectedIndexForEditing !== null) {
+            AppState.selectedIndexForEditing = null;
+            renderRhythm(); // Re-renderiza para remover a seleção visual
+        }
+    });
+
+    // ========= EVENTOS DO POPOVER DE EDIÇÃO =========
+    document.getElementById('popover-delete-button').addEventListener('click', (e) => {
+        e.stopPropagation();
         if (AppState.selectedIndexForEditing === null) return;
         
-        const indexToDelete = AppState.selectedIndexForEditing;
-        AppState.customPattern.splice(indexToDelete, 1);
-
-        if(indexToDelete > 0 && AppState.customPattern[indexToDelete - 1]?.tiedToNext) {
-             delete AppState.customPattern[indexToDelete - 1].tiedToNext;
-        }
-        
+        AppState.customPattern.splice(AppState.selectedIndexForEditing, 1);
         AppState.selectedIndexForEditing = null;
+        
         updateActivePatternAndTimeSignature();
         renderRhythm();
         updateMessage("Figura apagada.");
     });
-    
-    document.getElementById('login-button').addEventListener('click', loginUser);
-    document.getElementById('logout-button').addEventListener('click', logoutUser);
-    document.getElementById('save-rhythm-button').addEventListener('click', saveCurrentRhythm);
-    document.getElementById('load-rhythms-button').addEventListener('click', loadSavedRhythm);
-    document.getElementById('export-wav-button').addEventListener('click', exportWavOffline);
+
+    document.getElementById('popover-tie-button').addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (AppState.selectedIndexForEditing === null) return;
+
+        const result = handlePaletteFigureClick({ name: 'Ligadura' });
+        updateMessage(result.message, result.success ? 'info' : 'error');
+        if(result.success) {
+            // Não é preciso chamar updateActivePatternAndTimeSignature aqui pois
+            // handlePaletteFigureClick não altera o padrão, apenas o estado da ligadura
+            // que será reprocessado na renderização.
+            updateActivePatternAndTimeSignature(); // Para re-calcular as sílabas e durações de ligadura
+            renderRhythm();
+        }
+    });
 }

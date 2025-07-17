@@ -76,8 +76,7 @@
                 <div id="figure-palette" class="flex flex-wrap gap-2 justify-center p-3 bg-slate-900/50 rounded-lg border border-slate-700 mb-4"></div>
                 <div class="flex flex-wrap gap-3 justify-center">
                     <button id="clear-custom-rhythm" class="btn-action btn-clear">Limpar</button>
-                    <button id="delete-selected-figure-button" class="btn-action btn-delete-fig hidden">Apagar</button>
-                </div>
+                    </div>
             </div>
              
             <div class="panel user-actions">
@@ -109,6 +108,47 @@
     </div>
 
     <select id="lesson-select" class="hidden-native-select"></select>
+
+    <div id="modal-overlay" class="modal-overlay hidden"></div>
+
+    <div id="login-modal" class="modal hidden">
+        <h3 class="modal-title">Login</h3>
+        <p class="modal-text">Digite seu nome de utilizador para salvar e carregar ritmos.</p>
+        <input type="text" id="username-input" class="modal-input" placeholder="Nome de utilizador">
+        <div class="modal-actions">
+            <button id="login-confirm-button" class="btn-action">Login</button>
+            <button id="login-cancel-button" class="btn-action btn-secondary">Cancelar</button>
+        </div>
+    </div>
+    <div id="save-rhythm-modal" class="modal hidden">
+        <h3 class="modal-title">Salvar Ritmo</h3>
+        <p class="modal-text">Dê um nome para o seu ritmo personalizado.</p>
+        <input type="text" id="rhythm-name-input" class="modal-input" placeholder="Nome do ritmo">
+        <div class="modal-actions">
+            <button id="save-confirm-button" class="btn-action">Salvar</button>
+            <button id="save-cancel-button" class="btn-action btn-secondary">Cancelar</button>
+        </div>
+    </div>
+    <div id="load-rhythm-modal" class="modal hidden">
+        <h3 class="modal-title">Carregar Ritmo</h3>
+        <p class="modal-text">Selecione um dos seus ritmos salvos para carregar.</p>
+        <div id="load-rhythm-list" class="modal-list"></div>
+        <div class="modal-actions">
+            <button id="load-cancel-button" class="btn-action btn-secondary">Cancelar</button>
+        </div>
+    </div>
+    <div id="error-modal" class="modal modal-error hidden">
+        <h3 class="modal-title modal-title-error"><i class="fas fa-exclamation-triangle"></i> Erro Crítico</h3>
+        <p id="error-modal-text" class="modal-text"></p>
+        <div class="modal-actions">
+            <button id="error-ok-button" class="btn-action btn-secondary">OK</button>
+        </div>
+    </div>
+
+    <div id="edit-popover" class="edit-popover hidden">
+        <button id="popover-tie-button" class="popover-button" title="Adicionar/Remover Ligadura">&#9900;</button>
+        <button id="popover-delete-button" class="popover-button" title="Apagar Figura"><i class="fas fa-trash-alt"></i></button>
+    </div>
 
     <script type="module" src="src/main.js"></script>
 </body>

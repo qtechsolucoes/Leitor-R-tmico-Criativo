@@ -14,7 +14,80 @@ const countdownDisplay = document.getElementById('countdown-display');
 const playPauseButton = document.getElementById('play-pause-button');
 const customLessonSelect = document.getElementById('custom-lesson-select');
 
+// --- Elementos do Modal ---
+const modalOverlay = document.getElementById('modal-overlay');
+const loginModal = document.getElementById('login-modal');
+const saveRhythmModal = document.getElementById('save-rhythm-modal');
+const loadRhythmModal = document.getElementById('load-rhythm-modal');
+const errorModal = document.getElementById('error-modal');
+const errorModalText = document.getElementById('error-modal-text');
+
+// --- Elementos do Popover ---
+const editPopover = document.getElementById('edit-popover');
+
 // --- Funções de Manipulação da UI Exportadas ---
+
+export function showModal(modalElement) {
+    modalOverlay.classList.remove('hidden');
+    modalElement.classList.remove('hidden');
+}
+
+export function hideAllModals() {
+    modalOverlay.classList.add('hidden');
+    loginModal.classList.add('hidden');
+    saveRhythmModal.classList.add('hidden');
+    loadRhythmModal.classList.add('hidden');
+    errorModal.classList.add('hidden');
+}
+
+export function showErrorModal(message) {
+    errorModalText.textContent = message;
+    showModal(errorModal);
+}
+
+export function populateLoadRhythmModal(userRhythms) {
+    const listContainer = document.getElementById('load-rhythm-list');
+    listContainer.innerHTML = ''; // Limpa a lista anterior
+
+    if (!userRhythms || userRhythms.length === 0) {
+        listContainer.innerHTML = '<p class="text-center text-slate-400">Nenhum ritmo salvo encontrado.</p>';
+        return;
+    }
+
+    userRhythms.forEach((rhythm, index) => {
+        const button = document.createElement('button');
+        button.className = 'load-item-button';
+        button.textContent = rhythm.name;
+        button.dataset.index = index;
+        listContainer.appendChild(button);
+    });
+}
+
+/**
+ * Esconde o popover de edição.
+ */
+export function hideEditPopover() {
+    editPopover.classList.add('hidden');
+}
+
+/**
+ * Mostra e posiciona o popover de edição acima da figura selecionada.
+ * @param {HTMLElement} figureElement - O elemento .figure-container que foi clicado.
+ */
+export function showEditPopover(figureElement) {
+    const displayContainer = document.getElementById('rhythm-display-container');
+    const containerRect = displayContainer.getBoundingClientRect();
+    const figureRect = figureElement.getBoundingClientRect();
+
+    // Calcula a posição do topo e do centro do elemento da figura
+    const top = figureRect.top - containerRect.top + displayContainer.scrollTop - editPopover.offsetHeight - 10;
+    const left = figureRect.left - containerRect.left + displayContainer.scrollLeft + (figureRect.width / 2) - (editPopover.offsetWidth / 2);
+
+    editPopover.style.top = `${top}px`;
+    editPopover.style.left = `${left}px`;
+    editPopover.classList.remove('hidden');
+}
+
 
 export function updateMessage(text, type = 'info') {
     messageArea.textContent = text;
@@ -50,7 +123,6 @@ export function updatePlaybackButtons(isPlaying) {
 
 export function enableAllControls() {
     document.querySelectorAll('button, select, input').forEach(el => el.disabled = false);
-    document.getElementById('delete-selected-figure-button').classList.toggle('hidden', AppState.selectedIndexForEditing === null);
     updateLoginUI();
 }
 
@@ -141,13 +213,13 @@ function drawTie(row, startEl, endEl) {
 export function renderRhythm() {
     rhythmDisplayEl.innerHTML = '';
     updateFigureFocusDisplay(null);
+    hideEditPopover(); // Garante que o popover seja escondido a cada nova renderização
     
     if (!AppState.activePattern || AppState.activePattern.length === 0) {
         const message = AppState.currentMode === 'freeCreate'
             ? "Comece a adicionar figuras no Painel de Criação."
             : "Bem-vindo! Selecione uma lição para começar.";
         rhythmDisplayEl.innerHTML = `<p class="text-slate-400 text-center w-full text-lg self-center">${message}</p>`;
-        document.getElementById('delete-selected-figure-button').classList.add('hidden');
         return;
     }
 
@@ -174,6 +246,7 @@ export function renderRhythm() {
     addTimeSignature(currentRow);
 
     AppState.activePattern.forEach((item, index) => {
+        if (item.type === 'final_barline') return;
         if (item.isTiedContinuation) return;
         
         const figureWidth = 70;
@@ -194,9 +267,16 @@ export function renderRhythm() {
         figureContainer.addEventListener('mouseleave', () => updateFigureFocusDisplay(null));
         
         if (AppState.currentMode === 'freeCreate' && !item.isControl) {
-            figureContainer.addEventListener('click', () => {
+            figureContainer.addEventListener('click', (e) => {
+                e.stopPropagation(); // Impede que o clique se propague para o display e feche o popover
                 handleFigureSelectionForEditing(index);
-                renderRhythm();
+                // Re-renderiza para mostrar o item selecionado e esconde o popover antigo
+                renderRhythm(); 
+                // Mostra o novo popover sobre o elemento recém-renderizado
+                const newFigureElement = rhythmDisplayEl.querySelector(`.figure-container[data-pattern-index="${index}"]`);
+                if(newFigureElement && AppState.selectedIndexForEditing === index) {
+                    showEditPopover(newFigureElement);
+                }
             });
             if (AppState.selectedIndexForEditing === index) {
                 figureContainer.classList.add('selected-for-edit');
@@ -247,11 +327,10 @@ export function renderRhythm() {
             currentBeatsInMeasure += beatValue;
         }
         
-        // Lógica da Barra de Compasso
         if (Math.abs(currentBeatsInMeasure - totalMeasureBeats) < tolerance) {
-            const isLastElement = index === AppState.activePattern.length - 1;
-            
-            if (!isLastElement) {
+            const hasMoreMusic = AppState.activePattern.slice(index + 1).some(fig => !fig.isControl);
+
+            if (hasMoreMusic) {
                  const barlineWidth = 20;
                  if (currentRowWidth + barlineWidth > containerWidth) {
                     currentRow = document.createElement('div');
@@ -270,15 +349,13 @@ export function renderRhythm() {
         }
     });
 
-    // Lógica da Barra Final (renderizada no final, se presente)
     const lastItem = AppState.activePattern[AppState.activePattern.length - 1];
     if(lastItem && lastItem.type === 'final_barline'){
         const finalBarEl = document.createElement('div');
         finalBarEl.className = 'final-barline-container';
-        finalBarEl.innerHTML = `<div class="final-barline-item"></div>`;
+        finalBarEl.innerHTML = `<div class="final-barline-item"><div class="thin-bar"></div><div class="thick-bar"></div></div>`;
         currentRow.appendChild(finalBarEl);
     }
-
 
     rhythmDisplayEl.querySelectorAll('.rhythm-row').forEach(row => {
         AppState.activePattern.forEach((item, index) => {
@@ -295,8 +372,6 @@ export function renderRhythm() {
             }
         });
     });
-    
-    document.getElementById('delete-selected-figure-button').classList.toggle('hidden', AppState.selectedIndexForEditing === null);
 }
 
 export function switchMode(mode) {
@@ -314,7 +389,6 @@ export function switchMode(mode) {
     }
 
     updateActivePatternAndTimeSignature();
-    // A renderização precisa de um pequeno atraso para obter a largura correta do container
     setTimeout(renderRhythm, 50); 
     updateLoginUI();
 }
@@ -358,19 +432,8 @@ export function populateFigurePalette() {
     if (!figurePaletteDiv) return;
     figurePaletteDiv.innerHTML = '';
     
-    const tieButton = document.createElement('button');
-    tieButton.className = 'figure-button figure-button-control';
-    tieButton.innerHTML = '&#9900;';
-    tieButton.title = 'Adicionar/Remover Ligadura';
-    tieButton.addEventListener('click', () => {
-        const result = handlePaletteFigureClick({ name: 'Ligadura' });
-        updateMessage(result.message, result.success ? 'info' : 'error');
-        if(result.success) {
-            updateActivePatternAndTimeSignature();
-            renderRhythm();
-        }
-    });
-    figurePaletteDiv.appendChild(tieButton);
+    // O botão de ligadura foi removido da paleta principal pois agora está no popover.
+    // Pode-se optar por mantê-lo aqui como uma alternativa, se desejado.
 
     rhythmicFigures.forEach(fig => {
         const button = document.createElement('button');

@@ -1,15 +1,14 @@
-// --- Configurações e Dados Iniciais ---
 export const rhythmicFigures = [
     { name: 'Semibreve', symbol: '𝅝', type: 'note', duration: 4},
     { name: 'Pausa de Semibreve', symbol: '𝄻', type: 'rest', duration: 4},
     { name: 'Mínima Pontuada', symbol: '𝅗𝅥.', type: 'note', duration: 3},
     { name: 'Mínima', symbol: '𝅗𝅥', type: 'note', duration: 2},
     { name: 'Pausa de Mínima', symbol: '𝄼', type: 'rest', duration: 2},
-     { name: 'Semínima Pontuada', symbol: '♩.', type: 'note', duration: 1.5},
+    { name: 'Semínima Pontuada', symbol: '♩.', type: 'note', duration: 1.5},
     { name: 'Semínima', symbol: '♩', type: 'note', duration: 1},
     { name: 'Pausa de Semínima', symbol: '𝄽', type: 'rest', duration: 1},
+    { name: 'Colcheia Pontuada', symbol: '𝅘𝅥𝅮.', type: 'note', duration: 0.75},
     { name: 'Colcheia', symbol: '𝅘𝅥𝅮', type: 'note', duration: 0.5},
-     { name: 'Colcheia Pontuada', symbol: '𝅘𝅥𝅮.', type: 'note', duration: 0.75},
     { name: 'Pausa de Colcheia', symbol: '𝄾', type: 'rest', duration: 0.5},
     { name: 'Semicolcheia', symbol: '𝅘𝅥𝅯', type: 'note', duration: 0.25},
     { name: 'Pausa de Semicolcheia', symbol: '𝄿', type: 'rest', duration: 0.25},
@@ -28,12 +27,14 @@ export const lessons = [
         timeSignature: { beats: 4, beatType: 4 },
         tempo: 60,
         pattern: [
-            { type: 'note', duration: 4, symbol: '𝅝' }, { type: 'note', duration: 4, symbol: '𝅝' },
             { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
             { type: 'note', duration: 4, symbol: '𝅝' },
             { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
             { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
-            { type: 'note', duration: 4, symbol: '𝅝' }, { type: 'note', duration: 4, symbol: '𝅝' },
+            { type: 'note', duration: 4, symbol: '𝅝' },
+            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 4, symbol: '𝅝' },
+            { type: 'note', duration: 4, symbol: '𝅝' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
@@ -42,13 +43,14 @@ export const lessons = [
         timeSignature: { beats: 4, beatType: 4 },
         tempo: 65,
         pattern: [
-            { type: 'note', duration: 4, symbol: '𝅝' }, { type: 'rest', duration: 4, symbol: '𝄻' },
-            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'rest', duration: 2, symbol: '𝄼' },
-            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 4, symbol: '𝅝' }, 
             { type: 'rest', duration: 4, symbol: '𝄻' },
             { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'rest', duration: 2, symbol: '𝄼' },
-            { type: 'rest', duration: 2, symbol: '𝄼' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'rest', duration: 2, symbol: '𝄼' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'rest', duration: 4, symbol: '𝄻' },
             { type: 'note', duration: 4, symbol: '𝅝' },
+            { type: 'rest', duration: 2, symbol: '𝄼' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
@@ -58,13 +60,13 @@ export const lessons = [
         tempo: 70,
         pattern: [
             { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' },
-            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
-            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
-            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' },
             { type: 'note', duration: 4, symbol: '𝅝' },
-            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 1, symbol: '♩' },
-            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
-            { type: 'note', duration: 4, symbol: '𝅝' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
@@ -74,11 +76,11 @@ export const lessons = [
         tempo: 75,
         pattern: [
             { type: 'note', duration: 1, symbol: '♩' }, { type: 'rest', duration: 1, symbol: '𝄽' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'rest', duration: 1, symbol: '𝄽' },
-            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'rest', duration: 2, symbol: '𝄼' },
+            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'rest', duration: 2, symbol: '𝄼' },
             { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'rest', duration: 1, symbol: '𝄽' }, { type: 'note', duration: 1, symbol: '♩' },
-            { type: 'rest', duration: 1, symbol: '𝄽' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'rest', duration: 1, symbol: '𝄽' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'rest', duration: 1, symbol: '𝄽' },
             { type: 'note', duration: 4, symbol: '𝅝' },
-            { type: 'note', duration: 1, symbol: '♩' }, { type: 'rest', duration: 1, symbol: '𝄽' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'rest', duration: 1, symbol: '𝄽' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
             { type: 'rest', duration: 2, symbol: '𝄼' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'rest', duration: 1, symbol: '𝄽' },
             { type: 'note', duration: 4, symbol: '𝅝' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
@@ -89,46 +91,46 @@ export const lessons = [
         timeSignature: { beats: 4, beatType: 4 },
         tempo: 80,
         pattern: [
-            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'rest', duration: 1, symbol: '𝄽' },
-            { type: 'note', duration: 1, symbol: '♩' }, { type: 'rest', duration: 1, symbol: '𝄽' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'rest', duration: 1, symbol: '𝄽' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'rest', duration: 1, symbol: '𝄽' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
             { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' },
             { type: 'rest', duration: 4, symbol: '𝄻' },
             { type: 'note', duration: 4, symbol: '𝅝' },
-            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'rest', duration: 1, symbol: '𝄽' }, { type: 'note', duration: 1, symbol: '♩' },
-            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'rest', duration: 1, symbol: '𝄽' },
+            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'rest', duration: 1, symbol: '𝄽' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'rest', duration: 1, symbol: '𝄽' },
             { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'rest', duration: 2, symbol: '𝄼' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
-
-    // Módulo I (continuação) - Lições 6 a 10: Variação de Compassos 2/4, 3/4 e 4/4 com Semibreve, Mínima, Semínima, Colcheia, Semicolcheia e suas pausas.
     {
-        name: "Módulo I - Lição 6: Explorando 2/4 com Semínimas e Colcheias",
+        name: "Módulo I - Lição 6: Explorando 2/4 com Colcheias",
         timeSignature: { beats: 2, beatType: 4 },
         tempo: 85,
         pattern: [
-            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 1
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Compasso 2
-            { type: 'rest', duration: 1, symbol: '𝄽' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 3
-            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, // Compasso 4 (Mínima completa o compasso 2/4)
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 5
-            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Compasso 6
-            { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 7
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, 
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
+            { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'rest', duration: 1, symbol: '𝄽' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 2, symbol: '𝅗𝅥' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
     {
-        name: "Módulo I - Lição 7: Ritmos em 3/4 com Semínimas e Pausas",
+        name: "Módulo I - Lição 7: Ritmos em 3/4",
         timeSignature: { beats: 3, beatType: 4 },
         tempo: 90,
         pattern: [
-            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 1
-            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 2
-            { type: 'note', duration: 1, symbol: '♩' }, { type: 'rest', duration: 1, symbol: '𝄽' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 3
-            { type: 'rest', duration: 3, symbol: '𝄼' }, // Compasso 4 (Mínima com pausa completa o compasso)
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Compasso 5
-            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 6
-            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, // Compasso 7 (Mínima pontuada, se permitido neste módulo, ou 3 semínimas)
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'rest', duration: 1, symbol: '𝄽' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'rest', duration: 1, symbol: '𝄽' },
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
@@ -137,12 +139,11 @@ export const lessons = [
         timeSignature: { beats: 4, beatType: 4 },
         tempo: 95,
         pattern: [
-            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, // 1 tempo
-            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'rest', duration: 0.25, symbol: '𝄿' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, // 2 tempo
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, // 3 e 4 tempos
-            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Compasso 2
-            { type: 'rest', duration: 0.25, symbol: '𝄿' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 1, symbol: '𝄽' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 3
-            { type: 'note', duration: 4, symbol: '𝅝' }, // Compasso 4
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'rest', duration: 1, symbol: '𝄽' },
+            { type: 'note', duration: 4, symbol: '𝅝' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
@@ -151,11 +152,11 @@ export const lessons = [
         timeSignature: { beats: 4, beatType: 4 },
         tempo: 100,
         pattern: [
-            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 1, symbol: '𝄽' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 1
-            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' },
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' }, // Compasso 2
-            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 3
-            { type: 'rest', duration: 4, symbol: '𝄻' }, // Compasso 4
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 1, symbol: '𝄽' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'rest', duration: 1, symbol: '𝄽' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'rest', duration: 4, symbol: '𝄻' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
@@ -164,27 +165,27 @@ export const lessons = [
         timeSignature: { beats: 4, beatType: 4 },
         tempo: 105,
         pattern: [
-            { type: 'note', duration: 4, symbol: '𝅝' }, // Compasso 1
-            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'rest', duration: 2, symbol: '𝄼' }, // Compasso 2
-            { type: 'note', duration: 1, symbol: '♩' }, { type: 'rest', duration: 1, symbol: '𝄽' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'rest', duration: 1, symbol: '𝄽' }, // Compasso 3
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
-            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, // Compasso 4
-            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'rest', duration: 1, symbol: '𝄽' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 5
+            { type: 'note', duration: 4, symbol: '𝅝' }, 
+            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'rest', duration: 2, symbol: '𝄼' }, 
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'rest', duration: 1, symbol: '𝄽' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'rest', duration: 1, symbol: '𝄽' },
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'rest', duration: 1, symbol: '𝄽' }, { type: 'note', duration: 1, symbol: '♩' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
 
     // Módulo II - Lições 11 a 20: Variação de Compassos 2/4, 3/4 e 4/4 com Semibreve, Mínima, Semínima, Colcheia, Semicolcheia e suas pausas.
-    {
+       {
         name: "Módulo II - Lição 11: Padrões de 2/4 Acelerados",
         timeSignature: { beats: 2, beatType: 4 },
         tempo: 110,
         pattern: [
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Compasso 1
-            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' },
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Compasso 2
-            { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 1, symbol: '𝄽' }, // Compasso 3
-            { type: 'note', duration: 1, symbol: '♩' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Compasso 4
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 1, symbol: '𝄽' },
+            { type: 'note', duration: 2, symbol: '𝅗𝅥' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
@@ -193,23 +194,23 @@ export const lessons = [
         timeSignature: { beats: 3, beatType: 4 },
         tempo: 115,
         pattern: [
-            { type: 'note', duration: 1, symbol: '♩' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 1
-            { type: 'rest', duration: 1, symbol: '𝄽' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 2
-            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'rest', duration: 1, symbol: '𝄽' }, // Compasso 3
-            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' },
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 4
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'rest', duration: 1, symbol: '𝄽' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'rest', duration: 1, symbol: '𝄽' },
+            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
     {
-        name: "Módulo II - Lição 13: Continuidade em 4/4 com Colcheias e Semicolcheias",
+        name: "Módulo II - Lição 13: Continuidade em 4/4",
         timeSignature: { beats: 4, beatType: 4 },
         tempo: 120,
         pattern: [
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Compasso 1 e 2 (total de 4 tempos)
-            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' },
-            { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 3 e 4 (total de 4 tempos)
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 4, symbol: '𝅝' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
@@ -218,10 +219,11 @@ export const lessons = [
         timeSignature: { beats: 2, beatType: 4 },
         tempo: 125,
         pattern: [
-            { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'rest', duration: 0.25, symbol: '𝄿' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Compasso 1
-            { type: 'note', duration: 1, symbol: '♩' }, { type: 'rest', duration: 1, symbol: '𝄽' }, // Compasso 2
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, // Compasso 3
-            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, // Compasso 4
+            { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'rest', duration: 0.25, symbol: '𝄿' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'rest', duration: 1, symbol: '𝄽' },
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 2, symbol: '𝅗𝅥' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
@@ -230,10 +232,10 @@ export const lessons = [
         timeSignature: { beats: 3, beatType: 4 },
         tempo: 130,
         pattern: [
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 1
-            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'rest', duration: 0.25, symbol: '𝄿' },
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Compasso 2
-            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 3
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
@@ -242,10 +244,10 @@ export const lessons = [
         timeSignature: { beats: 4, beatType: 4 },
         tempo: 135,
         pattern: [
-            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' },
-            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'rest', duration: 0.25, symbol: '𝄿' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' },
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 1, symbol: '𝄽' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 1 e 2
-            { type: 'note', duration: 4, symbol: '𝅝' }, // Compasso 3
+            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'rest', duration: 0.25, symbol: '𝄿' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 1, symbol: '𝄽' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 4, symbol: '𝅝' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
@@ -254,9 +256,11 @@ export const lessons = [
         timeSignature: { beats: 2, beatType: 4 },
         tempo: 140,
         pattern: [
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Compasso 1
-            { type: 'rest', duration: 0.25, symbol: '𝄿' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 2
-            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, // Compasso 3
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
+            { type: 'rest', duration: 0.25, symbol: '𝄿' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
@@ -265,9 +269,10 @@ export const lessons = [
         timeSignature: { beats: 3, beatType: 4 },
         tempo: 145,
         pattern: [
-            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 1, symbol: '𝄽' }, // Compasso 1
-            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 2
-            { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.25, symbol: '𝄿' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 3
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 1, symbol: '𝄽' },
+            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.25, symbol: '𝄿' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
@@ -276,11 +281,10 @@ export const lessons = [
         timeSignature: { beats: 4, beatType: 4 },
         tempo: 150,
         pattern: [
-            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' },
-            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' },
-            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' },
-            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, // Quatro tempos de semicolcheias
-            { type: 'rest', duration: 4, symbol: '𝄻' }, // Pausa de semibreve
+            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'rest', duration: 4, symbol: '𝄻' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
@@ -289,23 +293,26 @@ export const lessons = [
         timeSignature: { beats: 4, beatType: 4 },
         tempo: 155,
         pattern: [
-            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 1
-            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'rest', duration: 0.25, symbol: '𝄿' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 2
-            { type: 'note', duration: 4, symbol: '𝅝' }, // Compasso 3
+            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'rest', duration: 0.25, symbol: '𝄿' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 4, symbol: '𝅝' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
 
     // Módulo III - Lições 21 a 30: Introdução à Mínima Pontuada e Colcheia Pontuada
-    {
+        {
         name: "Módulo III - Lição 21: Mínima Pontuada em 3/4",
         timeSignature: { beats: 3, beatType: 4 },
         tempo: 70,
         pattern: [
-            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, // Compasso 1 (Mínima Pontuada)
-            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 2
-            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, // Compasso 3
-            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 4 (Semínima pontuada e Colcheia)
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
+            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
@@ -314,9 +321,11 @@ export const lessons = [
         timeSignature: { beats: 4, beatType: 4 },
         tempo: 75,
         pattern: [
-            { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 1
-            { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'rest', duration: 0.25, symbol: '𝄿' }, { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' }, // Compasso 2
-            { type: 'note', duration: 4, symbol: '𝅝' }, // Compasso 3
+            { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 4, symbol: '𝅝' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
@@ -325,34 +334,35 @@ export const lessons = [
         timeSignature: { beats: 2, beatType: 4 },
         tempo: 80,
         pattern: [
-            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Compasso 1
-            { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'rest', duration: 1, symbol: '𝄽' }, // Compasso 2
-            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, // Compasso 3
-            { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 4
+            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
+            { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'rest', duration: 0.5, symbol: '𝄾' },
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1.5, symbol: '♩.' },
+            { type: 'note', duration: 2, symbol: '𝅗𝅥' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
     {
-        name: "Módulo III - Lição 24: Padrões com Pausas Pontuadas em 3/4",
+        name: "Módulo III - Lição 24: Padrões com Pausas Pontuadas",
         timeSignature: { beats: 3, beatType: 4 },
         tempo: 85,
         pattern: [
-            { type: 'rest', duration: 1.5, symbol: '𝄽.' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 1
-            { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'rest', duration: 0.25, symbol: '𝄿' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 2
-            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, // Compasso 3
-            { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'rest', duration: 1, symbol: '𝄽' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 4
+            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'rest', duration: 0.25, symbol: '𝄿' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'rest', duration: 1.5, symbol: '𝄽.' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
     {
-        name: "Módulo III - Lição 25: Desafios Rítmicos com Pontuadas em 4/4",
+        name: "Módulo III - Lição 25: Desafios Rítmicos com Pontuadas",
         timeSignature: { beats: 4, beatType: 4 },
         tempo: 90,
         pattern: [
-            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 1
-            { type: 'rest', duration: 1.5, symbol: '𝄽.' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.75, symbol: '𝄾.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 2
-            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 3
-            { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 4
+            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'rest', duration: 1.5, symbol: '𝄽.' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.75, symbol: '𝄾.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
@@ -361,41 +371,44 @@ export const lessons = [
         timeSignature: { beats: 4, beatType: 4 },
         tempo: 95,
         pattern: [
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' }, // Compasso 1
-            { type: 'rest', duration: 0.75, symbol: '𝄾.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 2
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'rest', duration: 0.75, symbol: '𝄾.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
     {
-        name: "Módulo III - Lição 27: Melodias Simples com Pontuadas",
+        name: "Módulo III - Lição 27: Melodias Rítmicas com Pontuadas",
         timeSignature: { beats: 3, beatType: 4 },
         tempo: 100,
         pattern: [
-            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 1
-            { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Compasso 2
-            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, // Compasso 3
+            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
     {
-        name: "Módulo III - Lição 28: Prática com Grupos de Colcheias Pontuadas",
+        name: "Módulo III - Lição 28: Prática com Grupos de Pontuadas",
         timeSignature: { beats: 4, beatType: 4 },
         tempo: 105,
         pattern: [
-            { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' },
-            { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, // Quatro tempos de colcheias pontuadas e semicolcheias
-            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Compasso 2
+            { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
+            { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
     {
-        name: "Módulo III - Lição 29: Combinações Avançadas de Pontuadas e Pausas",
+        name: "Módulo III - Lição 29: Combinações Avançadas e Pausas",
         timeSignature: { beats: 4, beatType: 4 },
         tempo: 110,
         pattern: [
-            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'rest', duration: 1, symbol: '𝄽' }, // Compasso 1
-            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, { type: 'rest', duration: 1, symbol: '𝄽' }, // Compasso 2
-            { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 3
+            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'rest', duration: 1, symbol: '𝄽' },
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, { type: 'rest', duration: 1, symbol: '𝄽' },
+            { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
@@ -404,60 +417,66 @@ export const lessons = [
         timeSignature: { beats: 4, beatType: 4 },
         tempo: 115,
         pattern: [
-            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, { type: 'note', duration: 1, symbol: '♩' }, // Compasso 1
-            { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'rest', duration: 1.5, symbol: '𝄽.' }, // Compasso 2
-            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'rest', duration: 1, symbol: '𝄽' }, // Compasso 3
-            { type: 'note', duration: 4, symbol: '𝅝' }, // Compasso 4
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'rest', duration: 1.5, symbol: '𝄽.' },
+            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'rest', duration: 1, symbol: '𝄽' },
+            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'rest', duration: 1, symbol: '𝄽' },
+            { type: 'note', duration: 4, symbol: '𝅝' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
-
     // Módulo IV - Lições 31 a 40: Variação das Unidades de Tempo (2/2, 3/2, 3/8, 4/8)
-    {
+      {
         name: "Módulo IV - Lição 31: Introdução ao Compasso 2/2 (Alla Breve)",
         timeSignature: { beats: 2, beatType: 2 }, // Mínima vale um tempo
-        tempo: 60,
+        tempo: 80, // O tempo é sentido em 2, mas o BPM pode ser mais rápido
         pattern: [
-            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' }, // Duas mínimas (equivalente a uma semibreve)
-            { type: 'note', duration: 4, symbol: '𝅝' }, // Uma semibreve (dois tempos de mínima)
-            { type: 'rest', duration: 4, symbol: '𝄻' }, // Pausa de semibreve
-            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'rest', duration: 2, symbol: '𝄼' }, // Mínima e pausa de mínima
+            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 4, symbol: '𝅝' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'rest', duration: 2, symbol: '𝄼' },
+            { type: 'note', duration: 4, symbol: '𝅝' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
     {
         name: "Módulo IV - Lição 32: Explorando o Compasso 3/2",
         timeSignature: { beats: 3, beatType: 2 }, // Mínima vale um tempo
-        tempo: 65,
+        tempo: 70,
         pattern: [
-            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' }, // Três mínimas
-            { type: 'note', duration: 4, symbol: '𝅝' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' }, // Uma semibreve e uma mínima
-            { type: 'rest', duration: 2, symbol: '𝄼' }, { type: 'note', duration: 4, symbol: '𝅝' }, // Pausa de mínima e semibreve
-            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, // Duas mínimas pontuadas (se permitido, mas para 3/2, 3 mínimas ou uma semibreve e uma mínima)
+            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 4, symbol: '𝅝' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 4, symbol: '𝅝' },
+            { type: 'rest', duration: 2, symbol: '𝄼' }, { type: 'note', duration: 4, symbol: '𝅝' },
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
+            { type: 'note', duration: 6, symbol: '𝅝.' }, // Semibreve pontuada
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
     {
         name: "Módulo IV - Lição 33: Ritmos em 3/8",
         timeSignature: { beats: 3, beatType: 8 }, // Colcheia vale um tempo
-        tempo: 120, // A batida principal é a colcheia
+        tempo: 120,
         pattern: [
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Três colcheias
-            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Semínima e colcheia
-            { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, // Três pausas de colcheia
-            { type: 'note', duration: 1.5, symbol: '♩.' }, // Semínima pontuada
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 1.5, symbol: '♩.' },
+            { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
+            { type: 'note', duration: 1.5, symbol: '♩.' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
     {
-        name: "Módulo IV - Lição 34: Padrões em 4/8",
-        timeSignature: { beats: 4, beatType: 8 }, // Colcheia vale um tempo
+        name: "Módulo IV - Lição 34: Padrões em 6/8 (Comparativo)",
+        timeSignature: { beats: 6, beatType: 8 }, // 6 colcheias por compasso
         tempo: 130,
         pattern: [
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Quatro colcheias
-            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, // Duas semínimas
-            { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 1, symbol: '𝄽' }, // Pausa de colcheia, colcheia, pausa de semínima
-            { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 1, symbol: '♩' }, // Colcheia pontuada, semicolcheia, semínima
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
+            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'note', duration: 1.5, symbol: '♩.' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
+            { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
@@ -466,12 +485,12 @@ export const lessons = [
         timeSignature: { beats: 4, beatType: 4 }, // Revertendo para 4/4 para comparação
         tempo: 70,
         pattern: [
-            { type: 'note', duration: 4, symbol: '𝅝' }, // Uma semibreve em 4/4
-            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' }, // Duas mínimas em 4/4
-            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, // Quatro semínimas em 4/4
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 4, symbol: '𝅝' },
             // Agora, como se estivesse em 2/2
-            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'rest', duration: 2, symbol: '𝄼' }, // Uma mínima e uma pausa de mínima (equivale a um compasso de 2/2)
-            { type: 'note', duration: 4, symbol: '𝅝' }, // Uma semibreve (equivale a um compasso de 2/2)
+            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'rest', duration: 2, symbol: '𝄼' }, // Duas mínimas em 4/4, sentido como 2/2
+            { type: 'note', duration: 4, symbol: '𝅝' }, // Uma semibreve em 4/4, sentida como 2/2
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
@@ -480,9 +499,10 @@ export const lessons = [
         timeSignature: { beats: 3, beatType: 2 },
         tempo: 75,
         pattern: [
-            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' }, // Mínima, duas semínimas, mínima
-            { type: 'rest', duration: 4, symbol: '𝄻' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' }, // Pausa de semibreve, mínima
-            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'rest', duration: 2, symbol: '𝄼' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' }, // Mínima, pausa de mínima, mínima
+            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 4, symbol: '𝅝' }, { type: 'rest', duration: 2, symbol: '𝄼' },
+            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'rest', duration: 2, symbol: '𝄼' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 6, symbol: '𝅝.' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
@@ -491,33 +511,48 @@ export const lessons = [
         timeSignature: { beats: 3, beatType: 8 },
         tempo: 140,
         pattern: [
-            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, // Seis semicolcheias (equivalente a 1.5 tempos de colcheia)
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, // Colcheia, pausa de colcheia, colcheia
-            { type: 'note', duration: 1.5, symbol: '♩.' }, // Semínima pontuada
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
+            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'rest', duration: 0.5, symbol: '𝄾' },
+            { type: 'note', duration: 1.5, symbol: '♩.' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
     {
-        name: "Módulo IV - Lição 38: Prática de Agilidade em 4/8",
-        timeSignature: { beats: 4, beatType: 8 },
+        name: "Módulo IV - Lição 38: Prática de Agilidade em 6/8",
+        timeSignature: { beats: 6, beatType: 8 },
         tempo: 150,
         pattern: [
-            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' },
-            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, // Duas semínimas (total de 8 semicolcheias)
-            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, // Duas colcheias com pausas
-            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'rest', duration: 0.5, symbol: '𝄾' }, // Semínima pontuada, pausa de colcheia
+            { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' },
+            { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 1.5, symbol: '♩.' }, { type: 'rest', duration: 1.5, symbol: '𝄽.' },
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },
     {
-        name: "Módulo IV - Lição 39: Fusão de Compassos e Figuras (Revisão)",
+        name: "Módulo IV - Lição 39: Fusão de Compassos e Figuras",
         timeSignature: { beats: 4, beatType: 4 }, // Voltando para 4/4 para revisão geral
         tempo: 80,
         pattern: [
-            { type: 'note', duration: 4, symbol: '𝅝' }, // Semibreve
-            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, { type: 'note', duration: 1, symbol: '♩' }, // Mínima pontuada e semínima
-            { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'rest', duration: 1, symbol: '𝄽' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' }, // Colcheia pontuada, semicolcheia, pausa de semínima, mínima
-            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' }, // Mínima, duas colcheias, semínima
+            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 0.75, symbol: '𝅘𝅥𝅮.' }, { type: 'note', duration: 0.25, symbol: '𝅘𝅥𝅯' }, { type: 'rest', duration: 1, symbol: '𝄽' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 4, symbol: '𝅝' },
+            {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
+        ]
+    },
+    {
+        name: "Módulo IV - Lição 40: Desafio Final de Unidades de Tempo",
+        timeSignature: { beats: 3, beatType: 2 }, // Desafio final em 3/2
+        tempo: 90,
+        pattern: [
+            { type: 'note', duration: 4, symbol: '𝅝' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'rest', duration: 2, symbol: '𝄼' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' }, { type: 'note', duration: 2, symbol: '𝅗𝅥' },
+            { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' }, { type: 'note', duration: 1, symbol: '♩' },
+            { type: 'note', duration: 3, symbol: '𝅗𝅥.' }, { type: 'note', duration: 3, symbol: '𝅗𝅥.' },
+            { type: 'note', duration: 6, symbol: '𝅝.' },
             {type: 'final_barline', duration: 0, symbol: '𝄂', isControl: true}
         ]
     },

@@ -2,7 +2,7 @@
 
 import { AppState } from './state.js';
 import { getBeatValue } from './core.js';
-import { highlightActiveVisualElement, updatePlaybackButtons, enableAllControls, disablePlaybackControls, updateMessage, updateCountdownDisplay } from './ui.js';
+import { highlightActiveVisualElement, updatePlaybackButtons, enableAllControls, disablePlaybackControls, updateMessage, updateCountdownDisplay, showErrorModal } from './ui.js';
 
 let offlineContext;
 
@@ -30,7 +30,7 @@ export function initializeSynths() {
         
     } catch (e) {
         console.error("ERRO CRÍTICO em initializeSynths:", e);
-        updateMessage("Erro ao inicializar componentes de áudio.", "error");
+        showErrorModal("Não foi possível inicializar os componentes de áudio. Por favor, atualize a página e tente novamente.");
     }
 }
 
@@ -136,7 +136,7 @@ export async function startCountdownAndPlay() {
 
     } catch (error) {
         console.error("Erro ao iniciar playback:", error);
-        updateMessage("Erro: " + error.message, "error");
+        showErrorModal(`Ocorreu um erro ao tentar iniciar a reprodução: ${error.message}`);
         stopRhythmExecution();
     }
 }
@@ -205,8 +205,6 @@ function scheduleMetronome() {
     }
 
     AppState.metronomeEventId = new Tone.Part((time, value) => {
-        // CORREÇÃO: A condição que limitava o metrônomo foi removida.
-        // Ele agora tocará sempre que o transporte estiver rodando.
         AppState.synths.metronomeSynth.triggerAttackRelease(value.note, "32n", time);
     }, events).start(0);
 
@@ -265,7 +263,7 @@ export async function exportWavOffline() {
         updateMessage("Ficheiro WAV exportado com sucesso!", "success");
     } catch (e) {
         console.error("Erro ao exportar WAV:", e);
-        updateMessage("Erro ao exportar ficheiro WAV.", "error");
+        showErrorModal("Ocorreu um erro inesperado durante a exportação para WAV.");
     }
 }
 

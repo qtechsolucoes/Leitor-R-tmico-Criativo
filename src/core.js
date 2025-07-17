@@ -34,11 +34,24 @@ function processPattern(pattern) {
     });
 
     for (let i = 0; i < newPattern.length; i++) {
+        // Ignora se o item for um controle (barra de repetição, etc.)
+        if (newPattern[i].isControl) continue;
+
         if (newPattern[i].tiedToNext && i + 1 < newPattern.length) {
-            let nextNote = newPattern[i + 1];
-            if (nextNote && nextNote.type === 'note') {
-                nextNote.isTiedContinuation = true;
-                newPattern[i].totalTiedDuration = (newPattern[i].duration || 0) + (nextNote.duration || 0);
+            let nextNoteIndex = i + 1;
+            // Encontra a próxima nota real, pulando possíveis elementos de controle entre as notas ligadas
+            while(nextNoteIndex < newPattern.length && newPattern[nextNoteIndex].isControl) {
+                nextNoteIndex++;
+            }
+
+            if (nextNoteIndex < newPattern.length) {
+                let nextNote = newPattern[nextNoteIndex];
+                if (nextNote && nextNote.type === 'note') {
+                    nextNote.isTiedContinuation = true;
+                    // Acumula a duração da ligadura
+                    let currentDuration = newPattern[i].totalTiedDuration || newPattern[i].duration;
+                    newPattern[i].totalTiedDuration = currentDuration + (nextNote.duration || 0);
+                }
             }
         }
     }
@@ -86,7 +99,7 @@ export function updateActivePatternAndTimeSignature() {
 }
 
 /**
- * Valida se um padrão rítmico respeita as regras de compasso.
+ * Valida se um padrão rítmico respeita as regras de compasso de forma estrita.
  */
 function isPatternValid(pattern) {
     if (!pattern || pattern.length === 0) return true;
@@ -97,49 +110,83 @@ function isPatternValid(pattern) {
     let currentBeatsInMeasure = 0;
 
     for (const item of pattern) {
-        if (item.isControl) continue;
+        // Ignora elementos de controle (barras de repetição, etc.) e notas que são continuação de ligadura
+        if (item.isControl || item.isTiedContinuation) continue;
         
         const itemBeatValue = getBeatValue(item.duration, timeSig);
+        
+        // Verifica se a adição da figura ultrapassa o limite do compasso atual
+        if (currentBeatsInMeasure + itemBeatValue > totalMeasureBeats + tolerance) {
+            return false; // Inválido: A figura não cabe no compasso.
+        }
+
         currentBeatsInMeasure += itemBeatValue;
 
-        if (currentBeatsInMeasure > totalMeasureBeats + tolerance) {
-            return false; // Excedeu o compasso
-        }
-
+        // Se o compasso está completo, zera para o próximo
         if (Math.abs(currentBeatsInMeasure - totalMeasureBeats) < tolerance) {
-            currentBeatsInMeasure = 0; // Zera para o próximo compasso
+            currentBeatsInMeasure = 0;
         }
     }
-    return true;
+
+    // Após verificar todas as figuras, se o último compasso não estiver completo, o padrão é inválido.
+    // (A menos que estejamos no meio da construção, mas para o clique, a validação deve ser do compasso atual)
+    // Esta lógica é inerente ao fluxo acima: a validação falhará no momento em que uma figura exceder o compasso.
+    // Não é necessário um check final, pois a validação é feita a cada adição.
+    
+    return true; // Se o loop terminar sem retornar false, o padrão é válido até o momento.
 }
 
 /**
  * Lida com o clique numa figura da paleta.
  */
 export function handlePaletteFigureClick(figure) {
+    if (AppState.currentMode !== 'freeCreate') {
+        return { success: false, message: "Mude para o Modo de Criação Livre para editar." };
+    }
+
+    // Lógica para adicionar/remover ligadura
     if (figure.name === 'Ligadura') {
-        // A lógica de ligadura é tratada separadamente, sem validação de compasso
         if (AppState.selectedIndexForEditing !== null && AppState.customPattern[AppState.selectedIndexForEditing]) {
             const selectedItem = AppState.customPattern[AppState.selectedIndexForEditing];
-            if (selectedItem.type === 'note') {
+            if (selectedItem.type === 'note' && !selectedItem.isControl) {
+                // Alterna o estado da ligadura
                 selectedItem.tiedToNext = !selectedItem.tiedToNext;
+                
+                // Remove a propriedade se for false para manter o objeto limpo
+                if (!selectedItem.tiedToNext) {
+                    delete selectedItem.tiedToNext;
+                }
+                
+                // Valida o padrão após a alteração. Uma ligadura pode tornar um padrão inválido se a nota seguinte for uma pausa, por exemplo.
+                // Esta validação é um passo extra para garantir a consistência.
+                // (Para simplificar, vamos assumir que o usuário sabe o que faz ao adicionar uma ligadura)
                 return { success: true, message: selectedItem.tiedToNext ? "Ligadura adicionada." : "Ligadura removida." };
             }
         }
-        return { success: false, message: "Selecione uma nota para ligar." };
+        return { success: false, message: "Selecione uma nota para adicionar ou remover uma ligadura." };
     }
     
+    // Cria uma cópia temporária do padrão para testar a adição da nova figura.
     const tempPattern = JSON.parse(JSON.stringify(AppState.customPattern));
     
+    const newFigure = { ...figure };
+    // Remove propriedades desnecessárias da figura da paleta
+    delete newFigure.syllable; 
+    delete newFigure.totalTiedDuration;
+    delete newFigure.isTiedContinuation;
+
+    // Se um item está selecionado, a nova figura o substituirá.
+    // Caso contrário, a nova figura será adicionada ao final.
     if (AppState.selectedIndexForEditing !== null) {
-        tempPattern.splice(AppState.selectedIndexForEditing, 1, figure);
+        tempPattern.splice(AppState.selectedIndexForEditing, 1, newFigure);
     } else {
-        tempPattern.push(figure);
+        tempPattern.push(newFigure);
     }
 
+    // Valida o padrão temporário com a nova figura.
     if (isPatternValid(tempPattern)) {
-        AppState.customPattern = tempPattern;
-        AppState.selectedIndexForEditing = null;
+        AppState.customPattern = tempPattern; // Se for válido, atualiza o padrão real.
+        AppState.selectedIndexForEditing = null; // Limpa a seleção após a ação.
         return { success: true, message: `${figure.name} adicionada.` };
     } else {
         return { success: false, message: "A figura não cabe no compasso!" };
@@ -150,5 +197,6 @@ export function handlePaletteFigureClick(figure) {
  * Lida com a seleção de uma figura para edição.
  */
 export function handleFigureSelectionForEditing(index) {
+    // Alterna a seleção: se clicar no mesmo item, desmarca. Se clicar em outro, marca o novo.
     AppState.selectedIndexForEditing = (AppState.selectedIndexForEditing === index) ? null : index;
 }
