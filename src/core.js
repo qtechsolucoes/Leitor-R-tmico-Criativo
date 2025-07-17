@@ -95,8 +95,14 @@ export function updateActivePatternAndTimeSignature() {
             beatType: parseInt(document.getElementById('time-signature-type').value)
         };
     }
+    // Adicionado: Sincroniza a fórmula de compasso com o Tone.Transport.
+    if (typeof Tone !== 'undefined' && Tone.Transport) {
+        const { beats, beatType } = AppState.activeTimeSignature;
+        Tone.Transport.timeSignature = [beats, beatType];
+    }
     AppState.activePattern = processPattern(rawPattern);
 }
+
 
 /**
  * Valida se um padrão rítmico respeita as regras de compasso de forma estrita.

@@ -48,6 +48,7 @@ export function stopRhythmExecution() {
     AppState.transportEventIds = [];
     
     if (AppState.metronomeEventId) {
+        // Corrigido: Usa-se dispose() para limpar o evento Part.
         AppState.metronomeEventId.dispose();
         AppState.metronomeEventId = null;
     }
@@ -108,6 +109,9 @@ export async function startCountdownAndPlay() {
         const { beats, beatType } = AppState.activeTimeSignature;
         
         Tone.Transport.bpm.value = userInputBpm;
+        // A fórmula de compasso agora é definida em core.js
+        // Tone.Transport.timeSignature = [beats, beatType];
+
         const singleBeatDuration = Tone.Time(`${beatType}n`).toSeconds();
 
         const countdownDuration = singleBeatDuration * beats;
@@ -199,8 +203,9 @@ function scheduleMetronome() {
     const events = [];
 
     for (let i = 0; i < beats; i++) {
-        const time = `${i}*${beatType}n`;
-        const note = (i % subdivision === 0) ? "G5" : "C5";
+        // Corrigido: Usa a notação 'compasso:pulso' para maior precisão.
+        const time = `0:${i}`; 
+        const note = (i % subdivision === 0) ? "G5" : "C5"; // Pulso forte
         events.push({ time, note });
     }
 
@@ -209,7 +214,8 @@ function scheduleMetronome() {
     }, events).start(0);
 
     AppState.metronomeEventId.loop = true;
-    AppState.metronomeEventId.loopEnd = `${beats}*${beatType}n`;
+    // Corrigido: Define o loop para durar exatamente um compasso.
+    AppState.metronomeEventId.loopEnd = "1m"; 
 }
 
 
