@@ -27,10 +27,13 @@
             </header>
             
             <div class="panel playback-panel">
-                <div class="flex items-center justify-center space-x-2 mb-4">
-                    <button id="tempo-decrease" class="btn-tempo">-</button>
-                    <span id="tempo-display" class="text-4xl font-semibold text-slate-100 w-28 text-center bg-transparent">100</span>
-                    <button id="tempo-increase" class="btn-tempo">+</button>
+                <div class="flex flex-col items-center mb-4">
+                    <label class="tempo-label">TEMPO (BPM)</label>
+                    <div class="flex items-center justify-center space-x-2">
+                        <button id="tempo-decrease" class="btn-tempo">-</button>
+                        <span id="tempo-display" class="text-4xl font-semibold text-slate-100 w-28 text-center bg-transparent">80</span>
+                        <button id="tempo-increase" class="btn-tempo">+</button>
+                    </div>
                 </div>
                  <div class="flex items-center justify-center space-x-4">
                     <button id="play-pause-button" class="btn-action btn-play btn-main-action"><i class="fas fa-play"></i> Tocar</button>
@@ -50,7 +53,6 @@
                             </div>
                         </div>
                     </div>
-                    <select id="mode-select" class="control-input hidden"></select>
                 </div>
                 <div id="lesson-selector-container" class="mb-4">
                     <label class="block text-sm font-medium text-slate-300 mb-2">Lição:</label>
@@ -67,16 +69,36 @@
                 <h3 class="panel-title">Painel de Criação</h3>
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div>
-                        <label for="time-signature-beats" class="text-sm font-medium text-slate-300 mb-1">Pulsos:</label>
-                        <select id="time-signature-beats" class="control-input">
-                            <option value="2">2</option><option value="3">3</option><option value="4" selected>4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="9">9</option><option value="12">12</option>
-                        </select>
+                        <label class="text-sm font-medium text-slate-300 mb-1">Pulsos:</label>
+                        <div class="custom-select-wrapper">
+                            <div id="custom-beats-select" class="custom-select">
+                                <span class="custom-select-trigger">4</span>
+                                <div class="custom-options">
+                                    <div class="custom-option" data-value="2">2</div>
+                                    <div class="custom-option" data-value="3">3</div>
+                                    <div class="custom-option selected" data-value="4">4</div>
+                                    <div class="custom-option" data-value="5">5</div>
+                                    <div class="custom-option" data-value="6">6</div>
+                                    <div class="custom-option" data-value="7">7</div>
+                                    <div class="custom-option" data-value="9">9</div>
+                                    <div class="custom-option" data-value="12">12</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div>
-                        <label for="time-signature-type" class="text-sm font-medium text-slate-300 mb-1">Unidade:</label>
-                        <select id="time-signature-type" class="control-input">
-                           <option value="2">Mínima (𝅗𝅥)</option><option value="4" selected>Semínima (♩)</option><option value="8">Colcheia (𝅘𝅥𝅮)</option><option value="16">Semicolcheia (𝅘𝅥𝅯)</option>
-                        </select>
+                        <label class="text-sm font-medium text-slate-300 mb-1">Unidade:</label>
+                        <div class="custom-select-wrapper">
+                             <div id="custom-type-select" class="custom-select">
+                                <span class="custom-select-trigger">Semínima (♩)</span>
+                                <div class="custom-options">
+                                   <div class="custom-option" data-value="2">Mínima (𝅗𝅥)</div>
+                                   <div class="custom-option selected" data-value="4">Semínima (♩)</div>
+                                   <div class="custom-option" data-value="8">Colcheia (𝅘𝅥𝅮)</div>
+                                   <div class="custom-option" data-value="16">Semicolcheia (𝅘𝅥𝅯)</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div id="figure-palette" class="flex flex-wrap gap-2 justify-center p-3 bg-slate-900/50 rounded-lg border border-slate-700 mb-4"></div>
@@ -112,8 +134,6 @@
             </footer>
         </main>
     </div>
-
-    <select id="lesson-select" class="hidden-native-select"></select>
 
     <div id="modal-overlay" class="modal-overlay hidden"></div>
 

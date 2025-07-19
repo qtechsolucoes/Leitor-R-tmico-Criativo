@@ -2,9 +2,8 @@
 
 import { AppState } from './state.js';
 import { rhythmicFigures, lessons } from './config.js';
-import { getBeatValue, getDurationText, handlePaletteFigureClick, handleFigureSelectionForEditing, updateActivePatternAndTimeSignature } from './core.js';
+import { getBeatValue, getDurationText, getFractionalNotation, handlePaletteFigureClick, handleFigureSelectionForEditing, updateActivePatternAndTimeSignature } from './core.js';
 
-// --- Elementos do DOM ---
 const rhythmDisplayEl = document.getElementById('rhythm-display');
 const figureFocusDisplayEl = document.getElementById('figure-focus-display');
 const customRhythmCreatorDiv = document.getElementById('custom-rhythm-creator');
@@ -13,19 +12,13 @@ const messageArea = document.getElementById('message-area');
 const countdownDisplay = document.getElementById('countdown-display');
 const playPauseButton = document.getElementById('play-pause-button');
 const customLessonSelect = document.getElementById('custom-lesson-select');
-
-// --- Elementos do Modal ---
 const modalOverlay = document.getElementById('modal-overlay');
 const loginModal = document.getElementById('login-modal');
 const saveRhythmModal = document.getElementById('save-rhythm-modal');
 const loadRhythmModal = document.getElementById('load-rhythm-modal');
 const errorModal = document.getElementById('error-modal');
 const errorModalText = document.getElementById('error-modal-text');
-
-// --- Elementos do Popover ---
 const editPopover = document.getElementById('edit-popover');
-
-// --- Funções de Manipulação da UI Exportadas ---
 
 export function showModal(modalElement) {
     modalOverlay.classList.remove('hidden');
@@ -47,7 +40,7 @@ export function showErrorModal(message) {
 
 export function populateLoadRhythmModal(userRhythms) {
     const listContainer = document.getElementById('load-rhythm-list');
-    listContainer.innerHTML = ''; // Limpa a lista anterior
+    listContainer.innerHTML = ''; 
 
     if (!userRhythms || userRhythms.length === 0) {
         listContainer.innerHTML = '<p class="text-center text-slate-400">Nenhum ritmo salvo encontrado.</p>';
@@ -151,7 +144,7 @@ export function highlightActiveVisualElement(patternIndex, activeBeatIndex = 0) 
     }
 }
 
-function updateFigureFocusDisplay(item) {
+export function updateFigureFocusDisplay(item) {
     if (!figureFocusDisplayEl) return;
 
     if (item && !item.isControl) {
@@ -160,14 +153,16 @@ function updateFigureFocusDisplay(item) {
              figureFocusDisplayEl.classList.remove('visible');
              return;
         }
+        
         const beatValue = getBeatValue(item.duration, AppState.activeTimeSignature);
         const durationText = getDurationText(beatValue);
+        const fractionText = getFractionalNotation(beatValue);
 
         figureFocusDisplayEl.innerHTML = `
             <div class="focus-symbol">${item.symbol}</div>
             <div class="focus-details">
                 <div class="focus-name">${figureDef.name}</div>
-                <div class="focus-duration">Duração: ${durationText}</div>
+                <div class="focus-duration">Duração: ${durationText} ${fractionText}</div>
             </div>
         `;
         figureFocusDisplayEl.classList.add('visible');
@@ -177,29 +172,40 @@ function updateFigureFocusDisplay(item) {
     }
 }
 
+// --- CURVATURA DA LIGADURA APRIMORADA ---
 function drawTie(row, startEl, endEl) {
-    const tie = document.createElement('div');
-    tie.className = 'tie';
     const rowRect = row.getBoundingClientRect();
     const startRect = startEl.getBoundingClientRect();
     const endRect = endEl.getBoundingClientRect();
     
     if(!startRect || !endRect) return;
 
-    const left = startRect.left - rowRect.left + (startRect.width / 2);
-    const width = endRect.left - startRect.left;
-    
-    tie.style.position = 'absolute';
-    tie.style.left = `${left}px`;
-    tie.style.width = `${width}px`;
+    const startX = startRect.left - rowRect.left + (startRect.width / 2);
+    const endX = endRect.left - rowRect.left + (endRect.width / 2);
+    const width = endX - startX;
     
     const noteItem = startEl.querySelector('.note-item');
-    if (noteItem) {
-        tie.style.top = `${noteItem.offsetTop}px`;
-    }
+    if (!noteItem) return;
 
-    row.appendChild(tie);
+    const yPos = noteItem.offsetTop + noteItem.offsetHeight - 8; 
+    const minCurvature = 15; // Garante uma curva mínima
+    const curvature = minCurvature + (width * 0.15); // Curva base + um pouco da largura
+
+    const M = `M ${startX},${yPos}`;
+    const Q = `Q ${startX + width / 2},${yPos + curvature} ${endX},${yPos}`;
+    
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.classList.add('tie-svg');
+    svg.style.left = `0px`;
+    svg.style.top = `0px`;
+
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute('d', `${M} ${Q}`);
+    
+    svg.appendChild(path);
+    row.appendChild(svg);
 }
+
 
 export function renderRhythm() {
     rhythmDisplayEl.innerHTML = '';
@@ -221,6 +227,7 @@ export function renderRhythm() {
 
     const containerWidth = rhythmDisplayEl.clientWidth;
     const timeSigWidth = 80;
+    const gapWidth = 4;
     let currentRowWidth = timeSigWidth;
     
     let currentRow = document.createElement('div');
@@ -237,11 +244,11 @@ export function renderRhythm() {
     addTimeSignature(currentRow);
 
     AppState.activePattern.forEach((item, index) => {
-        if (item.type === 'final_barline' || item.isTiedContinuation) return;
+        if (item.type === 'final_barline') return;
         
         const figureWidth = 70;
         
-        if (currentRowWidth + figureWidth > containerWidth) {
+        if (currentRowWidth + figureWidth + gapWidth > containerWidth) {
             currentRow = document.createElement('div');
             currentRow.className = 'rhythm-row';
             rhythmDisplayEl.appendChild(currentRow);
@@ -252,9 +259,6 @@ export function renderRhythm() {
         const figureContainer = document.createElement('div');
         figureContainer.className = 'figure-container';
         figureContainer.dataset.patternIndex = index;
-        
-        figureContainer.addEventListener('mouseenter', () => updateFigureFocusDisplay(item));
-        figureContainer.addEventListener('mouseleave', () => updateFigureFocusDisplay(null));
         
         if (AppState.currentMode === 'freeCreate' && !item.isControl) {
             figureContainer.addEventListener('click', (e) => {
@@ -276,20 +280,34 @@ export function renderRhythm() {
         const beatValue = getBeatValue(item.duration, timeSig);
 
         if (!item.isControl) {
-            const startBeatInMeasure = (currentBeatsInMeasure % totalMeasureBeats);
-            const roundedBeatValue = Math.round(beatValue);
             let beatHTML = '';
-            
-            if (beatValue >= 1 && Math.abs(beatValue - roundedBeatValue) < tolerance) {
+            const startBeatInMeasure = currentBeatsInMeasure % totalMeasureBeats;
+
+            if (beatValue >= 1) {
+                const roundedBeatValue = Math.floor(beatValue);
                 for (let i = 0; i < roundedBeatValue; i++) {
                     const beatNumber = Math.floor(startBeatInMeasure) + 1 + i;
                     if (beatNumber <= totalMeasureBeats) {
-                         beatHTML += `<span data-beat-index="${i}">${beatNumber}</span> `;
+                        beatHTML += `<span data-beat-index="${i}">${beatNumber}</span>`;
                     }
                 }
             } else {
-                 const beatNumber = Math.floor(startBeatInMeasure) + 1;
-                 beatHTML = `<span data-beat-index="0">${beatNumber}</span>`;
+                const mainBeatNumber = Math.floor(startBeatInMeasure) + 1;
+                const fraction = startBeatInMeasure - Math.floor(startBeatInMeasure);
+                let beatDisplay = '&nbsp;';
+
+                if (mainBeatNumber <= totalMeasureBeats) {
+                    if (Math.abs(fraction) < tolerance) {
+                        beatDisplay = mainBeatNumber;
+                    } else if (Math.abs(fraction - 0.5) < tolerance) {
+                        beatDisplay = 'e';
+                    } else if (Math.abs(fraction - 0.25) < tolerance) {
+                        beatDisplay = '+';
+                    } else if (Math.abs(fraction - 0.75) < tolerance) {
+                        beatDisplay = 'a';
+                    }
+                }
+                beatHTML = `<span data-beat-index="0">${beatDisplay}</span>`;
             }
             beatCounterElement.innerHTML = beatHTML;
         }
@@ -305,7 +323,7 @@ export function renderRhythm() {
         
         figureContainer.append(beatCounterElement, noteItemElement, syllableElement);
         currentRow.appendChild(figureContainer);
-        currentRowWidth += figureWidth;
+        currentRowWidth += figureWidth + gapWidth;
 
         if (!item.isControl) currentBeatsInMeasure += beatValue;
         
@@ -313,7 +331,7 @@ export function renderRhythm() {
             const hasMoreMusic = AppState.activePattern.slice(index + 1).some(fig => !fig.isControl);
             if (hasMoreMusic) {
                  const barlineWidth = 20;
-                 if (currentRowWidth + barlineWidth > containerWidth) {
+                 if (currentRowWidth + barlineWidth + gapWidth > containerWidth) {
                     currentRow = document.createElement('div');
                     currentRow.className = 'rhythm-row';
                     rhythmDisplayEl.appendChild(currentRow);
@@ -324,7 +342,7 @@ export function renderRhythm() {
                 barlineEl.className = 'barline-container';
                 barlineEl.innerHTML = `<div class="barline-item"></div>`;
                 currentRow.appendChild(barlineEl);
-                currentRowWidth += barlineWidth;
+                currentRowWidth += barlineWidth + gapWidth;
             }
             currentBeatsInMeasure = 0;
         }
@@ -342,13 +360,17 @@ export function renderRhythm() {
         AppState.activePattern.forEach((item, index) => {
             if (item.tiedToNext) {
                 const startEl = row.querySelector(`.figure-container[data-pattern-index="${index}"]`);
-                let nextVisibleIndex = index + 1;
-                while(nextVisibleIndex < AppState.activePattern.length && AppState.activePattern[nextVisibleIndex].isTiedContinuation) {
-                    nextVisibleIndex++;
+                
+                let nextNoteIndex = index + 1;
+                while(nextNoteIndex < AppState.activePattern.length && (AppState.activePattern[nextNoteIndex].isControl || AppState.activePattern[nextNoteIndex].type === 'rest')) {
+                    nextNoteIndex++;
                 }
-                const endEl = row.querySelector(`.figure-container[data-pattern-index="${nextVisibleIndex}"]`);
-                if (startEl && endEl) {
-                    drawTie(row, startEl, endEl);
+                
+                if (nextNoteIndex < AppState.activePattern.length) {
+                    const endEl = row.querySelector(`.figure-container[data-pattern-index="${nextNoteIndex}"]`);
+                    if (startEl && endEl) {
+                        drawTie(row, startEl, endEl);
+                    }
                 }
             }
         });

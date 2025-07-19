@@ -6,9 +6,6 @@ import { highlightActiveVisualElement, updatePlaybackButtons, enableAllControls,
 
 let offlineContext;
 
-/**
- * Inicializa ou reinicializa os sintetizadores de áudio.
- */
 export function initializeSynths() {
     try {
         if (AppState.synths.noteSynth) AppState.synths.noteSynth.dispose();
@@ -34,9 +31,6 @@ export function initializeSynths() {
     }
 }
 
-/**
- * Para completamente a execução do ritmo.
- */
 export function stopRhythmExecution() {
     AppState.isPlaying = false;
     AppState.isCountingDown = false;
@@ -48,7 +42,6 @@ export function stopRhythmExecution() {
     AppState.transportEventIds = [];
     
     if (AppState.metronomeEventId) {
-        // Corrigido: Usa-se dispose() para limpar o evento Part.
         AppState.metronomeEventId.dispose();
         AppState.metronomeEventId = null;
     }
@@ -62,9 +55,6 @@ export function stopRhythmExecution() {
     }
 }
 
-/**
- * Pausa ou retoma a execução.
- */
 export function togglePauseResume() {
     if (Tone.Transport.state === 'paused') {
         AppState.isPlaying = true;
@@ -81,16 +71,10 @@ export function togglePauseResume() {
     }
 }
 
-/**
- * Verifica se um compasso é composto.
- */
 function isCompound(beats, beatType) {
     return beatType >= 8 && beats % 3 === 0 && beats > 3;
 }
 
-/**
- * Inicia a contagem e a reprodução.
- */
 export async function startCountdownAndPlay() {
     if (AppState.isPlaying || AppState.isCountingDown || !AppState.activePattern || AppState.activePattern.length === 0) return;
     
@@ -109,8 +93,6 @@ export async function startCountdownAndPlay() {
         const { beats, beatType } = AppState.activeTimeSignature;
         
         Tone.Transport.bpm.value = userInputBpm;
-        // A fórmula de compasso agora é definida em core.js
-        // Tone.Transport.timeSignature = [beats, beatType];
 
         const singleBeatDuration = Tone.Time(`${beatType}n`).toSeconds();
 
@@ -145,9 +127,6 @@ export async function startCountdownAndPlay() {
     }
 }
 
-/**
- * Agenda a reprodução de áudio e os destaques visuais para cada tempo.
- */
 function schedulePlayback(offset = 0) {
     let currentTime = offset;
     const timeSig = AppState.activeTimeSignature;
@@ -155,19 +134,18 @@ function schedulePlayback(offset = 0) {
     const tolerance = 0.001;
 
     AppState.activePattern.forEach((item, originalIndex) => {
-        if (item.isControl || item.isTiedContinuation) return;
+        if (item.isControl) return;
         
-        const noteDurationInBeats = getBeatValue(item.duration, timeSig);
-        const noteDurationInSeconds = noteDurationInBeats * beatTypeDurationSeconds;
-        const soundDurationSeconds = getBeatValue(item.totalTiedDuration || item.duration, timeSig) * beatTypeDurationSeconds;
-
-        if (item.type === 'note') {
+        if (item.type === 'note' && !item.isTiedContinuation) {
+            const soundDurationSeconds = getBeatValue(item.totalTiedDuration || item.duration, timeSig) * beatTypeDurationSeconds;
             AppState.transportEventIds.push(Tone.Transport.scheduleOnce(t => {
                 AppState.synths.noteSynth.triggerAttackRelease("C4", soundDurationSeconds, t);
             }, currentTime));
         }
         
+        const noteDurationInBeats = getBeatValue(item.duration, timeSig);
         const roundedBeatValue = Math.round(noteDurationInBeats);
+        
         if (noteDurationInBeats >= 1 && Math.abs(noteDurationInBeats - roundedBeatValue) < tolerance) {
             for (let i = 0; i < roundedBeatValue; i++) {
                 const beatHighlightTime = currentTime + (i * beatTypeDurationSeconds);
@@ -181,6 +159,7 @@ function schedulePlayback(offset = 0) {
             }, currentTime));
         }
         
+        const noteDurationInSeconds = noteDurationInBeats * beatTypeDurationSeconds;
         currentTime += noteDurationInSeconds;
     });
 
@@ -190,9 +169,6 @@ function schedulePlayback(offset = 0) {
     }, currentTime + 0.5));
 }
 
-/**
- * Cria e agenda a parte do metrônomo para tocar continuamente.
- */
 function scheduleMetronome() {
     if (AppState.metronomeEventId) {
         AppState.metronomeEventId.dispose();
@@ -203,9 +179,8 @@ function scheduleMetronome() {
     const events = [];
 
     for (let i = 0; i < beats; i++) {
-        // Corrigido: Usa a notação 'compasso:pulso' para maior precisão.
         const time = `0:${i}`; 
-        const note = (i % subdivision === 0) ? "G5" : "C5"; // Pulso forte
+        const note = (i % subdivision === 0) ? "G5" : "C5";
         events.push({ time, note });
     }
 
@@ -214,14 +189,10 @@ function scheduleMetronome() {
     }, events).start(0);
 
     AppState.metronomeEventId.loop = true;
-    // Corrigido: Define o loop para durar exatamente um compasso.
     AppState.metronomeEventId.loopEnd = "1m"; 
 }
 
 
-/**
- * Exporta o ritmo atual para um ficheiro WAV.
- */
 export async function exportWavOffline() {
     updateMessage("A exportar para WAV... Por favor, aguarde.");
 
@@ -273,26 +244,25 @@ export async function exportWavOffline() {
     }
 }
 
-// Função auxiliar para converter AudioBuffer para formato WAV
 function bufferToWave(abuffer) {
     let numOfChan = abuffer.numberOfChannels,
         length = abuffer.length * numOfChan * 2 + 44,
         buffer = new ArrayBuffer(length),
         view = new DataView(buffer),
         channels = [], i, sample, offset = 0, pos = 0;
-    setUint32(0x46464952); // "RIFF"
-    setUint32(length - 8); // file length - 8
-    setUint32(0x45564157); // "WAVE"
-    setUint32(0x20746d66); // "fmt " chunk
-    setUint32(16); // length = 16
-    setUint16(1); // PCM (uncompressed)
+    setUint32(0x46464952);
+    setUint32(length - 8);
+    setUint32(0x45564157);
+    setUint32(0x20746d66);
+    setUint32(16);
+    setUint16(1);
     setUint16(numOfChan);
     setUint32(abuffer.sampleRate);
-    setUint32(abuffer.sampleRate * 2 * numOfChan); // avg. bytes/sec
-    setUint16(numOfChan * 2); // block-align
-    setUint16(16); // 16-bit
-    setUint32(0x61746164); // "data" - chunk
-    setUint32(length - pos - 4); // chunk length
+    setUint32(abuffer.sampleRate * 2 * numOfChan);
+    setUint16(numOfChan * 2);
+    setUint16(16);
+    setUint32(0x61746164);
+    setUint32(length - pos - 4);
     for (i = 0; i < abuffer.numberOfChannels; i++)
         channels.push(abuffer.getChannelData(i));
     while (pos < length) {

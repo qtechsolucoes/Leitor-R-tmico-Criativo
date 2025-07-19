@@ -3,94 +3,152 @@
 import { AppState } from './state.js';
 import { lessons, rhythmicFigures } from './config.js';
 
-/**
- * Arredonda um número para um número específico de casas decimais para evitar imprecisões de ponto flutuante.
- * @param {number} value - O número a ser arredondado.
- * @param {number} decimals - O número de casas decimais.
- * @returns {number} - O número arredondado.
- */
 function round(value, decimals = 5) {
     return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
 }
 
-/**
- * Calcula o valor de uma figura em tempos, com base na fórmula de compasso ativa.
- */
 export function getBeatValue(figureDuration, timeSig) {
     if (!timeSig || !timeSig.beatType) return 0;
     const beatUnitValue = 4 / timeSig.beatType;
     return figureDuration / beatUnitValue;
 }
 
-/**
- * Retorna uma string descritiva para a duração de uma figura.
- */
 export function getDurationText(beatValue) {
     if (beatValue === 1) return `1 tempo`;
-    if (beatValue < 1) return `${beatValue.toFixed(2).replace('0.', '.')} de tempo`;
+    if (beatValue < 1) return `${beatValue.toFixed(2)} de tempo`;
     return `${beatValue} tempos`;
 }
 
-/**
- * Processa um padrão para adicionar sílabas e calcular durações de ligaduras.
- */
+export function getFractionalNotation(beatValue) {
+    if (beatValue >= 1 || beatValue <= 0) return "";
+    const tolerance = 1.0E-6;
+    let h1=1, h2=0, k1=0, k2=1;
+    let b = beatValue;
+    do {
+        let a = Math.floor(b);
+        let aux = h1; h1 = a*h1+h2; h2 = aux;
+        aux = k1; k1 = a*k1+k2; k2 = aux;
+        b = 1/(b-a);
+    } while (Math.abs(beatValue - h1/k1) > beatValue * tolerance);
+
+    if ([2, 3, 4, 6, 8, 12, 16, 24, 32].includes(k1)) {
+       return `(${h1}/${k1} de tempo)`;
+    }
+    return "";
+}
+
+// --- LÓGICA DE LIGADURA (SOM) CORRIGIDA ---
 function processPattern(pattern) {
     const newPattern = JSON.parse(JSON.stringify(pattern));
 
-    // Resetar e calcular durações de ligaduras
     newPattern.forEach(fig => {
         delete fig.isTiedContinuation;
         delete fig.totalTiedDuration;
     });
 
     for (let i = 0; i < newPattern.length; i++) {
-        // Ignora se o item for um controle (barra de repetição, etc.)
-        if (newPattern[i].isControl) continue;
+        // Se a figura atual já é uma continuação de ligadura, pule-a
+        if (newPattern[i].isTiedContinuation || newPattern[i].isControl) {
+            continue;
+        }
 
-        if (newPattern[i].tiedToNext && i + 1 < newPattern.length) {
-            let nextNoteIndex = i + 1;
-            // Encontra a próxima nota real, pulando possíveis elementos de controle entre as notas ligadas
-            while(nextNoteIndex < newPattern.length && newPattern[nextNoteIndex].isControl) {
-                nextNoteIndex++;
-            }
+        // Se a figura atual está ligada à próxima
+        if (newPattern[i].tiedToNext) {
+            let totalDuration = newPattern[i].duration;
+            let currentIndex = i;
+            let continueChain = true;
 
-            if (nextNoteIndex < newPattern.length) {
-                let nextNote = newPattern[nextNoteIndex];
-                if (nextNote && nextNote.type === 'note') {
+            while (continueChain) {
+                // Encontra a próxima nota real para a qual ligar
+                let nextNoteIndex = -1;
+                let searchIndex = currentIndex + 1;
+                while (searchIndex < newPattern.length && nextNoteIndex === -1) {
+                    if (newPattern[searchIndex].type === 'note') {
+                        nextNoteIndex = searchIndex;
+                    }
+                    searchIndex++;
+                }
+
+                if (nextNoteIndex !== -1) {
+                    const nextNote = newPattern[nextNoteIndex];
+                    totalDuration += nextNote.duration;
                     nextNote.isTiedContinuation = true;
-                    // Acumula a duração da ligadura
-                    let currentDuration = newPattern[i].totalTiedDuration || newPattern[i].duration;
-                    newPattern[i].totalTiedDuration = currentDuration + (nextNote.duration || 0);
+
+                    // Se a próxima nota também estiver ligada, continue a cadeia
+                    if (nextNote.tiedToNext) {
+                        currentIndex = nextNoteIndex;
+                    } else {
+                        continueChain = false; // Fim da cadeia de ligaduras
+                    }
+                } else {
+                    continueChain = false; // Não há mais notas para ligar
                 }
             }
+            newPattern[i].totalTiedDuration = totalDuration;
         }
     }
 
-    // Atribuir sílabas
-    for (const fig of newPattern) {
-        if (fig.isControl || fig.isTiedContinuation) continue;
+    // Lógica de atribuição de sílabas (permanece a mesma)
+    let lastSyllableWasTa = false;
+    for (let i = 0; i < newPattern.length; i++) {
+        const fig = newPattern[i];
         const duration = fig.totalTiedDuration || fig.duration;
-        if (fig.type === 'rest') {
+
+        if (fig.isControl || fig.isTiedContinuation || fig.type === 'rest') {
             fig.syllable = '&nbsp;';
+            lastSyllableWasTa = false;
             continue;
         }
-        if (duration === 4) fig.syllable = 'Ta-a-a-a';
-        else if (duration === 3) fig.syllable = 'Ta-a-a';
-        else if (duration === 2) fig.syllable = 'Ta-a';
-        else if (duration === 1.5) fig.syllable = 'Tai-a';
-        else if (duration === 1) fig.syllable = 'Ta';
-        else if (duration === 0.75) fig.syllable = 'Tai-ti';
-        else if (duration === 0.5) fig.syllable = 'Ti-ti';
-        else if (duration === 0.25) fig.syllable = 'Tiri';
-        else fig.syllable = 'Ta';
+
+        if (duration >= 1) {
+            if (duration === 4) fig.syllable = 'Ta-a-a-a';
+            else if (duration === 3) fig.syllable = 'Ta-a-a';
+            else if (duration === 2) fig.syllable = 'Ta-a';
+            else if (duration === 1.5) fig.syllable = 'Tai-a';
+            else if (duration === 1) fig.syllable = 'Ta';
+            else fig.syllable = 'Ta';
+            lastSyllableWasTa = false;
+        }
+        else if (duration === 0.5) {
+            if (lastSyllableWasTa) {
+                fig.syllable = 'Ca';
+                lastSyllableWasTa = false;
+            } else {
+                fig.syllable = 'Ta';
+                lastSyllableWasTa = true;
+            }
+        }
+        else if (duration === 0.25) {
+            const semiSyllables = ['Ti', 'Ri', 'Ti', 'Ri'];
+            let positionInGroup = 0;
+            let k = i - 1;
+            while (k >= 0 && newPattern[k].duration === 0.25 && newPattern[k].type === 'note' && !newPattern[k].isControl && !newPattern[k].isTiedContinuation) {
+                positionInGroup++;
+                k--;
+            }
+            fig.syllable = semiSyllables[positionInGroup % 4];
+            lastSyllableWasTa = false;
+        }
+        else if (duration === 0.75) {
+            fig.syllable = 'Tai-ti';
+            lastSyllableWasTa = false;
+        }
+        else {
+            fig.syllable = '&nbsp;';
+            lastSyllableWasTa = false;
+        }
+
+        if (duration === 0.5) {
+            let nextFig = newPattern[i + 1];
+            if (!nextFig || nextFig.duration !== 0.5 || nextFig.type !== 'note') {
+                lastSyllableWasTa = false;
+            }
+        }
     }
     
     return newPattern;
 }
 
-/**
- * Atualiza o padrão rítmico ativo, a fórmula de compasso e sincroniza com o motor de áudio.
- */
 export function updateActivePatternAndTimeSignature() {
     let rawPattern;
     if (AppState.currentMode === 'lessons') {
@@ -99,14 +157,16 @@ export function updateActivePatternAndTimeSignature() {
         AppState.activeTimeSignature = lesson.timeSignature;
         if (lesson.tempo) document.getElementById('tempo-display').textContent = lesson.tempo;
     } else {
+        const beatsValue = document.querySelector('#custom-beats-select .custom-option.selected').dataset.value;
+        const typeValue = document.querySelector('#custom-type-select .custom-option.selected').dataset.value;
+
         rawPattern = AppState.customPattern;
         AppState.activeTimeSignature = {
-            beats: parseInt(document.getElementById('time-signature-beats').value),
-            beatType: parseInt(document.getElementById('time-signature-type').value)
+            beats: parseInt(beatsValue),
+            beatType: parseInt(typeValue)
         };
     }
     
-    // Sincroniza a fórmula de compasso com o Tone.Transport para o metrônomo.
     if (typeof Tone !== 'undefined' && Tone.Transport) {
         const { beats, beatType } = AppState.activeTimeSignature;
         Tone.Transport.timeSignature = [beats, beatType];
@@ -115,9 +175,6 @@ export function updateActivePatternAndTimeSignature() {
     AppState.activePattern = processPattern(rawPattern);
 }
 
-/**
- * Valida se um padrão rítmico respeita as regras de compasso de forma estrita.
- */
 function isPatternValid(pattern) {
     if (!pattern || pattern.length === 0) return true;
     
@@ -127,85 +184,83 @@ function isPatternValid(pattern) {
     let currentBeatsInMeasure = 0;
 
     for (const item of pattern) {
-        // Ignora elementos de controle e notas que são continuação de ligadura
         if (item.isControl || item.isTiedContinuation) continue;
         
         const itemBeatValue = getBeatValue(item.duration, timeSig);
         
-        // Verifica se a adição da figura ultrapassa o limite do compasso atual
         if (round(currentBeatsInMeasure + itemBeatValue) > totalMeasureBeats + tolerance) {
-            return false; // Inválido: A figura não cabe no compasso.
+            return false;
         }
 
         currentBeatsInMeasure = round(currentBeatsInMeasure + itemBeatValue);
 
-        // Se o compasso está completo, zera para o próximo
         if (Math.abs(currentBeatsInMeasure - totalMeasureBeats) < tolerance) {
             currentBeatsInMeasure = 0;
         }
     }
     
-    return true; // Se o loop terminar sem retornar false, o padrão é válido.
+    return true;
 }
 
-/**
- * Lida com o clique numa figura da paleta.
- */
 export function handlePaletteFigureClick(figure) {
     if (AppState.currentMode !== 'freeCreate') {
         return { success: false, message: "Mude para o Modo de Criação Livre para editar." };
     }
 
-    // Lógica para adicionar/remover ligadura
     if (figure.name === 'Ligadura') {
         if (AppState.selectedIndexForEditing !== null && AppState.customPattern[AppState.selectedIndexForEditing]) {
             const selectedItem = AppState.customPattern[AppState.selectedIndexForEditing];
-            if (selectedItem.type === 'note' && !selectedItem.isControl) {
-                // Alterna o estado da ligadura
-                selectedItem.tiedToNext = !selectedItem.tiedToNext;
-                
-                // Remove a propriedade se for false para manter o objeto limpo
-                if (!selectedItem.tiedToNext) {
-                    delete selectedItem.tiedToNext;
-                }
-                
-                return { success: true, message: selectedItem.tiedToNext ? "Ligadura adicionada." : "Ligadura removida." };
+            
+            if (selectedItem.type !== 'note' || selectedItem.isControl) {
+                 return { success: false, message: "Selecione uma nota para ligar (não uma pausa)." };
             }
+
+            let nextNoteIndex = AppState.selectedIndexForEditing + 1;
+            while(nextNoteIndex < AppState.customPattern.length && (AppState.customPattern[nextNoteIndex].isControl || AppState.customPattern[nextNoteIndex].type === 'rest')) {
+                nextNoteIndex++;
+            }
+            
+            if (nextNoteIndex >= AppState.customPattern.length) {
+                if (selectedItem.tiedToNext) {
+                    delete selectedItem.tiedToNext;
+                     return { success: true, message: "Ligadura removida." };
+                }
+                return { success: false, message: "Não há uma próxima nota para ligar." };
+            }
+            
+            selectedItem.tiedToNext = !selectedItem.tiedToNext;
+            
+            if (!selectedItem.tiedToNext) {
+                delete selectedItem.tiedToNext;
+            }
+            
+            return { success: true, message: selectedItem.tiedToNext ? "Ligadura adicionada." : "Ligadura removida." };
         }
         return { success: false, message: "Selecione uma nota para adicionar ou remover uma ligadura." };
     }
     
-    // Cria uma cópia temporária do padrão para testar a adição da nova figura.
     const tempPattern = JSON.parse(JSON.stringify(AppState.customPattern));
     
     const newFigure = { ...figure };
-    // Remove propriedades desnecessárias da figura da paleta
     delete newFigure.syllable; 
     delete newFigure.totalTiedDuration;
     delete newFigure.isTiedContinuation;
 
-    // Se um item está selecionado, a nova figura o substituirá.
-    // Caso contrário, a nova figura será adicionada ao final.
     if (AppState.selectedIndexForEditing !== null) {
         tempPattern.splice(AppState.selectedIndexForEditing, 1, newFigure);
     } else {
         tempPattern.push(newFigure);
     }
 
-    // Valida o padrão temporário com a nova figura.
     if (isPatternValid(tempPattern)) {
-        AppState.customPattern = tempPattern; // Se for válido, atualiza o padrão real.
-        AppState.selectedIndexForEditing = null; // Limpa a seleção após a ação.
+        AppState.customPattern = tempPattern;
+        AppState.selectedIndexForEditing = null;
         return { success: true, message: `${figure.name} adicionada.` };
     } else {
         return { success: false, message: "A figura não cabe no compasso!" };
     }
 }
 
-/**
- * Lida com a seleção de uma figura para edição.
- */
 export function handleFigureSelectionForEditing(index) {
-    // Alterna a seleção: se clicar no mesmo item, desmarca. Se clicar em outro, marca o novo.
     AppState.selectedIndexForEditing = (AppState.selectedIndexForEditing === index) ? null : index;
 }

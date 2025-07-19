@@ -2,10 +2,10 @@
 import { startCountdownAndPlay, togglePauseResume, stopRhythmExecution, exportWavOffline } from './audio.js';
 import { AppState } from './state.js';
 import { updateActivePatternAndTimeSignature, handlePaletteFigureClick, handleFigureSelectionForEditing } from './core.js';
-import { switchMode, renderRhythm, updateMessage, populateFigurePalette, updateLoginUI, showModal, hideAllModals, populateLoadRhythmModal, hideEditPopover } from './ui.js';
+import { switchMode, renderRhythm, updateMessage, populateFigurePalette, updateLoginUI, showModal, hideAllModals, populateLoadRhythmModal, hideEditPopover, updateCustomDropdownTrigger, updateFigureFocusDisplay } from './ui.js';
+import { lessons } from './config.js';
 
 // --- Elementos do DOM ---
-const modeSelect = document.getElementById('mode-select');
 const customLessonSelect = document.getElementById('custom-lesson-select');
 
 // --- Elementos do Modal ---
@@ -76,11 +76,26 @@ function handleLoadRhythm(index) {
     const savedRhythms = JSON.parse(localStorage.getItem('lrc_savedRhythms')) || {};
     const userRhythms = savedRhythms[username];
 
-    if (!isNaN(index) && index >= 0 && index < userRhythms.length) {
+    if (userRhythms && !isNaN(index) && index >= 0 && index < userRhythms.length) {
         const rhythm = userRhythms[index];
         AppState.customPattern = JSON.parse(JSON.stringify(rhythm.pattern));
-        document.getElementById('time-signature-beats').value = rhythm.timeSignature.beats;
-        document.getElementById('time-signature-type').value = rhythm.timeSignature.beatType;
+        
+        const beatsSelect = document.getElementById('custom-beats-select');
+        const typeSelect = document.getElementById('custom-type-select');
+
+        const newBeatOption = beatsSelect.querySelector(`.custom-option[data-value="${rhythm.timeSignature.beats}"]`);
+        if(newBeatOption) {
+            beatsSelect.querySelector('.custom-option.selected')?.classList.remove('selected');
+            newBeatOption.classList.add('selected');
+            beatsSelect.querySelector('.custom-select-trigger').textContent = newBeatOption.textContent;
+        }
+
+        const newTypeOption = typeSelect.querySelector(`.custom-option[data-value="${rhythm.timeSignature.beatType}"]`);
+         if(newTypeOption) {
+            typeSelect.querySelector('.custom-option.selected')?.classList.remove('selected');
+            newTypeOption.classList.add('selected');
+            typeSelect.querySelector('.custom-select-trigger').textContent = newTypeOption.textContent;
+        }
         
         switchMode('freeCreate'); 
         updateActivePatternAndTimeSignature();
@@ -93,82 +108,75 @@ function handleLoadRhythm(index) {
     }
 }
 
+function setupCustomSelect(selectElement, panelElement, onSelectCallback) {
+     selectElement.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = selectElement.classList.toggle('open');
+        panelElement.classList.toggle('panel-on-top', isOpen);
+    });
+
+    selectElement.querySelectorAll('.custom-option').forEach(option => {
+        option.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const selectedValue = option.dataset.value;
+            const selectedText = option.textContent;
+
+            selectElement.querySelector('.custom-option.selected')?.classList.remove('selected');
+            option.classList.add('selected');
+            selectElement.querySelector('.custom-select-trigger').textContent = selectedText;
+
+            selectElement.classList.remove('open');
+            panelElement.classList.remove('panel-on-top');
+            
+            if (onSelectCallback) {
+                onSelectCallback(selectedValue);
+            }
+        });
+    });
+}
+
 
 /**
  * Configura todos os event listeners da aplicação.
  */
 export function setupEventListeners() {
-    // REMOVIDO: O event listener antigo para o select.
-    // modeSelect.addEventListener('change', (e) => switchMode(e.target.value));
-
-    // --- NOVO: Lógica para o seletor de MODO customizado ---
+    
     const customModeSelect = document.getElementById('custom-mode-select');
     const modePanel = customModeSelect.closest('.panel');
-    
-    customModeSelect.addEventListener('click', (e) => {
-        // Abre e fecha o dropdown
-        const isOpen = customModeSelect.classList.toggle('open');
-        modePanel.classList.toggle('panel-on-top', isOpen);
-    });
-
-    customModeSelect.querySelectorAll('.custom-option').forEach(option => {
-        option.addEventListener('click', (e) => {
-            e.stopPropagation(); // Impede que o clique feche o menu imediatamente
-            const selectedValue = option.dataset.value;
-            const selectedText = option.textContent;
-
-            // Remove a seleção anterior e adiciona à nova
-            customModeSelect.querySelector('.custom-option.selected').classList.remove('selected');
-            option.classList.add('selected');
-
-            // Atualiza o texto do gatilho
-            customModeSelect.querySelector('.custom-select-trigger').textContent = selectedText;
-
-            // Fecha o dropdown
-            customModeSelect.classList.remove('open');
-            modePanel.classList.remove('panel-on-top');
-            
-            // Chama a função original para trocar o modo
-            switchMode(selectedValue);
-        });
-    });
+    setupCustomSelect(customModeSelect, modePanel, switchMode);
 
     const lessonPanel = customLessonSelect.closest('.panel');
-    customLessonSelect.addEventListener('click', () => {
-        const isOpen = customLessonSelect.classList.toggle('open');
-        lessonPanel.classList.toggle('panel-on-top', isOpen);
+    setupCustomSelect(customLessonSelect, lessonPanel, (value) => {
+        const lessonIndex = parseInt(value);
+        AppState.currentLessonIndex = lessonIndex;
+        updateCustomDropdownTrigger(lessons[lessonIndex].name);
+        updateActivePatternAndTimeSignature();
+        renderRhythm();
     });
+
+    const customBeatsSelect = document.getElementById('custom-beats-select');
+    const customTypeSelect = document.getElementById('custom-type-select');
+    const creationPanel = document.getElementById('custom-rhythm-creator');
+
+    const onTimeSignatureChange = () => {
+         if (AppState.currentMode === 'freeCreate') {
+            stopRhythmExecution();
+            updateActivePatternAndTimeSignature();
+            renderRhythm();
+        }
+    }
+
+    setupCustomSelect(customBeatsSelect, creationPanel, onTimeSignatureChange);
+    setupCustomSelect(customTypeSelect, creationPanel, onTimeSignatureChange);
 
     document.addEventListener('click', (e) => {
-        if (!customLessonSelect.contains(e.target)) {
-            if (customLessonSelect.classList.contains('open')) {
-                customLessonSelect.classList.remove('open');
-                lessonPanel.classList.remove('panel-on-top');
+        const openCustomSelects = document.querySelectorAll('.custom-select.open');
+        openCustomSelects.forEach(select => {
+            if (!select.contains(e.target)) {
+                 select.classList.remove('open');
+                 select.closest('.panel')?.classList.remove('panel-on-top');
             }
-        }
-        // --- NOVO: Lógica para fechar o dropdown de MODO ao clicar fora ---
-        if (!customModeSelect.contains(e.target)) {
-            if (customModeSelect.classList.contains('open')) {
-                customModeSelect.classList.remove('open');
-                modePanel.classList.remove('panel-on-top');
-            }
-        }
-    });
-
-    document.getElementById('time-signature-beats').addEventListener('change', () => {
-        if (AppState.currentMode === 'freeCreate') {
-            stopRhythmExecution();
-            updateActivePatternAndTimeSignature();
-            renderRhythm();
-        }
-    });
-
-    document.getElementById('time-signature-type').addEventListener('change', () => {
-        if (AppState.currentMode === 'freeCreate') {
-            stopRhythmExecution();
-            updateActivePatternAndTimeSignature();
-            renderRhythm();
-        }
+        });
     });
 
     const tempoDisplay = document.getElementById('tempo-display');
@@ -194,7 +202,7 @@ export function setupEventListeners() {
         if(confirm("Tem a certeza que deseja limpar o padrão atual?")) {
             AppState.customPattern = [];
             AppState.selectedIndexForEditing = null;
-            hideEditPopover(); // LINHA ADICIONADA PARA GARANTIA EXTRA
+            hideEditPopover();
             updateActivePatternAndTimeSignature();
             renderRhythm();
             updateMessage("Padrão limpo.");
@@ -205,7 +213,11 @@ export function setupEventListeners() {
     document.getElementById('logout-button').addEventListener('click', logoutUser);
     document.getElementById('save-rhythm-button').addEventListener('click', () => showModal(saveRhythmModal));
     document.getElementById('load-rhythms-button').addEventListener('click', () => {
-        const username = AppState.user.currentUser.username;
+        const username = AppState.user.currentUser?.username;
+        if (!username) {
+            updateMessage("Faça login para carregar ritmos.", "error");
+            return;
+        }
         const savedRhythms = JSON.parse(localStorage.getItem('lrc_savedRhythms')) || {};
         const userRhythms = savedRhythms[username];
         populateLoadRhythmModal(userRhythms);
@@ -214,7 +226,6 @@ export function setupEventListeners() {
 
     document.getElementById('export-wav-button').addEventListener('click', exportWavOffline);
 
-    // --- Eventos dos Modais ---
     document.getElementById('login-confirm-button').addEventListener('click', handleLogin);
     document.getElementById('login-cancel-button').addEventListener('click', hideAllModals);
     document.getElementById('save-confirm-button').addEventListener('click', handleSaveRhythm);
@@ -236,15 +247,50 @@ export function setupEventListeners() {
         if (e.key === 'Enter') handleSaveRhythm();
     });
 
-    // Adiciona listener para fechar o popover ao clicar em qualquer lugar no display
-    document.getElementById('rhythm-display-container').addEventListener('click', () => {
+    const rhythmDisplayContainer = document.getElementById('rhythm-display-container');
+
+    rhythmDisplayContainer.addEventListener('click', () => {
         if (AppState.selectedIndexForEditing !== null) {
             AppState.selectedIndexForEditing = null;
-            renderRhythm(); // Re-renderiza para remover a seleção visual
+            renderRhythm();
         }
     });
 
-    // ========= EVENTOS DO POPOVER DE EDIÇÃO =========
+    // --- LÓGICA DEFINITIVA PARA EVITAR FLICKERING ---
+    let lastHoveredIndex = null;
+    let hideInfoBoxTimer = null; // Variável para controlar o timer
+
+    rhythmDisplayContainer.addEventListener('mouseover', (e) => {
+        // Sempre que o mouse se move, cancelamos qualquer timer pendente para esconder a caixa
+        clearTimeout(hideInfoBoxTimer);
+
+        const figureContainer = e.target.closest('.figure-container');
+
+        if (figureContainer) {
+            const patternIndex = figureContainer.dataset.patternIndex;
+            if (patternIndex !== lastHoveredIndex) {
+                lastHoveredIndex = patternIndex;
+                const item = AppState.activePattern[parseInt(patternIndex)];
+                if (item) {
+                    updateFigureFocusDisplay(item);
+                }
+            }
+        } else {
+            // Se o mouse está sobre o fundo (mas não sobre uma figura), iniciamos um timer para esconder a caixa
+            lastHoveredIndex = null;
+            hideInfoBoxTimer = setTimeout(() => {
+                updateFigureFocusDisplay(null);
+            }, 100); // Um pequeno atraso de 100ms
+        }
+    });
+
+    rhythmDisplayContainer.addEventListener('mouseleave', () => {
+        // Se o mouse sai completamente da área, escondemos a caixa
+        lastHoveredIndex = null;
+        updateFigureFocusDisplay(null);
+    });
+    // --- FIM DA LÓGICA DEFINITIVA ---
+
     document.getElementById('popover-delete-button').addEventListener('click', (e) => {
         e.stopPropagation();
         if (AppState.selectedIndexForEditing === null) return;
@@ -264,10 +310,7 @@ export function setupEventListeners() {
         const result = handlePaletteFigureClick({ name: 'Ligadura' });
         updateMessage(result.message, result.success ? 'info' : 'error');
         if(result.success) {
-            // Não é preciso chamar updateActivePatternAndTimeSignature aqui pois
-            // handlePaletteFigureClick não altera o padrão, apenas o estado da ligadura
-            // que será reprocessado na renderização.
-            updateActivePatternAndTimeSignature(); // Para re-calcular as sílabas e durações de ligadura
+            updateActivePatternAndTimeSignature();
             renderRhythm();
         }
     });
