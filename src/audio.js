@@ -9,14 +9,38 @@ let offlineContext;
 export function initializeSynths() {
     try {
         if (AppState.synths.noteSynth) AppState.synths.noteSynth.dispose();
+        if (AppState.synths.attackSynth) AppState.synths.attackSynth.dispose(); // Limpa o novo synth
         if (AppState.synths.metronomeSynth) AppState.synths.metronomeSynth.dispose();
 
+        // --- SOLUÇÃO DE ÁUDIO DEFINITIVA ---
+
+        // 1. Sintetizador para a SUSTENTAÇÃO da nota (som puro)
         AppState.synths.noteSynth = new Tone.PolySynth(Tone.Synth, {
-            oscillator: { type: "triangle" },
-            envelope: { attack: 0.01, decay: 0.2, sustain: 0.2, release: 0.3 },
-            volume: -6
+            oscillator: { 
+                type: "sine" // Onda Senoidal: o som mais puro e limpo
+            },
+            envelope: {
+                attack: 0.005,
+                decay: 0.0,    // Sem decaimento
+                sustain: 1.0,  // Volume máximo durante toda a nota
+                release: 0.1
+            },
+            volume: -8
         }).toDestination();
 
+        // 2. Sintetizador para o ATAQUE da nota (o "click" inicial)
+        AppState.synths.attackSynth = new Tone.MembraneSynth({
+            pitchDecay: 0.01,
+            octaves: 4.,
+            envelope: {
+                attack: 0.001,
+                decay: 0.2,
+                sustain: 0,
+            },
+            volume: 0
+        }).toDestination();
+        
+        // 3. Sintetizador do Metrônomo (inalterado)
         AppState.synths.metronomeSynth = new Tone.MembraneSynth({
             pitchDecay: 0.01,
             octaves: 5,
@@ -138,8 +162,11 @@ function schedulePlayback(offset = 0) {
         
         if (item.type === 'note' && !item.isTiedContinuation) {
             const soundDurationSeconds = getBeatValue(item.totalTiedDuration || item.duration, timeSig) * beatTypeDurationSeconds;
+            
+            // Toca os dois sons ao mesmo tempo
             AppState.transportEventIds.push(Tone.Transport.scheduleOnce(t => {
-                AppState.synths.noteSynth.triggerAttackRelease("C4", soundDurationSeconds, t);
+                AppState.synths.noteSynth.triggerAttackRelease("C5", soundDurationSeconds, t);
+                AppState.synths.attackSynth.triggerAttackRelease("C6", "16n", t); // "16n" é uma duração curta para o click
             }, currentTime));
         }
         
@@ -212,15 +239,30 @@ export async function exportWavOffline() {
     totalDurationSeconds += 1.0;
 
     offlineContext = new Tone.OfflineContext(2, totalDurationSeconds, Tone.context.sampleRate);
-    const offlineNoteSynth = new Tone.PolySynth(Tone.Synth, { context: offlineContext }).toDestination();
+    
+    const offlineSustainSynth = new Tone.PolySynth(Tone.Synth, {
+        oscillator: { type: "sine" },
+        envelope: { attack: 0.005, decay: 0.0, sustain: 1.0, release: 0.1 },
+        volume: -8,
+        context: offlineContext
+    }).toDestination();
+
+    const offlineAttackSynth = new Tone.MembraneSynth({
+        pitchDecay: 0.01,
+        octaves: 2,
+        envelope: { attack: 0.001, decay: 0.2, sustain: 0 },
+        volume: -5,
+        context: offlineContext
+    }).toDestination();
     
     let currentTime = 0;
     AppState.activePattern.forEach(item => {
         if (item.type === 'note' && !item.isTiedContinuation) {
             const soundDuration = getBeatValue(item.totalTiedDuration || item.duration, timeSig) * singleBeatDuration;
-            offlineNoteSynth.triggerAttackRelease("C4", soundDuration, currentTime);
+            offlineSustainSynth.triggerAttackRelease("C4", soundDuration, currentTime);
+            offlineAttackSynth.triggerAttackRelease("C2", "16n", currentTime);
         }
-        if (!item.isControl && !item.isTiedContinuation) {
+        if (!item.isControl) {
             currentTime += getBeatValue(item.duration, timeSig) * singleBeatDuration;
         }
     });

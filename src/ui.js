@@ -172,7 +172,6 @@ export function updateFigureFocusDisplay(item) {
     }
 }
 
-// --- CURVATURA DA LIGADURA APRIMORADA ---
 function drawTie(row, startEl, endEl) {
     const rowRect = row.getBoundingClientRect();
     const startRect = startEl.getBoundingClientRect();
@@ -187,9 +186,9 @@ function drawTie(row, startEl, endEl) {
     const noteItem = startEl.querySelector('.note-item');
     if (!noteItem) return;
 
-    const yPos = noteItem.offsetTop + noteItem.offsetHeight - 8; 
-    const minCurvature = 15; // Garante uma curva mínima
-    const curvature = minCurvature + (width * 0.15); // Curva base + um pouco da largura
+    const yPos = noteItem.offsetTop + noteItem.offsetHeight; 
+    const minCurvature = 20;
+    const curvature = minCurvature + (width * 0.2);
 
     const M = `M ${startX},${yPos}`;
     const Q = `Q ${startX + width / 2},${yPos + curvature} ${endX},${yPos}`;
@@ -226,8 +225,11 @@ export function renderRhythm() {
     let currentBeatsInMeasure = 0;
 
     const containerWidth = rhythmDisplayEl.clientWidth;
-    const timeSigWidth = 80;
-    const gapWidth = 4;
+    // --- LARGURAS AJUSTADAS PARA QUEBRA DE LINHA PRECISA ---
+    const timeSigWidth = 76;   // 60px de largura + 16px de margem
+    const figureWidth = 60;    // 60px de largura do .note-item
+    const barlineWidth = 18;   // 2px de largura + 16px de margem
+    const gapWidth = 4;        // 4px de espaçamento entre elementos
     let currentRowWidth = timeSigWidth;
     
     let currentRow = document.createElement('div');
@@ -246,9 +248,7 @@ export function renderRhythm() {
     AppState.activePattern.forEach((item, index) => {
         if (item.type === 'final_barline') return;
         
-        const figureWidth = 70;
-        
-        if (currentRowWidth + figureWidth + gapWidth > containerWidth) {
+        if (currentRowWidth + gapWidth + figureWidth > containerWidth) {
             currentRow = document.createElement('div');
             currentRow.className = 'rhythm-row';
             rhythmDisplayEl.appendChild(currentRow);
@@ -323,15 +323,14 @@ export function renderRhythm() {
         
         figureContainer.append(beatCounterElement, noteItemElement, syllableElement);
         currentRow.appendChild(figureContainer);
-        currentRowWidth += figureWidth + gapWidth;
+        currentRowWidth += gapWidth + figureWidth;
 
         if (!item.isControl) currentBeatsInMeasure += beatValue;
         
         if (Math.abs(currentBeatsInMeasure - totalMeasureBeats) < tolerance) {
-            const hasMoreMusic = AppState.activePattern.slice(index + 1).some(fig => !fig.isControl);
+            const hasMoreMusic = AppState.activePattern.slice(index + 1).some(fig => !fig.isControl && fig.type !== 'final_barline');
             if (hasMoreMusic) {
-                 const barlineWidth = 20;
-                 if (currentRowWidth + barlineWidth + gapWidth > containerWidth) {
+                 if (currentRowWidth + gapWidth + barlineWidth > containerWidth) {
                     currentRow = document.createElement('div');
                     currentRow.className = 'rhythm-row';
                     rhythmDisplayEl.appendChild(currentRow);
@@ -342,7 +341,7 @@ export function renderRhythm() {
                 barlineEl.className = 'barline-container';
                 barlineEl.innerHTML = `<div class="barline-item"></div>`;
                 currentRow.appendChild(barlineEl);
-                currentRowWidth += barlineWidth + gapWidth;
+                currentRowWidth += gapWidth + barlineWidth;
             }
             currentBeatsInMeasure = 0;
         }
