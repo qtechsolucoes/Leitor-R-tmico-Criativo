@@ -11,7 +11,6 @@ const lessonSelectorContainer = document.getElementById('lesson-selector-contain
 const messageArea = document.getElementById('message-area');
 const countdownDisplay = document.getElementById('countdown-display');
 const playPauseButton = document.getElementById('play-pause-button');
-const customLessonSelect = document.getElementById('custom-lesson-select');
 const modalOverlay = document.getElementById('modal-overlay');
 const loginModal = document.getElementById('login-modal');
 const saveRhythmModal = document.getElementById('save-rhythm-modal');
@@ -19,6 +18,7 @@ const loadRhythmModal = document.getElementById('load-rhythm-modal');
 const errorModal = document.getElementById('error-modal');
 const errorModalText = document.getElementById('error-modal-text');
 const editPopover = document.getElementById('edit-popover');
+const lessonModal = document.getElementById('lesson-modal');
 
 export function showModal(modalElement) {
     modalOverlay.classList.remove('hidden');
@@ -31,6 +31,7 @@ export function hideAllModals() {
     saveRhythmModal.classList.add('hidden');
     loadRhythmModal.classList.add('hidden');
     errorModal.classList.add('hidden');
+    lessonModal.classList.add('hidden');
 }
 
 export function showErrorModal(message) {
@@ -205,7 +206,6 @@ function drawTie(row, startEl, endEl) {
     row.appendChild(svg);
 }
 
-
 export function renderRhythm() {
     rhythmDisplayEl.innerHTML = '';
     updateFigureFocusDisplay(null);
@@ -225,11 +225,10 @@ export function renderRhythm() {
     let currentBeatsInMeasure = 0;
 
     const containerWidth = rhythmDisplayEl.clientWidth;
-    // --- LARGURAS AJUSTADAS PARA QUEBRA DE LINHA PRECISA ---
-    const timeSigWidth = 76;   // 60px de largura + 16px de margem
-    const figureWidth = 60;    // 60px de largura do .note-item
-    const barlineWidth = 18;   // 2px de largura + 16px de margem
-    const gapWidth = 4;        // 4px de espaçamento entre elementos
+    const timeSigWidth = 76;
+    const figureWidth = 60;
+    const barlineWidth = 18;
+    const gapWidth = 4;
     let currentRowWidth = timeSigWidth;
     
     let currentRow = document.createElement('div');
@@ -393,40 +392,45 @@ export function switchMode(mode) {
     updateLoginUI();
 }
 
-export function populateCustomLessonDropdown() {
-    const customOptionsContainer = customLessonSelect.querySelector('.custom-options');
-    if (!customOptionsContainer) return;
-    customOptionsContainer.innerHTML = '';
-    const lessonPanel = customLessonSelect.closest('.panel');
-    
+export function populateLessonModal() {
+    const contentEl = document.getElementById('lesson-modal-content');
+    if (!contentEl) return;
+    contentEl.innerHTML = '';
+
+    const modules = {};
     lessons.forEach((lesson, index) => {
-        const optionEl = document.createElement('div');
-        optionEl.className = 'custom-option';
-        optionEl.textContent = lesson.name;
-        optionEl.dataset.value = index;
-        optionEl.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const selectedValue = e.currentTarget.dataset.value;
-            AppState.currentLessonIndex = parseInt(selectedValue);
-            updateCustomDropdownTrigger(lessons[selectedValue].name);
-            customOptionsContainer.querySelectorAll('.custom-option').forEach(opt => opt.classList.remove('selected'));
-            e.currentTarget.classList.add('selected');
-            
-            customLessonSelect.classList.remove('open');
-            lessonPanel.classList.remove('panel-on-top');
-            
-            updateActivePatternAndTimeSignature();
-            renderRhythm();
-        });
-        customOptionsContainer.appendChild(optionEl);
+        const moduleName = lesson.name.split(' - ')[0];
+        if (!modules[moduleName]) {
+            modules[moduleName] = [];
+        }
+        modules[moduleName].push({ ...lesson, originalIndex: index });
     });
+
+    for (const moduleName in modules) {
+        const moduleContainer = document.createElement('div');
+        
+        const header = document.createElement('div');
+        header.className = 'accordion-module-header';
+        header.textContent = moduleName;
+        
+        const list = document.createElement('div');
+        list.className = 'accordion-lessons-list';
+        
+        modules[moduleName].forEach(lesson => {
+            const item = document.createElement('div');
+            item.className = 'accordion-lesson-item';
+            item.textContent = lesson.name.split(': ')[1];
+            item.dataset.index = lesson.originalIndex;
+            list.appendChild(item);
+        });
+
+        moduleContainer.appendChild(header);
+        moduleContainer.appendChild(list);
+        contentEl.appendChild(moduleContainer);
+    }
 }
 
-export function updateCustomDropdownTrigger(text) {
-    const trigger = customLessonSelect.querySelector('.custom-select-trigger');
-    if (trigger) trigger.textContent = text;
-}
-
+// CORREÇÃO: Adicionada a palavra 'export' para que a função seja encontrada pelo main.js
 export function populateFigurePalette() {
     const figurePaletteDiv = document.getElementById('figure-palette');
     if (!figurePaletteDiv) return;

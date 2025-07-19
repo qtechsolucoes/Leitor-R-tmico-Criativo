@@ -56,14 +56,9 @@
                 </div>
                 <div id="lesson-selector-container" class="mb-4">
                     <label class="block text-sm font-medium text-slate-300 mb-2">Lição:</label>
-                    <div class="custom-select-wrapper">
-                        <div id="custom-lesson-select" class="custom-select">
-                            <span class="custom-select-trigger">Selecione uma lição</span>
-                            <div class="custom-options"></div>
-                        </div>
-                    </div>
+                    <button id="open-lesson-modal-button" class="btn-action btn-secondary w-full">Selecionar Lição</button>
                 </div>
-                 </div>
+            </div>
 
             <div id="custom-rhythm-creator" class="panel hidden">
                 <h3 class="panel-title">Painel de Criação</h3>
@@ -136,6 +131,15 @@
     </div>
 
     <div id="modal-overlay" class="modal-overlay hidden"></div>
+
+    <div id="lesson-modal" class="modal-lessons hidden">
+        <div class="modal-lessons-header">
+            <h2 class="modal-lessons-title">Selecione uma Lição</h2>
+            <button id="close-lesson-modal-button" class="modal-lessons-close">&times;</button>
+        </div>
+        <div id="lesson-modal-content" class="modal-lessons-content">
+            </div>
+    </div>
 
     <div id="login-modal" class="modal hidden">
         <h3 class="modal-title">Login</h3>

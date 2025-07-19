@@ -1,7 +1,8 @@
 // main.js
 
 import { setupEventListeners } from './events.js';
-import { populateCustomLessonDropdown, switchMode, updateLoginUI, updateCustomDropdownTrigger, populateFigurePalette } from './ui.js';
+// CORREÇÃO: Removida a importação da função que não existe mais
+import { switchMode, updateLoginUI, populateFigurePalette } from './ui.js';
 import { initializeSynths } from './audio.js';
 import { lessons } from './config.js';
 
@@ -9,7 +10,7 @@ import { lessons } from './config.js';
  * Função principal que inicializa toda a aplicação.
  */
 function init() {
-    populateCustomLessonDropdown();
+    // A população do dropdown/modal agora é feita sob demanda, então removemos a chamada daqui.
     
     // Popula a paleta de figuras rítmicas na inicialização.
     populateFigurePalette();
@@ -20,15 +21,8 @@ function init() {
 
     updateLoginUI(); 
     
+    // Define o modo inicial e carrega a primeira lição por padrão.
     switchMode('lessons');
-
-    if (lessons.length > 0) {
-        updateCustomDropdownTrigger(lessons[0].name);
-        const firstOption = document.querySelector('.custom-option[data-value="0"]');
-        if (firstOption) {
-            firstOption.classList.add('selected');
-        }
-    }
     
     console.log("Aplicação 'Leitor Rítmico Criativo' (Versão Final) inicializada.");
 }

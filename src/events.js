@@ -2,21 +2,15 @@
 import { startCountdownAndPlay, togglePauseResume, stopRhythmExecution, exportWavOffline } from './audio.js';
 import { AppState } from './state.js';
 import { updateActivePatternAndTimeSignature, handlePaletteFigureClick, handleFigureSelectionForEditing } from './core.js';
-import { switchMode, renderRhythm, updateMessage, populateFigurePalette, updateLoginUI, showModal, hideAllModals, populateLoadRhythmModal, hideEditPopover, updateCustomDropdownTrigger, updateFigureFocusDisplay } from './ui.js';
+import { switchMode, renderRhythm, updateMessage, updateLoginUI, showModal, hideAllModals, populateLoadRhythmModal, hideEditPopover, updateFigureFocusDisplay, populateLessonModal } from './ui.js';
 import { lessons } from './config.js';
 
-// --- Elementos do DOM ---
-const customLessonSelect = document.getElementById('custom-lesson-select');
-
-// --- Elementos do Modal ---
 const loginModal = document.getElementById('login-modal');
 const saveRhythmModal = document.getElementById('save-rhythm-modal');
 const loadRhythmModal = document.getElementById('load-rhythm-modal');
+const lessonModal = document.getElementById('lesson-modal');
 const usernameInput = document.getElementById('username-input');
 const rhythmNameInput = document.getElementById('rhythm-name-input');
-
-
-// --- Funções de Persistência ---
 
 function handleLogin() {
     const username = usernameInput.value.trim();
@@ -135,24 +129,11 @@ function setupCustomSelect(selectElement, panelElement, onSelectCallback) {
     });
 }
 
-
-/**
- * Configura todos os event listeners da aplicação.
- */
 export function setupEventListeners() {
     
     const customModeSelect = document.getElementById('custom-mode-select');
     const modePanel = customModeSelect.closest('.panel');
     setupCustomSelect(customModeSelect, modePanel, switchMode);
-
-    const lessonPanel = customLessonSelect.closest('.panel');
-    setupCustomSelect(customLessonSelect, lessonPanel, (value) => {
-        const lessonIndex = parseInt(value);
-        AppState.currentLessonIndex = lessonIndex;
-        updateCustomDropdownTrigger(lessons[lessonIndex].name);
-        updateActivePatternAndTimeSignature();
-        renderRhythm();
-    });
 
     const customBeatsSelect = document.getElementById('custom-beats-select');
     const customTypeSelect = document.getElementById('custom-type-select');
@@ -256,14 +237,11 @@ export function setupEventListeners() {
         }
     });
 
-    // --- LÓGICA DEFINITIVA PARA EVITAR FLICKERING ---
     let lastHoveredIndex = null;
-    let hideInfoBoxTimer = null; // Variável para controlar o timer
+    let hideInfoBoxTimer = null;
 
     rhythmDisplayContainer.addEventListener('mouseover', (e) => {
-        // Sempre que o mouse se move, cancelamos qualquer timer pendente para esconder a caixa
         clearTimeout(hideInfoBoxTimer);
-
         const figureContainer = e.target.closest('.figure-container');
 
         if (figureContainer) {
@@ -276,20 +254,17 @@ export function setupEventListeners() {
                 }
             }
         } else {
-            // Se o mouse está sobre o fundo (mas não sobre uma figura), iniciamos um timer para esconder a caixa
             lastHoveredIndex = null;
             hideInfoBoxTimer = setTimeout(() => {
                 updateFigureFocusDisplay(null);
-            }, 100); // Um pequeno atraso de 100ms
+            }, 100);
         }
     });
 
     rhythmDisplayContainer.addEventListener('mouseleave', () => {
-        // Se o mouse sai completamente da área, escondemos a caixa
         lastHoveredIndex = null;
         updateFigureFocusDisplay(null);
     });
-    // --- FIM DA LÓGICA DEFINITIVA ---
 
     document.getElementById('popover-delete-button').addEventListener('click', (e) => {
         e.stopPropagation();
@@ -312,6 +287,29 @@ export function setupEventListeners() {
         if(result.success) {
             updateActivePatternAndTimeSignature();
             renderRhythm();
+        }
+    });
+
+    // --- LÓGICA DO NOVO MODAL DE LIÇÕES ---
+    document.getElementById('open-lesson-modal-button').addEventListener('click', () => {
+        populateLessonModal();
+        showModal(lessonModal);
+    });
+
+    document.getElementById('close-lesson-modal-button').addEventListener('click', hideAllModals);
+
+    document.getElementById('lesson-modal-content').addEventListener('click', (e) => {
+        if (e.target.classList.contains('accordion-module-header')) {
+            const list = e.target.nextElementSibling;
+            list.style.display = list.style.display === 'block' ? 'none' : 'block';
+        }
+
+        if (e.target.classList.contains('accordion-lesson-item')) {
+            const lessonIndex = parseInt(e.target.dataset.index);
+            AppState.currentLessonIndex = lessonIndex;
+            updateActivePatternAndTimeSignature();
+            renderRhythm();
+            hideAllModals();
         }
     });
 }

@@ -51,6 +51,9 @@ html::-webkit-scrollbar-thumb:hover {
     padding: 1.5rem;
 }
 
+/* ==========================================================================
+   PAINEL DE CONTROLO (ESQUERDA)
+   ========================================================================== */
 .control-panel {
     display: flex;
     flex-direction: column;
@@ -60,17 +63,17 @@ html::-webkit-scrollbar-thumb:hover {
     scrollbar-width: thin;
     scrollbar-color: var(--scrollbar-thumb-bg) var(--scrollbar-bg);
 }
-.control-panel::-webkit-scrollbar, #rhythm-display-container::-webkit-scrollbar {
+.control-panel::-webkit-scrollbar, #rhythm-display-container::-webkit-scrollbar, .modal-lessons-content::-webkit-scrollbar {
     width: 8px;
 }
-.control-panel::-webkit-scrollbar-track, #rhythm-display-container::-webkit-scrollbar-track {
+.control-panel::-webkit-scrollbar-track, #rhythm-display-container::-webkit-scrollbar-track, .modal-lessons-content::-webkit-scrollbar-track {
     background: transparent;
 }
-.control-panel::-webkit-scrollbar-thumb, #rhythm-display-container::-webkit-scrollbar-thumb {
+.control-panel::-webkit-scrollbar-thumb, #rhythm-display-container::-webkit-scrollbar-thumb, .modal-lessons-content::-webkit-scrollbar-thumb {
     background-color: var(--scrollbar-thumb-bg);
     border-radius: 4px;
 }
-.control-panel::-webkit-scrollbar-thumb:hover, #rhythm-display-container::-webkit-scrollbar-thumb:hover {
+.control-panel::-webkit-scrollbar-thumb:hover, #rhythm-display-container::-webkit-scrollbar-thumb:hover, .modal-lessons-content::-webkit-scrollbar-thumb:hover {
     background-color: var(--scrollbar-thumb-hover-bg);
 }
 
@@ -252,8 +255,7 @@ html::-webkit-scrollbar-thumb:hover {
 .rhythm-row {
     display: flex;
     flex-wrap: nowrap;
-    /* --- CORREÇÃO DE ALINHAMENTO --- */
-    align-items: center; /* Trocado de flex-end para center */
+    align-items: center;
     gap: 4px;
     position: relative;
 }
@@ -468,4 +470,86 @@ html::-webkit-scrollbar-thumb:hover {
 
 .hidden {
     display: none !important;
+}
+
+/* --- ESTILOS PARA O NOVO MODAL DE LIÇÕES --- */
+.modal-lessons {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 50;
+    width: 90%;
+    max-width: 800px;
+    height: 80vh;
+    background: var(--bg-dark-end);
+    border-radius: 1rem;
+    border: 1px solid var(--panel-border);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+}
+.modal-lessons-header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--panel-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+.modal-lessons-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--glow-cyan);
+}
+.modal-lessons-close {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 2.5rem;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.2s;
+}
+.modal-lessons-close:hover {
+    color: var(--text-primary);
+}
+.modal-lessons-content {
+    padding: 1.5rem;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+.accordion-module-header {
+    background-color: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    padding: 1rem 1.5rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    margin-bottom: 1rem;
+    transition: background-color 0.2s;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+.accordion-module-header:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+.accordion-lessons-list {
+    padding-left: 1.5rem;
+    display: none; /* Escondido por padrão */
+    margin-bottom: 1rem;
+}
+.accordion-lesson-item {
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+    border-bottom: 1px solid var(--panel-border);
+}
+.accordion-lesson-item:last-child {
+    border-bottom: none;
+}
+.accordion-lesson-item:hover {
+    background-color: var(--glow-purple);
+    color: white;
 }
