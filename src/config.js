@@ -1,9 +1,9 @@
 // src/config.js
 
-// Importa a lista completa de lições da nossa nova estrutura modular
 import { lessons } from './lessons/index.js';
 
 export const rhythmicFigures = [
+    // ... Figuras existentes ...
     { name: 'Semibreve', symbol: '𝅝', type: 'note', duration: 4},
     { name: 'Pausa de Semibreve', symbol: '𝄻', type: 'rest', duration: 4},
     { name: 'Mínima Pontuada', symbol: '𝅗𝅥.', type: 'note', duration: 3},
@@ -15,16 +15,15 @@ export const rhythmicFigures = [
     { name: 'Colcheia Pontuada', symbol: '𝅘𝅥𝅮.', type: 'note', duration: 0.75},
     { name: 'Colcheia', symbol: '𝅘𝅥𝅮', type: 'note', duration: 0.5},
     { name: 'Pausa de Colcheia', symbol: '𝄾', type: 'rest', duration: 0.5},
+    { name: 'Colcheia de Tercina', symbol: '<span class="tuplet-symbol">3</span>𝅘𝅥𝅮', baseSymbol: '𝅘𝅥𝅮', type: 'note', duration: 1/3, isTupletChild: true, tupletN: 3 },
+    { name: 'Pausa de Colcheia de Tercina', symbol: '<span class="tuplet-symbol">3</span>𝄾', baseSymbol: '𝄾', type: 'rest', duration: 1/3, isTupletChild: true, tupletN: 3 },
     { name: 'Semicolcheia', symbol: '𝅘𝅥𝅯', type: 'note', duration: 0.25},
     { name: 'Pausa de Semicolcheia', symbol: '𝄿', type: 'rest', duration: 0.25},
     { name: 'Fusa', symbol: '𝅘𝅥𝅰', type: 'note', duration: 0.125},
     { name: 'Pausa de Fusa', symbol: '𝅀', type: 'rest', duration: 0.125},
     { name: 'Semifusa', symbol: '𝅘𝅥𝅱', type: 'note', duration: 0.0625},
     { name: 'Pausa de Semifusa', symbol: '𝅁', type: 'rest', duration: 0.0625},
-    { name: 'Início de Repetição', symbol: '𝄆', type: 'repeat_start', duration: 0, isControl: true},
-    { name: 'Fim de Repetição', symbol: '𝄇', type: 'repeat_end', duration: 0, isControl: true},
     { name: 'Barra Final Dupla', symbol: '𝄂', type: 'final_barline', duration: 0, isControl: true}
 ];
 
-// Exporta as lições que foram importadas e agrupadas
 export { lessons };

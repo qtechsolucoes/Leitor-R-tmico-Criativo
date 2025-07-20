@@ -149,7 +149,7 @@ export function updateFigureFocusDisplay(item) {
     if (!figureFocusDisplayEl) return;
 
     if (item && !item.isControl) {
-        const figureDef = rhythmicFigures.find(rf => rf.symbol === item.symbol && rf.duration === item.duration);
+        const figureDef = rhythmicFigures.find(rf => (rf.baseSymbol || rf.symbol) === (item.baseSymbol || item.symbol) && Math.abs(rf.duration - item.duration) < 0.01);
         if (!figureDef) {
              figureFocusDisplayEl.classList.remove('visible');
              return;
@@ -160,7 +160,7 @@ export function updateFigureFocusDisplay(item) {
         const fractionText = getFractionalNotation(beatValue);
 
         figureFocusDisplayEl.innerHTML = `
-            <div class="focus-symbol">${item.symbol}</div>
+            <div class="focus-symbol">${item.baseSymbol || item.symbol}</div>
             <div class="focus-details">
                 <div class="focus-name">${figureDef.name}</div>
                 <div class="focus-duration">Duração: ${durationText} ${fractionText}</div>
@@ -206,6 +206,99 @@ function drawTie(row, startEl, endEl) {
     row.appendChild(svg);
 }
 
+function groupTuplets(pattern) {
+    const groupedPattern = [];
+    let i = 0;
+    while (i < pattern.length) {
+        const item = pattern[i];
+        if (item.isTupletChild) {
+            const tupletGroup = {
+                type: 'tuplet_group',
+                tupletN: item.tupletN,
+                items: [],
+                originalIndices: []
+            };
+            while (i < pattern.length && 
+                   pattern[i].isTupletChild && 
+                   pattern[i].tupletN === tupletGroup.tupletN &&
+                   tupletGroup.items.length < tupletGroup.tupletN) {
+                tupletGroup.items.push(pattern[i]);
+                tupletGroup.originalIndices.push(i);
+                i++;
+            }
+            groupedPattern.push(tupletGroup);
+        } else {
+            groupedPattern.push(item);
+            i++;
+        }
+    }
+    return groupedPattern;
+}
+
+function renderFigure(item, index, beatContext) {
+    const figureContainer = document.createElement('div');
+    figureContainer.className = 'figure-container';
+    figureContainer.dataset.patternIndex = index;
+    
+    if (AppState.currentMode === 'freeCreate' && !item.isControl) {
+        figureContainer.addEventListener('click', (e) => {
+            e.stopPropagation();
+            handleFigureSelectionForEditing(index);
+            renderRhythm();
+            const newFigureElement = rhythmDisplayEl.querySelector(`.figure-container[data-pattern-index="${index}"]`);
+            if(newFigureElement && AppState.selectedIndexForEditing === index) {
+                showEditPopover(newFigureElement);
+            }
+        });
+        if (AppState.selectedIndexForEditing === index) {
+            figureContainer.classList.add('selected-for-edit');
+        }
+    }
+    
+    const beatCounterElement = document.createElement('div');
+    beatCounterElement.className = 'beat-counter-text';
+    
+    // --- LÓGICA DO CONTADOR DE TEMPO ---
+    if (beatContext && !item.isControl) {
+        const { currentBeatsInMeasure, timeSig, tolerance } = beatContext;
+        const beatValue = getBeatValue(item.duration, timeSig);
+        let beatHTML = '';
+
+        if (beatValue >= 1) {
+             const roundedBeatValue = Math.floor(beatValue);
+             for (let i = 0; i < roundedBeatValue; i++) {
+                 const beatNumber = Math.floor(currentBeatsInMeasure) + 1 + i;
+                 beatHTML += `<span data-beat-index="${i}">${beatNumber}</span>`;
+             }
+        } else {
+            const beatNumber = Math.floor(currentBeatsInMeasure) + 1;
+            const fraction = currentBeatsInMeasure - Math.floor(currentBeatsInMeasure);
+            let beatDisplay = '&nbsp;';
+
+            if (Math.abs(fraction) < tolerance) beatDisplay = beatNumber;
+            else if (Math.abs(fraction - 0.5) < tolerance) beatDisplay = 'e';
+            else if (Math.abs(fraction - 0.25) < tolerance) beatDisplay = '+';
+            else if (Math.abs(fraction - 0.75) < tolerance) beatDisplay = 'a';
+            else if (item.isTupletChild && Math.abs(fraction) > tolerance) beatDisplay = '&'; // Símbolo para subdivisões de quiáltera
+            
+            beatHTML = `<span data-beat-index="0">${beatDisplay}</span>`;
+        }
+        beatCounterElement.innerHTML = beatHTML;
+    }
+
+    const noteItemElement = document.createElement('div');
+    noteItemElement.className = `note-item ${item.type === 'note' ? 'bg-blue-500' : 'bg-gray-300'}`;
+    noteItemElement.innerHTML = item.baseSymbol || item.symbol;
+    if(item.isControl) noteItemElement.classList.add('control-item');
+
+    const syllableElement = document.createElement('div');
+    syllableElement.className = 'syllable-text';
+    syllableElement.innerHTML = item.syllable || '&nbsp;';
+    
+    figureContainer.append(beatCounterElement, noteItemElement, syllableElement);
+    return figureContainer;
+}
+
 export function renderRhythm() {
     rhythmDisplayEl.innerHTML = '';
     updateFigureFocusDisplay(null);
@@ -243,93 +336,66 @@ export function renderRhythm() {
     };
     
     addTimeSignature(currentRow);
+    
+    const groupedPattern = groupTuplets(AppState.activePattern);
 
-    AppState.activePattern.forEach((item, index) => {
-        if (item.type === 'final_barline') return;
-        
-        if (currentRowWidth + gapWidth + figureWidth > containerWidth) {
+    groupedPattern.forEach((group) => {
+        let elementToAppend;
+        let elementWidth = 0;
+        let currentItemIndex = -1;
+
+        if (group.type === 'tuplet_group') {
+            const tupletContainer = document.createElement('div');
+            tupletContainer.className = 'tuplet-container';
+
+            const tupletIndicator = document.createElement('div');
+            tupletIndicator.className = 'tuplet-indicator';
+            tupletIndicator.innerHTML = `<span class="tuplet-number">${group.tupletN}</span>`;
+            tupletContainer.appendChild(tupletIndicator);
+            
+            let tupletBeats = 0;
+            group.items.forEach((item, itemIndex) => {
+                const originalIndex = group.originalIndices[itemIndex];
+                const beatContext = { currentBeatsInMeasure, timeSig, tolerance };
+                const figureEl = renderFigure(item, originalIndex, beatContext);
+                tupletContainer.appendChild(figureEl);
+                if (!item.isControl) {
+                    const itemBeats = getBeatValue(item.duration, timeSig);
+                    currentBeatsInMeasure += itemBeats;
+                    tupletBeats += itemBeats;
+                }
+            });
+            elementToAppend = tupletContainer;
+            elementWidth = group.items.length * (figureWidth + gapWidth);
+            currentItemIndex = group.originalIndices[group.originalIndices.length - 1];
+        } else {
+            const item = group;
+            currentItemIndex = AppState.activePattern.findIndex(p => p === item);
+            if (item.type === 'final_barline') return;
+            
+            const beatContext = { currentBeatsInMeasure, timeSig, tolerance };
+            elementToAppend = renderFigure(item, currentItemIndex, beatContext);
+            elementWidth = figureWidth;
+             if (!item.isControl) {
+                currentBeatsInMeasure += getBeatValue(item.duration, timeSig);
+            }
+        }
+
+        if (containerWidth > 0 && currentRowWidth + gapWidth + elementWidth > containerWidth && currentRow.children.length > 1) {
             currentRow = document.createElement('div');
             currentRow.className = 'rhythm-row';
             rhythmDisplayEl.appendChild(currentRow);
             addTimeSignature(currentRow);
             currentRowWidth = timeSigWidth;
         }
-
-        const figureContainer = document.createElement('div');
-        figureContainer.className = 'figure-container';
-        figureContainer.dataset.patternIndex = index;
         
-        if (AppState.currentMode === 'freeCreate' && !item.isControl) {
-            figureContainer.addEventListener('click', (e) => {
-                e.stopPropagation();
-                handleFigureSelectionForEditing(index);
-                renderRhythm();
-                const newFigureElement = rhythmDisplayEl.querySelector(`.figure-container[data-pattern-index="${index}"]`);
-                if(newFigureElement && AppState.selectedIndexForEditing === index) {
-                    showEditPopover(newFigureElement);
-                }
-            });
-            if (AppState.selectedIndexForEditing === index) {
-                figureContainer.classList.add('selected-for-edit');
-            }
-        }
-        
-        const beatCounterElement = document.createElement('div');
-        beatCounterElement.className = 'beat-counter-text';
-        const beatValue = getBeatValue(item.duration, timeSig);
+        currentRow.appendChild(elementToAppend);
+        currentRowWidth += gapWidth + elementWidth;
 
-        if (!item.isControl) {
-            let beatHTML = '';
-            const startBeatInMeasure = currentBeatsInMeasure % totalMeasureBeats;
-
-            if (beatValue >= 1) {
-                const roundedBeatValue = Math.floor(beatValue);
-                for (let i = 0; i < roundedBeatValue; i++) {
-                    const beatNumber = Math.floor(startBeatInMeasure) + 1 + i;
-                    if (beatNumber <= totalMeasureBeats) {
-                        beatHTML += `<span data-beat-index="${i}">${beatNumber}</span>`;
-                    }
-                }
-            } else {
-                const mainBeatNumber = Math.floor(startBeatInMeasure) + 1;
-                const fraction = startBeatInMeasure - Math.floor(startBeatInMeasure);
-                let beatDisplay = '&nbsp;';
-
-                if (mainBeatNumber <= totalMeasureBeats) {
-                    if (Math.abs(fraction) < tolerance) {
-                        beatDisplay = mainBeatNumber;
-                    } else if (Math.abs(fraction - 0.5) < tolerance) {
-                        beatDisplay = 'e';
-                    } else if (Math.abs(fraction - 0.25) < tolerance) {
-                        beatDisplay = '+';
-                    } else if (Math.abs(fraction - 0.75) < tolerance) {
-                        beatDisplay = 'a';
-                    }
-                }
-                beatHTML = `<span data-beat-index="0">${beatDisplay}</span>`;
-            }
-            beatCounterElement.innerHTML = beatHTML;
-        }
-        
-        const noteItemElement = document.createElement('div');
-        noteItemElement.className = `note-item ${item.type === 'note' ? 'bg-blue-500' : 'bg-gray-300'}`;
-        noteItemElement.textContent = item.symbol;
-        if(item.isControl) noteItemElement.classList.add('control-item');
-
-        const syllableElement = document.createElement('div');
-        syllableElement.className = 'syllable-text';
-        syllableElement.innerHTML = item.syllable || '&nbsp;';
-        
-        figureContainer.append(beatCounterElement, noteItemElement, syllableElement);
-        currentRow.appendChild(figureContainer);
-        currentRowWidth += gapWidth + figureWidth;
-
-        if (!item.isControl) currentBeatsInMeasure += beatValue;
-        
         if (Math.abs(currentBeatsInMeasure - totalMeasureBeats) < tolerance) {
-            const hasMoreMusic = AppState.activePattern.slice(index + 1).some(fig => !fig.isControl && fig.type !== 'final_barline');
+            const hasMoreMusic = AppState.activePattern.slice(currentItemIndex + 1).some(fig => !fig.isControl && fig.type !== 'final_barline');
             if (hasMoreMusic) {
-                 if (currentRowWidth + gapWidth + barlineWidth > containerWidth) {
+                 if (containerWidth > 0 && currentRowWidth + gapWidth + barlineWidth > containerWidth) {
                     currentRow = document.createElement('div');
                     currentRow.className = 'rhythm-row';
                     rhythmDisplayEl.appendChild(currentRow);
@@ -345,6 +411,7 @@ export function renderRhythm() {
             currentBeatsInMeasure = 0;
         }
     });
+
 
     const lastItem = AppState.activePattern[AppState.activePattern.length - 1];
     if(lastItem && lastItem.type === 'final_barline'){
@@ -430,7 +497,6 @@ export function populateLessonModal() {
     }
 }
 
-// CORREÇÃO: Adicionada a palavra 'export' para que a função seja encontrada pelo main.js
 export function populateFigurePalette() {
     const figurePaletteDiv = document.getElementById('figure-palette');
     if (!figurePaletteDiv) return;
@@ -440,8 +506,10 @@ export function populateFigurePalette() {
         const button = document.createElement('button');
         button.className = 'figure-button';
         if (fig.isControl) button.classList.add('figure-button-control');
-        button.textContent = fig.symbol;
+        
+        button.innerHTML = fig.symbol; 
         button.title = fig.name;
+        
         button.addEventListener('click', () => {
             const result = handlePaletteFigureClick({ ...fig });
             if (result.success) {

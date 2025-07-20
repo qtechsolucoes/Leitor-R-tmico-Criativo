@@ -37,7 +37,6 @@ export function getFractionalNotation(beatValue) {
     return "";
 }
 
-// --- LÓGICA DE LIGADURA (SOM) CORRIGIDA ---
 function processPattern(pattern) {
     const newPattern = JSON.parse(JSON.stringify(pattern));
 
@@ -47,60 +46,56 @@ function processPattern(pattern) {
     });
 
     for (let i = 0; i < newPattern.length; i++) {
-        // Se a figura atual já é uma continuação de ligadura, pule-a
-        if (newPattern[i].isTiedContinuation || newPattern[i].isControl) {
-            continue;
-        }
-
-        // Se a figura atual está ligada à próxima
+        if (newPattern[i].isTiedContinuation || newPattern[i].isControl) continue;
         if (newPattern[i].tiedToNext) {
             let totalDuration = newPattern[i].duration;
             let currentIndex = i;
             let continueChain = true;
-
             while (continueChain) {
-                // Encontra a próxima nota real para a qual ligar
                 let nextNoteIndex = -1;
                 let searchIndex = currentIndex + 1;
                 while (searchIndex < newPattern.length && nextNoteIndex === -1) {
-                    if (newPattern[searchIndex].type === 'note') {
-                        nextNoteIndex = searchIndex;
-                    }
+                    if (newPattern[searchIndex].type === 'note') nextNoteIndex = searchIndex;
                     searchIndex++;
                 }
-
                 if (nextNoteIndex !== -1) {
                     const nextNote = newPattern[nextNoteIndex];
                     totalDuration += nextNote.duration;
                     nextNote.isTiedContinuation = true;
-
-                    // Se a próxima nota também estiver ligada, continue a cadeia
-                    if (nextNote.tiedToNext) {
-                        currentIndex = nextNoteIndex;
-                    } else {
-                        continueChain = false; // Fim da cadeia de ligaduras
-                    }
+                    if (nextNote.tiedToNext) currentIndex = nextNoteIndex;
+                    else continueChain = false;
                 } else {
-                    continueChain = false; // Não há mais notas para ligar
+                    continueChain = false;
                 }
             }
             newPattern[i].totalTiedDuration = totalDuration;
         }
     }
 
-    // Lógica de atribuição de sílabas (permanece a mesma)
     let lastSyllableWasTa = false;
+    let tupletCounter = 0;
+
     for (let i = 0; i < newPattern.length; i++) {
         const fig = newPattern[i];
         const duration = fig.totalTiedDuration || fig.duration;
+
+        if (!fig.isTupletChild) {
+            tupletCounter = 0;
+        }
 
         if (fig.isControl || fig.isTiedContinuation || fig.type === 'rest') {
             fig.syllable = '&nbsp;';
             lastSyllableWasTa = false;
             continue;
         }
-
-        if (duration >= 1) {
+        
+        if (fig.isTupletChild) {
+            const tupletSyllables = ['Ta', 'Ki', 'Da', 'Te', 'Re', 'Ti'];
+            fig.syllable = tupletSyllables[tupletCounter % tupletSyllables.length];
+            tupletCounter++;
+            lastSyllableWasTa = false;
+        }
+        else if (duration >= 1) {
             if (duration === 4) fig.syllable = 'Ta-a-a-a';
             else if (duration === 3) fig.syllable = 'Ta-a-a';
             else if (duration === 2) fig.syllable = 'Ta-a';
@@ -149,6 +144,7 @@ function processPattern(pattern) {
     return newPattern;
 }
 
+
 export function updateActivePatternAndTimeSignature() {
     let rawPattern;
     if (AppState.currentMode === 'lessons') {
@@ -157,8 +153,11 @@ export function updateActivePatternAndTimeSignature() {
         AppState.activeTimeSignature = lesson.timeSignature;
         if (lesson.tempo) document.getElementById('tempo-display').textContent = lesson.tempo;
     } else {
-        const beatsValue = document.querySelector('#custom-beats-select .custom-option.selected').dataset.value;
-        const typeValue = document.querySelector('#custom-type-select .custom-option.selected').dataset.value;
+        const beatsSelect = document.querySelector('#custom-beats-select .custom-option.selected');
+        const typeSelect = document.querySelector('#custom-type-select .custom-option.selected');
+        
+        const beatsValue = beatsSelect ? beatsSelect.dataset.value : '4';
+        const typeValue = typeSelect ? typeSelect.dataset.value : '4';
 
         rawPattern = AppState.customPattern;
         AppState.activeTimeSignature = {
@@ -175,6 +174,7 @@ export function updateActivePatternAndTimeSignature() {
     AppState.activePattern = processPattern(rawPattern);
 }
 
+// --- LÓGICA DE VALIDAÇÃO CORRIGIDA ---
 function isPatternValid(pattern) {
     if (!pattern || pattern.length === 0) return true;
     
@@ -189,18 +189,20 @@ function isPatternValid(pattern) {
         const itemBeatValue = getBeatValue(item.duration, timeSig);
         
         if (round(currentBeatsInMeasure + itemBeatValue) > totalMeasureBeats + tolerance) {
-            return false;
+            return false; // A figura estoura o compasso atual
         }
 
-        currentBeatsInMeasure = round(currentBeatsInMeasure + itemBeatValue);
+        currentBeatsInMeasure += itemBeatValue;
 
+        // Se o compasso estiver cheio (considerando a tolerância), reinicia para o próximo
         if (Math.abs(currentBeatsInMeasure - totalMeasureBeats) < tolerance) {
             currentBeatsInMeasure = 0;
         }
     }
     
-    return true;
+    return true; // Se o loop terminar, o padrão é válido
 }
+
 
 export function handlePaletteFigureClick(figure) {
     if (AppState.currentMode !== 'freeCreate') {
