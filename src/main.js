@@ -10,21 +10,20 @@ import { lessons } from './config.js';
  */
 async function fetchCurrentUser() {
     try {
-        // Tenta buscar o usuário na rota da API do backend
-        const res = await fetch('http://localhost:5000/api/current_user'); 
-
+        // ALTERADO: Use a URL completa do backend com localhost
+        const res = await fetch('http://localhost:5000/api/current_user', {
+            credentials: 'include'
+        });
         
-        // Se a resposta for bem-sucedida e tiver conteúdo, atualiza a UI com os dados
         if (res.ok && res.headers.get("Content-Length") > "0") {
             const user = await res.json();
             updateLoginUI(user);
         } else {
-            // Se não houver usuário (resposta vazia ou erro), atualiza a UI para o estado "deslogado"
             updateLoginUI(null);
         }
     } catch (error) {
         console.error('Erro ao buscar usuário: O backend pode estar offline.', error);
-        updateLoginUI(null); // Trata o erro como se não houvesse usuário logado
+        updateLoginUI(null);
     }
 }
 

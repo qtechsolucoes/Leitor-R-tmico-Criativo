@@ -1,0 +1,10 @@
+# Ficheiros de dependências do Node.js
+node_modules/
+
+# Ficheiros de ambiente com segredos
+.env
+
+# Logs e ficheiros temporários
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

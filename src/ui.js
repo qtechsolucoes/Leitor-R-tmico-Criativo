@@ -524,29 +524,39 @@ export function populateFigurePalette() {
 }
 
 export function updateLoginUI(user) {
-    const loginButton = document.getElementById('login-button');
-    const logoutButton = document.getElementById('logout-button');
+    const loggedOutView = document.getElementById('logged-out-view');
+    const loggedInView = document.getElementById('logged-in-view');
+    
     const saveRhythmButton = document.getElementById('save-rhythm-button');
     const loadRhythmsButton = document.getElementById('load-rhythms-button');
-    const userProfileDiv = document.getElementById('user-profile');
+    
     const userNameSpan = document.getElementById('user-name');
     const userAvatarImg = document.getElementById('user-avatar');
+    const userPointsSpan = document.getElementById('user-points');
     
     const isLoggedIn = !!user;
 
-    loginButton.classList.toggle('hidden', isLoggedIn);
-    logoutButton.classList.toggle('hidden', !isLoggedIn);
-    userProfileDiv.classList.toggle('hidden', !isLoggedIn);
+    if (isLoggedIn) {
+        loggedInView.classList.remove('hidden');
+        loggedInView.classList.add('visible');
+        loggedOutView.classList.remove('visible');
+        loggedOutView.classList.add('hidden');
+
+        userNameSpan.textContent = user.displayName;
+        userAvatarImg.src = user.photo;
+        userPointsSpan.textContent = `${user.points || 0} PONTOS`;
+
+        AppState.user.currentUser = user;
+    } else {
+        loggedOutView.classList.remove('hidden');
+        loggedOutView.classList.add('visible');
+        loggedInView.classList.remove('visible');
+        loggedInView.classList.add('hidden');
+
+        AppState.user.currentUser = null;
+    }
     
     const showUserButtons = isLoggedIn && AppState.currentMode === 'freeCreate';
     saveRhythmButton.classList.toggle('hidden', !showUserButtons);
     loadRhythmsButton.classList.toggle('hidden', !showUserButtons);
-
-    if (isLoggedIn) {
-        userNameSpan.textContent = user.displayName;
-        userAvatarImg.src = user.photo;
-        AppState.user.currentUser = user;
-    } else {
-        AppState.user.currentUser = null;
-    }
 }
