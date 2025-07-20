@@ -633,3 +633,54 @@ html::-webkit-scrollbar-thumb:hover {
     font-weight: 600;
     color: var(--glow-cyan);
 }
+
+/* --- ESTILOS PARA O PERFIL DO USUÁRIO --- */
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    border: 1px solid var(--panel-border);
+    width: 100%;
+    justify-content: center;
+}
+
+.user-profile img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--glow-cyan);
+}
+
+.user-profile span {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* --- ESTILOS PARA O BOTÃO DE LOGIN GOOGLE --- */
+.btn-google {
+    background-color: #ffffff;
+    color: #4A4A4A;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-weight: 600;
+    text-transform: none; /* Remove o 'uppercase' do btn-action */
+    letter-spacing: normal;
+    border: 1px solid #dcdcdc;
+    width: 100%; /* Faz o botão ocupar todo o espaço disponível no painel */
+}
+
+.btn-google:hover {
+    background-color: #f5f5f5;
+    border-color: #c6c6c6;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.btn-google .google-icon {
+    width: 20px;
+    height: 20px;
+}

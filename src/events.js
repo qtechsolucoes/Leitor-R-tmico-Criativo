@@ -5,33 +5,10 @@ import { updateActivePatternAndTimeSignature, handlePaletteFigureClick, handleFi
 import { switchMode, renderRhythm, updateMessage, updateLoginUI, showModal, hideAllModals, populateLoadRhythmModal, hideEditPopover, updateFigureFocusDisplay, populateLessonModal } from './ui.js';
 import { lessons } from './config.js';
 
-const loginModal = document.getElementById('login-modal');
 const saveRhythmModal = document.getElementById('save-rhythm-modal');
 const loadRhythmModal = document.getElementById('load-rhythm-modal');
 const lessonModal = document.getElementById('lesson-modal');
-const usernameInput = document.getElementById('username-input');
 const rhythmNameInput = document.getElementById('rhythm-name-input');
-
-function handleLogin() {
-    const username = usernameInput.value.trim();
-    if(username) {
-        AppState.user.currentUser = { username };
-        localStorage.setItem('lrc_currentUser', JSON.stringify(AppState.user.currentUser));
-        updateMessage(`Login como ${username}.`, "success");
-        updateLoginUI();
-        hideAllModals();
-        usernameInput.value = '';
-    } else {
-        updateMessage("Por favor, insira um nome de utilizador.", "error");
-    }
-}
-
-function logoutUser() {
-    AppState.user.currentUser = null;
-    localStorage.removeItem('lrc_currentUser');
-    updateMessage("Logout efetuado.");
-    updateLoginUI();
-}
 
 function handleSaveRhythm() {
     if (!AppState.user.currentUser) {
@@ -46,12 +23,13 @@ function handleSaveRhythm() {
     }
     const rhythmName = rhythmNameInput.value.trim();
     if (rhythmName) {
-        const username = AppState.user.currentUser.username;
+        // Usa o googleId como identificador único para salvar
+        const userId = AppState.user.currentUser.googleId;
         const savedRhythms = JSON.parse(localStorage.getItem('lrc_savedRhythms')) || {};
-        if (!savedRhythms[username]) {
-            savedRhythms[username] = [];
+        if (!savedRhythms[userId]) {
+            savedRhythms[userId] = [];
         }
-        savedRhythms[username].push({
+        savedRhythms[userId].push({
             name: rhythmName,
             pattern: AppState.customPattern,
             timeSignature: AppState.activeTimeSignature
@@ -66,9 +44,9 @@ function handleSaveRhythm() {
 }
 
 function handleLoadRhythm(index) {
-    const username = AppState.user.currentUser.username;
+    const userId = AppState.user.currentUser.googleId;
     const savedRhythms = JSON.parse(localStorage.getItem('lrc_savedRhythms')) || {};
-    const userRhythms = savedRhythms[username];
+    const userRhythms = savedRhythms[userId];
 
     if (userRhythms && !isNaN(index) && index >= 0 && index < userRhythms.length) {
         const rhythm = userRhythms[index];
@@ -190,25 +168,21 @@ export function setupEventListeners() {
         }
     });
     
-    document.getElementById('login-button').addEventListener('click', () => showModal(loginModal));
-    document.getElementById('logout-button').addEventListener('click', logoutUser);
     document.getElementById('save-rhythm-button').addEventListener('click', () => showModal(saveRhythmModal));
     document.getElementById('load-rhythms-button').addEventListener('click', () => {
-        const username = AppState.user.currentUser?.username;
-        if (!username) {
+        const userId = AppState.user.currentUser?.googleId;
+        if (!userId) {
             updateMessage("Faça login para carregar ritmos.", "error");
             return;
         }
         const savedRhythms = JSON.parse(localStorage.getItem('lrc_savedRhythms')) || {};
-        const userRhythms = savedRhythms[username];
+        const userRhythms = savedRhythms[userId];
         populateLoadRhythmModal(userRhythms);
         showModal(loadRhythmModal);
     });
 
     document.getElementById('export-wav-button').addEventListener('click', exportWavOffline);
-
-    document.getElementById('login-confirm-button').addEventListener('click', handleLogin);
-    document.getElementById('login-cancel-button').addEventListener('click', hideAllModals);
+    
     document.getElementById('save-confirm-button').addEventListener('click', handleSaveRhythm);
     document.getElementById('save-cancel-button').addEventListener('click', hideAllModals);
     document.getElementById('load-cancel-button').addEventListener('click', hideAllModals);
@@ -221,9 +195,6 @@ export function setupEventListeners() {
         }
     });
 
-    usernameInput.addEventListener('keyup', (e) => {
-        if (e.key === 'Enter') handleLogin();
-    });
     rhythmNameInput.addEventListener('keyup', (e) => {
         if (e.key === 'Enter') handleSaveRhythm();
     });
@@ -290,7 +261,6 @@ export function setupEventListeners() {
         }
     });
 
-    // --- LÓGICA DO NOVO MODAL DE LIÇÕES ---
     document.getElementById('open-lesson-modal-button').addEventListener('click', () => {
         populateLessonModal();
         showModal(lessonModal);

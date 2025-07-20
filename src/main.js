@@ -1,30 +1,49 @@
 // main.js
 
 import { setupEventListeners } from './events.js';
-// CORREÇÃO: Removida a importação da função que não existe mais
 import { switchMode, updateLoginUI, populateFigurePalette } from './ui.js';
 import { initializeSynths } from './audio.js';
 import { lessons } from './config.js';
 
 /**
+ * Função assíncrona para buscar o usuário logado no backend.
+ */
+async function fetchCurrentUser() {
+    try {
+        // Tenta buscar o usuário na rota da API do backend
+        const res = await fetch('http://localhost:5000/api/current_user'); 
+
+        
+        // Se a resposta for bem-sucedida e tiver conteúdo, atualiza a UI com os dados
+        if (res.ok && res.headers.get("Content-Length") > "0") {
+            const user = await res.json();
+            updateLoginUI(user);
+        } else {
+            // Se não houver usuário (resposta vazia ou erro), atualiza a UI para o estado "deslogado"
+            updateLoginUI(null);
+        }
+    } catch (error) {
+        console.error('Erro ao buscar usuário: O backend pode estar offline.', error);
+        updateLoginUI(null); // Trata o erro como se não houvesse usuário logado
+    }
+}
+
+/**
  * Função principal que inicializa toda a aplicação.
  */
-function init() {
-    // A população do dropdown/modal agora é feita sob demanda, então removemos a chamada daqui.
-    
-    // Popula a paleta de figuras rítmicas na inicialização.
+async function init() {
     populateFigurePalette();
-    
     setupEventListeners();
-    
     initializeSynths(); 
-
-    updateLoginUI(); 
     
-    // Define o modo inicial e carrega a primeira lição por padrão.
+    // Busca o usuário atual do backend ANTES de carregar a interface principal
+    await fetchCurrentUser(); 
+    
+    // Define o modo inicial e carrega a primeira lição por padrão
     switchMode('lessons');
     
     console.log("Aplicação 'Leitor Rítmico Criativo' (Versão Final) inicializada.");
 }
 
+// Inicia a aplicação
 init();

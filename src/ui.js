@@ -108,7 +108,7 @@ export function updatePlaybackButtons(isPlaying) {
 
 export function enableAllControls() {
     document.querySelectorAll('button, select, input').forEach(el => el.disabled = false);
-    updateLoginUI();
+    updateLoginUI(AppState.user.currentUser);
 }
 
 export function disablePlaybackControls(keepPlaybackButtonsEnabled = false) {
@@ -258,7 +258,6 @@ function renderFigure(item, index, beatContext) {
     const beatCounterElement = document.createElement('div');
     beatCounterElement.className = 'beat-counter-text';
     
-    // --- LÓGICA DO CONTADOR DE TEMPO ---
     if (beatContext && !item.isControl) {
         const { currentBeatsInMeasure, timeSig, tolerance } = beatContext;
         const beatValue = getBeatValue(item.duration, timeSig);
@@ -279,7 +278,7 @@ function renderFigure(item, index, beatContext) {
             else if (Math.abs(fraction - 0.5) < tolerance) beatDisplay = 'e';
             else if (Math.abs(fraction - 0.25) < tolerance) beatDisplay = '+';
             else if (Math.abs(fraction - 0.75) < tolerance) beatDisplay = 'a';
-            else if (item.isTupletChild && Math.abs(fraction) > tolerance) beatDisplay = '&'; // Símbolo para subdivisões de quiáltera
+            else if (item.isTupletChild && Math.abs(fraction) > tolerance) beatDisplay = '&';
             
             beatHTML = `<span data-beat-index="0">${beatDisplay}</span>`;
         }
@@ -456,7 +455,7 @@ export function switchMode(mode) {
 
     updateActivePatternAndTimeSignature();
     setTimeout(renderRhythm, 50); 
-    updateLoginUI();
+    updateLoginUI(AppState.user.currentUser);
 }
 
 export function populateLessonModal() {
@@ -524,16 +523,30 @@ export function populateFigurePalette() {
     });
 }
 
-export function updateLoginUI() {
+export function updateLoginUI(user) {
     const loginButton = document.getElementById('login-button');
     const logoutButton = document.getElementById('logout-button');
     const saveRhythmButton = document.getElementById('save-rhythm-button');
     const loadRhythmsButton = document.getElementById('load-rhythms-button');
+    const userProfileDiv = document.getElementById('user-profile');
+    const userNameSpan = document.getElementById('user-name');
+    const userAvatarImg = document.getElementById('user-avatar');
     
-    const isLoggedIn = !!AppState.user.currentUser;
+    const isLoggedIn = !!user;
+
     loginButton.classList.toggle('hidden', isLoggedIn);
     logoutButton.classList.toggle('hidden', !isLoggedIn);
+    userProfileDiv.classList.toggle('hidden', !isLoggedIn);
+    
     const showUserButtons = isLoggedIn && AppState.currentMode === 'freeCreate';
     saveRhythmButton.classList.toggle('hidden', !showUserButtons);
     loadRhythmsButton.classList.toggle('hidden', !showUserButtons);
+
+    if (isLoggedIn) {
+        userNameSpan.textContent = user.displayName;
+        userAvatarImg.src = user.photo;
+        AppState.user.currentUser = user;
+    } else {
+        AppState.user.currentUser = null;
+    }
 }
