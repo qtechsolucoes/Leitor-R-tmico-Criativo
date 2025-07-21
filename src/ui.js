@@ -303,7 +303,10 @@ export function renderRhythm() {
     updateFigureFocusDisplay(null);
     hideEditPopover();
     
-    if (!AppState.activePattern || AppState.activePattern.length === 0) {
+    const timeSig = AppState.activeTimeSignature;
+    
+    // Se não houver padrão e não estivermos no modo de jogo, mostre a mensagem padrão
+    if ((!AppState.activePattern || AppState.activePattern.length === 0) && AppState.currentMode !== 'gameRhythmicDictation') {
         const message = AppState.currentMode === 'freeCreate'
             ? "Comece a adicionar figuras no Painel de Criação."
             : "Bem-vindo! Selecione uma lição para começar.";
@@ -311,7 +314,6 @@ export function renderRhythm() {
         return;
     }
 
-    const timeSig = AppState.activeTimeSignature;
     const totalMeasureBeats = parseFloat(timeSig.beats);
     const tolerance = 0.001;
     let currentBeatsInMeasure = 0;
@@ -336,6 +338,8 @@ export function renderRhythm() {
     
     addTimeSignature(currentRow);
     
+    if (AppState.activePattern.length === 0) return; // Se o padrão estiver vazio, apenas mostre a fórmula de compasso e pare
+
     const groupedPattern = groupTuplets(AppState.activePattern);
 
     groupedPattern.forEach((group) => {
@@ -444,14 +448,28 @@ export function renderRhythm() {
 export function switchMode(mode) {
     AppState.currentMode = mode;
     AppState.selectedIndexForEditing = null;
-    const isLessonMode = mode === 'lessons';
+
+    const gamePanel = document.getElementById('game-panel');
+    const lessonSelectorContainer = document.getElementById('lesson-selector-container');
+    const customRhythmCreatorDiv = document.getElementById('custom-rhythm-creator');
+
+    gamePanel.classList.add('hidden');
+    lessonSelectorContainer.style.display = 'none';
+    customRhythmCreatorDiv.classList.add('hidden');
     
-    lessonSelectorContainer.style.display = isLessonMode ? 'block' : 'none';
-    customRhythmCreatorDiv.classList.toggle('hidden', isLessonMode);
-    
-    updateMessage(isLessonMode ? "Selecione uma lição na lista." : "Modo de Criação Livre ativado.");
-    
-    if(isLessonMode) AppState.customPattern = [];
+    AppState.customPattern = [];
+
+    if (mode === 'lessons') {
+        lessonSelectorContainer.style.display = 'block';
+        updateMessage("Selecione uma lição na lista.");
+    } else if (mode === 'freeCreate') {
+        customRhythmCreatorDiv.classList.remove('hidden');
+        updateMessage("Modo de Criação Livre ativado.");
+    } else if (mode === 'gameRhythmicDictation') {
+        gamePanel.classList.remove('hidden');
+        customRhythmCreatorDiv.classList.remove('hidden');
+        updateMessage("Jogo: Ditado Rítmico. Clique em 'Ouvir Ditado'.");
+    }
 
     updateActivePatternAndTimeSignature();
     setTimeout(renderRhythm, 50); 

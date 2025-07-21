@@ -1,7 +1,7 @@
 // events.js
-import { startCountdownAndPlay, togglePauseResume, stopRhythmExecution, exportWavOffline } from './audio.js';
+import { startCountdownAndPlay, togglePauseResume, stopRhythmExecution, exportWavOffline, playDictationPattern } from './audio.js';
 import { AppState } from './state.js';
-import { updateActivePatternAndTimeSignature, handlePaletteFigureClick, handleFigureSelectionForEditing } from './core.js';
+import { updateActivePatternAndTimeSignature, handlePaletteFigureClick, handleFigureSelectionForEditing, generateDictation, checkDictation, getCurrentDictationPattern } from './core.js';
 import { switchMode, renderRhythm, updateMessage, updateLoginUI, showModal, hideAllModals, populateLoadRhythmModal, hideEditPopover, updateFigureFocusDisplay, populateLessonModal } from './ui.js';
 import { lessons } from './config.js';
 
@@ -23,7 +23,6 @@ function handleSaveRhythm() {
     }
     const rhythmName = rhythmNameInput.value.trim();
     if (rhythmName) {
-        // Usa o googleId como identificador único para salvar
         const userId = AppState.user.currentUser.googleId;
         const savedRhythms = JSON.parse(localStorage.getItem('lrc_savedRhythms')) || {};
         if (!savedRhythms[userId]) {
@@ -281,5 +280,35 @@ export function setupEventListeners() {
             renderRhythm();
             hideAllModals();
         }
+    });
+
+    // --- LÓGICA DE EVENTOS DO JOGO ---
+    const startDictationBtn = document.getElementById('start-dictation-btn');
+    const checkDictationBtn = document.getElementById('check-dictation-btn');
+    const gameFeedbackEl = document.getElementById('game-feedback');
+
+    startDictationBtn.addEventListener('click', () => {
+        const pattern = generateDictation();
+        playDictationPattern(pattern);
+        
+        AppState.customPattern = [];
+        renderRhythm();
+        checkDictationBtn.classList.remove('hidden');
+        gameFeedbackEl.classList.add('hidden');
+        updateMessage("Recrie o ritmo que você ouviu.");
+    });
+
+    checkDictationBtn.addEventListener('click', () => {
+        const result = checkDictation(AppState.customPattern);
+        
+        gameFeedbackEl.textContent = result.message;
+        gameFeedbackEl.className = 'game-feedback';
+        gameFeedbackEl.classList.add(result.correct ? 'feedback-correct' : 'feedback-incorrect');
+        gameFeedbackEl.classList.remove('hidden');
+        
+        AppState.activePattern = getCurrentDictationPattern();
+        renderRhythm(); 
+        
+        updateMessage("Para jogar novamente, clique em 'Ouvir Ditado'.");
     });
 }

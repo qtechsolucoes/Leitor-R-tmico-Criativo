@@ -77,7 +77,7 @@ html::-webkit-scrollbar-thumb:hover {
     background-color: var(--scrollbar-thumb-hover-bg);
 }
 
-.app-header { text-align: center; margin-bottom: 1rem; }
+.app-header { text-align: center; margin-bottom: 0; }
 .app-title { font-family: 'Playfair Display', serif; font-size: 2.5rem; text-shadow: 0 0 8px var(--glow-cyan), 0 0 15px var(--glow-purple); color: var(--text-primary); }
 
 .panel {
@@ -331,7 +331,6 @@ html::-webkit-scrollbar-thumb:hover {
     flex-direction: column;
     gap: 1.25rem;
 }
-
 #logged-out-view, #logged-in-view {
     display: none;
 }
@@ -341,7 +340,6 @@ html::-webkit-scrollbar-thumb:hover {
     align-items: center;
     gap: 0.75rem;
 }
-
 .general-actions {
     display: flex;
     flex-wrap: wrap; 
@@ -357,32 +355,27 @@ html::-webkit-scrollbar-thumb:hover {
     width: 100%;
     justify-content: center;
 }
-
 .user-profile img {
     width: 40px;
     height: 40px;
     border-radius: 50%;
     border: 2px solid var(--glow-cyan);
 }
-
 .user-info {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
 }
-
 .user-info span {
     font-weight: 600;
     color: var(--text-primary);
 }
-
 .user-points {
     font-size: 0.8rem;
     font-weight: 500;
     color: var(--glow-yellow);
     text-shadow: 0 0 5px var(--glow-yellow);
 }
-
 .btn-logout {
     background-color: transparent;
     border: 1px solid var(--panel-border);
@@ -390,12 +383,10 @@ html::-webkit-scrollbar-thumb:hover {
     padding: 0.5rem 1rem;
     width: auto;
 }
-
 .btn-logout:hover {
     background-color: rgba(247, 37, 133, 0.2);
     border-color: var(--glow-pink);
 }
-
 .btn-google {
     background-color: #ffffff;
     color: #4A4A4A;
@@ -409,13 +400,11 @@ html::-webkit-scrollbar-thumb:hover {
     border: 1px solid #dcdcdc;
     width: 100%;
 }
-
 .btn-google:hover {
     background-color: #f5f5f5;
     border-color: #c6c6c6;
     box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
-
 .btn-google .google-icon {
     width: 20px;
     height: 20px;
@@ -651,7 +640,7 @@ html::-webkit-scrollbar-thumb:hover {
 }
 .accordion-lessons-list {
     padding-left: 1.5rem;
-    display: none; /* Escondido por padrão */
+    display: none;
     margin-bottom: 1rem;
 }
 .accordion-lesson-item {
@@ -677,7 +666,6 @@ html::-webkit-scrollbar-thumb:hover {
     padding-top: 25px;
     margin: 0 4px;
 }
-
 .tuplet-indicator {
     position: absolute;
     top: 0;
@@ -690,7 +678,6 @@ html::-webkit-scrollbar-thumb:hover {
     font-weight: 600;
     color: var(--text-secondary);
 }
-
 .tuplet-indicator::before {
     content: '';
     position: absolute;
@@ -703,7 +690,6 @@ html::-webkit-scrollbar-thumb:hover {
     border-right: 2px solid var(--text-secondary);
     border-radius: 4px 4px 0 0;
 }
-
 .tuplet-number {
     position: relative;
     top: -5px;
@@ -712,11 +698,9 @@ html::-webkit-scrollbar-thumb:hover {
     font-style: italic;
     font-size: 1.1rem;
 }
-
 .figure-button {
     position: relative;
 }
-
 .figure-button .tuplet-symbol {
     font-size: 0.8rem;
     position: absolute;
@@ -726,4 +710,56 @@ html::-webkit-scrollbar-thumb:hover {
     font-style: italic;
     font-weight: 600;
     color: var(--glow-cyan);
+}
+
+/* --- ESTILOS PARA O PAINEL DE JOGO --- */
+.game-instructions {
+    text-align: center;
+    margin-bottom: 1rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+.game-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+.btn-confirm {
+    background-color: var(--glow-yellow);
+    color: var(--text-dark);
+    border-color: var(--glow-yellow);
+}
+.btn-confirm:hover {
+    background-color: #fffa65;
+}
+.game-feedback {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    text-align: center;
+    font-weight: 600;
+}
+.feedback-correct {
+    background-color: rgba(0, 255, 150, 0.2);
+    border: 1px solid var(--glow-cyan);
+    color: #a7ffde;
+}
+.feedback-incorrect {
+    background-color: rgba(247, 37, 133, 0.2);
+    border: 1px solid var(--glow-pink);
+    color: #ff8ab4;
+}
+.game-figure-hint {
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--panel-border);
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    text-align: center;
+}
+.game-figure-hint span {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    margin: 0 0.25rem;
 }

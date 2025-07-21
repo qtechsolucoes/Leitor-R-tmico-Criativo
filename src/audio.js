@@ -9,38 +9,22 @@ let offlineContext;
 export function initializeSynths() {
     try {
         if (AppState.synths.noteSynth) AppState.synths.noteSynth.dispose();
-        if (AppState.synths.attackSynth) AppState.synths.attackSynth.dispose(); // Limpa o novo synth
+        if (AppState.synths.attackSynth) AppState.synths.attackSynth.dispose();
         if (AppState.synths.metronomeSynth) AppState.synths.metronomeSynth.dispose();
 
-        // --- SOLUÇÃO DE ÁUDIO DEFINITIVA ---
-
-        // 1. Sintetizador para a SUSTENTAÇÃO da nota (som puro)
         AppState.synths.noteSynth = new Tone.PolySynth(Tone.Synth, {
-            oscillator: { 
-                type: "sine" // Onda Senoidal: o som mais puro e limpo
-            },
-            envelope: {
-                attack: 0.005,
-                decay: 0.0,    // Sem decaimento
-                sustain: 1.0,  // Volume máximo durante toda a nota
-                release: 0.1
-            },
+            oscillator: { type: "sine" },
+            envelope: { attack: 0.005, decay: 0.0, sustain: 1.0, release: 0.1 },
             volume: -8
         }).toDestination();
 
-        // 2. Sintetizador para o ATAQUE da nota (o "click" inicial)
         AppState.synths.attackSynth = new Tone.MembraneSynth({
             pitchDecay: 0.01,
             octaves: 4.,
-            envelope: {
-                attack: 0.001,
-                decay: 0.2,
-                sustain: 0,
-            },
+            envelope: { attack: 0.001, decay: 0.2, sustain: 0 },
             volume: 0
         }).toDestination();
         
-        // 3. Sintetizador do Metrônomo (inalterado)
         AppState.synths.metronomeSynth = new Tone.MembraneSynth({
             pitchDecay: 0.01,
             octaves: 5,
@@ -163,10 +147,9 @@ function schedulePlayback(offset = 0) {
         if (item.type === 'note' && !item.isTiedContinuation) {
             const soundDurationSeconds = getBeatValue(item.totalTiedDuration || item.duration, timeSig) * beatTypeDurationSeconds;
             
-            // Toca os dois sons ao mesmo tempo
             AppState.transportEventIds.push(Tone.Transport.scheduleOnce(t => {
                 AppState.synths.noteSynth.triggerAttackRelease("C5", soundDurationSeconds, t);
-                AppState.synths.attackSynth.triggerAttackRelease("C6", "16n", t); // "16n" é uma duração curta para o click
+                AppState.synths.attackSynth.triggerAttackRelease("C6", "16n", t);
             }, currentTime));
         }
         
@@ -217,6 +200,42 @@ function scheduleMetronome() {
 
     AppState.metronomeEventId.loop = true;
     AppState.metronomeEventId.loopEnd = "1m"; 
+}
+
+/**
+ * Toca um padrão rítmico específico (para o ditado) sem feedback visual.
+ */
+export function playDictationPattern(pattern) {
+    if (AppState.isPlaying || AppState.isCountingDown || !pattern || pattern.length === 0) return;
+
+    stopRhythmExecution();
+    AppState.isPlaying = true;
+
+    const userInputBpm = parseInt(document.getElementById('tempo-display').textContent);
+    Tone.Transport.bpm.value = userInputBpm;
+
+    let currentTime = 0;
+    const timeSig = { beats: 4, beatType: 4 }; // O ditado inicial será sempre 4/4
+    const beatTypeDurationSeconds = Tone.Time(`${timeSig.beatType}n`).toSeconds();
+
+    pattern.forEach((item) => {
+        if (item.type === 'note') {
+            const soundDurationSeconds = getBeatValue(item.duration, timeSig) * beatTypeDurationSeconds;
+            AppState.transportEventIds.push(Tone.Transport.scheduleOnce(t => {
+                AppState.synths.noteSynth.triggerAttackRelease("C5", soundDurationSeconds, t);
+                AppState.synths.attackSynth.triggerAttackRelease("C6", "16n", t);
+            }, currentTime));
+        }
+        const noteDurationInSeconds = getBeatValue(item.duration, timeSig) * beatTypeDurationSeconds;
+        currentTime += noteDurationInSeconds;
+    });
+
+    // Adiciona um evento para parar a execução quando terminar
+    AppState.transportEventIds.push(Tone.Transport.scheduleOnce(() => {
+        stopRhythmExecution();
+    }, currentTime + 0.5));
+
+    Tone.Transport.start();
 }
 
 

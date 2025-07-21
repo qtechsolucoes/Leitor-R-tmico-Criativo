@@ -41,6 +41,19 @@
                 </div>
             </div>
 
+            <div id="game-panel" class="panel hidden">
+                <h3 class="panel-title">Ditado Rítmico</h3>
+                <div id="game-instructions" class="game-instructions">
+                    <p>Ouça o ritmo e o recrie no Painel de Criação.</p>
+                </div>
+                <div class="game-controls">
+                    <button id="start-dictation-btn" class="btn-action">Ouvir Ditado</button>
+                    <button id="check-dictation-btn" class="btn-action btn-confirm hidden">Verificar</button>
+                </div>
+                <div id="game-feedback" class="game-feedback hidden"></div>
+                <div id="game-figure-hint" class="game-figure-hint hidden"></div>
+            </div>
+
             <div class="panel">
                 <h3 class="panel-title">Modo e Conteúdo</h3>
                 <div class="mb-4">
@@ -51,6 +64,7 @@
                             <div class="custom-options">
                                 <div class="custom-option selected" data-value="lessons">Praticar Lições</div>
                                 <div class="custom-option" data-value="freeCreate">Criação Livre</div>
+                                <div class="custom-option" data-value="gameRhythmicDictation">Jogo: Ditado Rítmico</div>
                             </div>
                         </div>
                     </div>

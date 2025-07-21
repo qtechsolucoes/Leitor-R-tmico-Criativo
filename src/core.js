@@ -152,6 +152,11 @@ export function updateActivePatternAndTimeSignature() {
         rawPattern = lesson.pattern;
         AppState.activeTimeSignature = lesson.timeSignature;
         if (lesson.tempo) document.getElementById('tempo-display').textContent = lesson.tempo;
+    } else if (AppState.currentMode === 'gameRhythmicDictation') {
+        // No modo jogo, o padrão ativo é o que o utilizador está a construir
+        rawPattern = AppState.customPattern;
+        // Força o compasso para 4/4 para a lógica do jogo
+        AppState.activeTimeSignature = { beats: 4, beatType: 4 }; 
     } else {
         const beatsSelect = document.querySelector('#custom-beats-select .custom-option.selected');
         const typeSelect = document.querySelector('#custom-type-select .custom-option.selected');
@@ -174,7 +179,6 @@ export function updateActivePatternAndTimeSignature() {
     AppState.activePattern = processPattern(rawPattern);
 }
 
-// --- LÓGICA DE VALIDAÇÃO CORRIGIDA ---
 function isPatternValid(pattern) {
     if (!pattern || pattern.length === 0) return true;
     
@@ -189,24 +193,22 @@ function isPatternValid(pattern) {
         const itemBeatValue = getBeatValue(item.duration, timeSig);
         
         if (round(currentBeatsInMeasure + itemBeatValue) > totalMeasureBeats + tolerance) {
-            return false; // A figura estoura o compasso atual
+            return false;
         }
 
         currentBeatsInMeasure += itemBeatValue;
 
-        // Se o compasso estiver cheio (considerando a tolerância), reinicia para o próximo
         if (Math.abs(currentBeatsInMeasure - totalMeasureBeats) < tolerance) {
             currentBeatsInMeasure = 0;
         }
     }
     
-    return true; // Se o loop terminar, o padrão é válido
+    return true;
 }
 
-
 export function handlePaletteFigureClick(figure) {
-    if (AppState.currentMode !== 'freeCreate') {
-        return { success: false, message: "Mude para o Modo de Criação Livre para editar." };
+    if (AppState.currentMode !== 'freeCreate' && AppState.currentMode !== 'gameRhythmicDictation') {
+        return { success: false, message: "Mude para o Modo de Criação ou Jogo para editar." };
     }
 
     if (figure.name === 'Ligadura') {
@@ -265,4 +267,72 @@ export function handlePaletteFigureClick(figure) {
 
 export function handleFigureSelectionForEditing(index) {
     AppState.selectedIndexForEditing = (AppState.selectedIndexForEditing === index) ? null : index;
+}
+
+// --- LÓGICA DO JOGO: DITADO RÍTMICO ---
+
+let currentDictationPattern = [];
+
+/**
+ * Gera um ditado rítmico simples para o nível 1.
+ */
+export function generateDictation() {
+    const figures = [
+        { type: 'note', duration: 1, symbol: '♩' },
+        { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }
+    ];
+    
+    let pattern = [];
+    let currentBeats = 0;
+    const totalBeats = 4;
+
+    while (currentBeats < totalBeats) {
+        let randomFigure;
+        if (currentBeats <= totalBeats - 1) {
+             randomFigure = figures[Math.floor(Math.random() * figures.length)];
+        } else {
+             randomFigure = figures[1];
+        }
+       
+        const figureBeats = getBeatValue(randomFigure.duration, { beats: 4, beatType: 4 });
+
+        if (currentBeats + figureBeats <= totalBeats) {
+            pattern.push(randomFigure);
+            currentBeats += figureBeats;
+        }
+    }
+    
+    currentDictationPattern = pattern;
+    return currentDictationPattern;
+}
+
+/**
+ * Compara o padrão do utilizador com o ditado correto e calcula a pontuação.
+ */
+export function checkDictation(userPattern) {
+    if (userPattern.length !== currentDictationPattern.length) {
+        return { correct: false, score: 0, message: "O número de figuras está diferente." };
+    }
+
+    let correctNotes = 0;
+    const totalNotes = currentDictationPattern.length;
+
+    for (let i = 0; i < totalNotes; i++) {
+        if (userPattern[i].duration === currentDictationPattern[i].duration) {
+            correctNotes++;
+        }
+    }
+    
+    const score = correctNotes * 10;
+    const isPerfect = correctNotes === totalNotes;
+
+    if (isPerfect) {
+        return { correct: true, score: score + 50, message: `Perfeito! +${score + 50} Pontos!` };
+    } else {
+        return { correct: false, score: score, message: `Você acertou ${correctNotes} de ${totalNotes}. +${score} Pontos.` };
+    }
+}
+
+export function getCurrentDictationPattern() {
+    return currentDictationPattern;
 }
