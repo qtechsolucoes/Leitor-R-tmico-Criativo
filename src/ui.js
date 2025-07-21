@@ -290,6 +290,11 @@ function renderFigure(item, index, beatContext) {
     noteItemElement.innerHTML = item.baseSymbol || item.symbol;
     if(item.isControl) noteItemElement.classList.add('control-item');
 
+    // --- LÓGICA DE FEEDBACK VISUAL ---
+    if (typeof item.isCorrect === 'boolean') {
+        noteItemElement.classList.add(item.isCorrect ? 'feedback-correct' : 'feedback-incorrect');
+    }
+
     const syllableElement = document.createElement('div');
     syllableElement.className = 'syllable-text';
     syllableElement.innerHTML = item.syllable || '&nbsp;';
@@ -305,7 +310,6 @@ export function renderRhythm() {
     
     const timeSig = AppState.activeTimeSignature;
     
-    // Se não houver padrão e não estivermos no modo de jogo, mostre a mensagem padrão
     if ((!AppState.activePattern || AppState.activePattern.length === 0) && AppState.currentMode !== 'gameRhythmicDictation') {
         const message = AppState.currentMode === 'freeCreate'
             ? "Comece a adicionar figuras no Painel de Criação."
@@ -338,7 +342,7 @@ export function renderRhythm() {
     
     addTimeSignature(currentRow);
     
-    if (AppState.activePattern.length === 0) return; // Se o padrão estiver vazio, apenas mostre a fórmula de compasso e pare
+    if (AppState.activePattern.length === 0) return;
 
     const groupedPattern = groupTuplets(AppState.activePattern);
 
@@ -452,10 +456,12 @@ export function switchMode(mode) {
     const gamePanel = document.getElementById('game-panel');
     const lessonSelectorContainer = document.getElementById('lesson-selector-container');
     const customRhythmCreatorDiv = document.getElementById('custom-rhythm-creator');
+    const gameFigureHintEl = document.getElementById('game-figure-hint');
 
     gamePanel.classList.add('hidden');
     lessonSelectorContainer.style.display = 'none';
     customRhythmCreatorDiv.classList.add('hidden');
+    gameFigureHintEl.classList.add('hidden');
     
     AppState.customPattern = [];
 
@@ -469,6 +475,8 @@ export function switchMode(mode) {
         gamePanel.classList.remove('hidden');
         customRhythmCreatorDiv.classList.remove('hidden');
         updateMessage("Jogo: Ditado Rítmico. Clique em 'Ouvir Ditado'.");
+        document.getElementById('start-dictation-btn').textContent = "Ouvir Ditado";
+        document.getElementById('check-dictation-btn').classList.add('hidden');
     }
 
     updateActivePatternAndTimeSignature();
@@ -532,7 +540,6 @@ export function populateFigurePalette() {
             if (result.success) {
                 updateActivePatternAndTimeSignature();
                 renderRhythm();
-                updateMessage(result.message);
             } else {
                 updateMessage(result.message, 'error');
             }

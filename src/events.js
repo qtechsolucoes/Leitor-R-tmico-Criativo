@@ -1,5 +1,5 @@
 // events.js
-import { startCountdownAndPlay, togglePauseResume, stopRhythmExecution, exportWavOffline, playDictationPattern } from './audio.js';
+import { startCountdownAndPlay, togglePauseResume, stopRhythmExecution, exportWavOffline, playDictationPatternWithCountdown } from './audio.js';
 import { AppState } from './state.js';
 import { updateActivePatternAndTimeSignature, handlePaletteFigureClick, handleFigureSelectionForEditing, generateDictation, checkDictation, getCurrentDictationPattern } from './core.js';
 import { switchMode, renderRhythm, updateMessage, updateLoginUI, showModal, hideAllModals, populateLoadRhythmModal, hideEditPopover, updateFigureFocusDisplay, populateLessonModal } from './ui.js';
@@ -9,6 +9,35 @@ const saveRhythmModal = document.getElementById('save-rhythm-modal');
 const loadRhythmModal = document.getElementById('load-rhythm-modal');
 const lessonModal = document.getElementById('lesson-modal');
 const rhythmNameInput = document.getElementById('rhythm-name-input');
+
+async function addPointsAndUpdateUI(points) {
+    if (!AppState.user.currentUser || points <= 0) {
+        return;
+    }
+
+    try {
+        const res = await fetch('http://localhost:5000/api/add_points', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({ points: points }),
+        });
+
+        if (res.ok) {
+            const updatedUser = await res.json();
+            updateLoginUI(updatedUser);
+        } else {
+            console.error('Falha ao atualizar os pontos no servidor.');
+            updateMessage("Erro de rede ao salvar pontos.", "error");
+        }
+    } catch (error) {
+        console.error('Erro de rede ao tentar adicionar pontos:', error);
+        updateMessage("Erro de rede ao salvar pontos.", "error");
+    }
+}
+
 
 function handleSaveRhythm() {
     if (!AppState.user.currentUser) {
@@ -282,33 +311,51 @@ export function setupEventListeners() {
         }
     });
 
-    // --- LÓGICA DE EVENTOS DO JOGO ---
+    // --- LÓGICA DE EVENTOS DO JOGO ATUALIZADA ---
     const startDictationBtn = document.getElementById('start-dictation-btn');
     const checkDictationBtn = document.getElementById('check-dictation-btn');
     const gameFeedbackEl = document.getElementById('game-feedback');
+    const gameFigureHintEl = document.getElementById('game-figure-hint');
 
     startDictationBtn.addEventListener('click', () => {
-        const pattern = generateDictation();
-        playDictationPattern(pattern);
-        
-        AppState.customPattern = [];
-        renderRhythm();
-        checkDictationBtn.classList.remove('hidden');
-        gameFeedbackEl.classList.add('hidden');
-        updateMessage("Recrie o ritmo que você ouviu.");
+        const btnText = startDictationBtn.textContent;
+
+        if (btnText === "Repetir Áudio") {
+            playDictationPatternWithCountdown(getCurrentDictationPattern());
+        } else { // "Ouvir Ditado" ou "Próximo Ditado"
+            const { pattern, figuresUsed } = generateDictation();
+            playDictationPatternWithCountdown(pattern);
+            
+            AppState.customPattern = [];
+            renderRhythm();
+            
+            checkDictationBtn.classList.remove('hidden');
+            gameFeedbackEl.classList.add('hidden');
+            
+            gameFigureHintEl.innerHTML = 'Figuras neste exercício: ' + figuresUsed.map(f => `<span>${f.symbol}</span>`).join(' ');
+            gameFigureHintEl.classList.remove('hidden');
+
+            startDictationBtn.textContent = "Repetir Áudio";
+            updateMessage("Recrie o ritmo que você ouviu.");
+        }
     });
 
-    checkDictationBtn.addEventListener('click', () => {
+    checkDictationBtn.addEventListener('click', async () => {
         const result = checkDictation(AppState.customPattern);
+        
+        await addPointsAndUpdateUI(result.score);
         
         gameFeedbackEl.textContent = result.message;
         gameFeedbackEl.className = 'game-feedback';
-        gameFeedbackEl.classList.add(result.correct ? 'feedback-correct' : 'feedback-incorrect');
+        gameFeedbackEl.classList.add(result.score > 0 ? 'feedback-correct' : 'feedback-incorrect');
         gameFeedbackEl.classList.remove('hidden');
         
-        AppState.activePattern = getCurrentDictationPattern();
-        renderRhythm(); 
+        // Renderiza a resposta do utilizador com as anotações (verde/vermelho)
+        AppState.activePattern = result.annotatedPattern;
+        renderRhythm();
         
-        updateMessage("Para jogar novamente, clique em 'Ouvir Ditado'.");
+        startDictationBtn.textContent = "Próximo Ditado";
+        checkDictationBtn.classList.add('hidden');
+        updateMessage("Compare a sua resposta. Clique em 'Próximo Ditado' para continuar.");
     });
 }

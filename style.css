@@ -6,6 +6,8 @@
     --glow-purple: #a656f7;
     --glow-pink: #f72585;
     --glow-yellow: #fff200;
+    --glow-green: #4ade80; /* Verde para acertos */
+    --glow-red: #f87171;   /* Vermelho para erros */
     --bg-dark-start: #020024;
     --bg-dark-mid: #0d0d3a;
     --bg-dark-end: #0b001a;
@@ -308,8 +310,8 @@ html::-webkit-scrollbar-thumb:hover {
     justify-content: center;
     margin: 0 0.5rem;
 }
-.barline-item { width: 2px; height: 60px; background-color: rgba(139, 92, 246, 0.4); }
-.final-barline-item { height: 60px; display: flex; align-items: center; gap: 3px; }
+.barline-item { width: 2px; height: 60px; background-color: rgba(139, 92, 246, 0.4);  transform: translateY(-20px); }
+.final-barline-item { height: 60px; display: flex; align-items: center; gap: 3px;  transform: translateY(-20px);}
 .final-barline-item .thin-bar { width: 2px; height: 100%; background-color: rgba(139, 92, 246, 0.6); }
 .final-barline-item .thick-bar { width: 6px; height: 100%; background-color: rgba(139, 92, 246, 0.8); }
 .figure-container.highlight .note-item, .figure-container.selected-for-edit .note-item { transform: scale(1.15); box-shadow: 0 0 20px var(--glow-yellow), 0 0 35px var(--glow-yellow); background: var(--glow-yellow); color: var(--text-dark) !important; }
@@ -762,4 +764,16 @@ html::-webkit-scrollbar-thumb:hover {
     color: var(--text-primary);
     font-size: 1.5rem;
     margin: 0 0.25rem;
+}
+
+/* --- NOVOS ESTILOS PARA FEEDBACK VISUAL DAS NOTAS --- */
+.note-item.feedback-correct {
+    background: linear-gradient(145deg, var(--glow-green), #6ee7b7);
+    box-shadow: 0 0 15px var(--glow-green);
+    color: var(--text-dark);
+}
+.note-item.feedback-incorrect {
+    background: linear-gradient(145deg, var(--glow-red), #fda4af);
+    box-shadow: 0 0 15px var(--glow-red);
+    color: var(--text-dark);
 }

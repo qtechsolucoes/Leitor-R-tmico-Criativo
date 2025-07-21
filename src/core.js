@@ -153,9 +153,7 @@ export function updateActivePatternAndTimeSignature() {
         AppState.activeTimeSignature = lesson.timeSignature;
         if (lesson.tempo) document.getElementById('tempo-display').textContent = lesson.tempo;
     } else if (AppState.currentMode === 'gameRhythmicDictation') {
-        // No modo jogo, o padrão ativo é o que o utilizador está a construir
         rawPattern = AppState.customPattern;
-        // Força o compasso para 4/4 para a lógica do jogo
         AppState.activeTimeSignature = { beats: 4, beatType: 4 }; 
     } else {
         const beatsSelect = document.querySelector('#custom-beats-select .custom-option.selected');
@@ -269,15 +267,12 @@ export function handleFigureSelectionForEditing(index) {
     AppState.selectedIndexForEditing = (AppState.selectedIndexForEditing === index) ? null : index;
 }
 
-// --- LÓGICA DO JOGO: DITADO RÍTMICO ---
+// --- LÓGICA DO JOGO: DITADO RÍTMICO ATUALIZADA ---
 
 let currentDictationPattern = [];
 
-/**
- * Gera um ditado rítmico simples para o nível 1.
- */
 export function generateDictation() {
-    const figures = [
+    const figuresUsed = [
         { type: 'note', duration: 1, symbol: '♩' },
         { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }
     ];
@@ -289,9 +284,9 @@ export function generateDictation() {
     while (currentBeats < totalBeats) {
         let randomFigure;
         if (currentBeats <= totalBeats - 1) {
-             randomFigure = figures[Math.floor(Math.random() * figures.length)];
+             randomFigure = figuresUsed[Math.floor(Math.random() * figuresUsed.length)];
         } else {
-             randomFigure = figures[1];
+             randomFigure = figuresUsed[1];
         }
        
         const figureBeats = getBeatValue(randomFigure.duration, { beats: 4, beatType: 4 });
@@ -303,35 +298,48 @@ export function generateDictation() {
     }
     
     currentDictationPattern = pattern;
-    return currentDictationPattern;
+    return { pattern, figuresUsed };
 }
 
 /**
  * Compara o padrão do utilizador com o ditado correto e calcula a pontuação.
+ * Retorna um objeto com a pontuação, mensagem e o padrão do utilizador anotado.
  */
 export function checkDictation(userPattern) {
-    if (userPattern.length !== currentDictationPattern.length) {
-        return { correct: false, score: 0, message: "O número de figuras está diferente." };
-    }
-
     let correctNotes = 0;
-    const totalNotes = currentDictationPattern.length;
+    const annotatedPattern = JSON.parse(JSON.stringify(userPattern)); // Cria uma cópia para anotar
 
-    for (let i = 0; i < totalNotes; i++) {
-        if (userPattern[i].duration === currentDictationPattern[i].duration) {
+    const maxLength = Math.max(userPattern.length, currentDictationPattern.length);
+
+    for (let i = 0; i < maxLength; i++) {
+        const userFig = annotatedPattern[i];
+        const correctFig = currentDictationPattern[i];
+
+        if (userFig && correctFig && userFig.duration === correctFig.duration) {
+            userFig.isCorrect = true;
             correctNotes++;
+        } else if (userFig) {
+            userFig.isCorrect = false;
         }
     }
     
     const score = correctNotes * 10;
-    const isPerfect = correctNotes === totalNotes;
+    const isPerfect = correctNotes === currentDictationPattern.length && userPattern.length === currentDictationPattern.length;
 
+    let message = "";
     if (isPerfect) {
-        return { correct: true, score: score + 50, message: `Perfeito! +${score + 50} Pontos!` };
+        message = `Perfeito! +${score + 50} Pontos!`;
     } else {
-        return { correct: false, score: score, message: `Você acertou ${correctNotes} de ${totalNotes}. +${score} Pontos.` };
+        message = `Você acertou ${correctNotes} de ${currentDictationPattern.length}. +${score} Pontos.`;
     }
+
+    return { 
+        score: isPerfect ? score + 50 : score, 
+        message: message,
+        annotatedPattern: annotatedPattern // Retorna o padrão do utilizador com anotações
+    };
 }
+
 
 export function getCurrentDictationPattern() {
     return currentDictationPattern;

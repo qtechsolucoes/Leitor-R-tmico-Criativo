@@ -83,6 +83,34 @@ function isCompound(beats, beatType) {
     return beatType >= 8 && beats % 3 === 0 && beats > 3;
 }
 
+// --- FUNÇÃO DE CONTAGEM REUTILIZÁVEL ---
+function scheduleCountdown(timeSig, onComplete) {
+    const { beats, beatType } = timeSig;
+    const singleBeatDuration = Tone.Time(`${beatType}n`).toSeconds();
+    const countdownDuration = singleBeatDuration * beats;
+
+    // Agenda os números da contagem
+    for (let i = 0; i < beats; i++) {
+        const time = i * singleBeatDuration;
+        AppState.transportEventIds.push(Tone.Transport.scheduleOnce(t => {
+            Tone.Draw.schedule(() => updateCountdownDisplay(beats - i), t);
+        }, time));
+    }
+
+    // Agenda a conclusão da contagem
+    AppState.transportEventIds.push(Tone.Transport.scheduleOnce(t => {
+        Tone.Draw.schedule(() => {
+            updateCountdownDisplay("");
+            if (onComplete) {
+                onComplete();
+            }
+        }, t);
+    }, countdownDuration - 0.05));
+
+    return countdownDuration;
+}
+
+
 export async function startCountdownAndPlay() {
     if (AppState.isPlaying || AppState.isCountingDown || !AppState.activePattern || AppState.activePattern.length === 0) return;
     
@@ -92,39 +120,24 @@ export async function startCountdownAndPlay() {
         if (Tone.context.state !== 'running') await Tone.start();
         
         initializeSynths();
-        
         stopRhythmExecution(); 
         AppState.isCountingDown = true;
         updateMessage("A preparar...");
 
         const userInputBpm = parseInt(document.getElementById('tempo-display').textContent);
-        const { beats, beatType } = AppState.activeTimeSignature;
-        
         Tone.Transport.bpm.value = userInputBpm;
-
-        const singleBeatDuration = Tone.Time(`${beatType}n`).toSeconds();
-
-        const countdownDuration = singleBeatDuration * beats;
-        schedulePlayback(countdownDuration);
+        
         scheduleMetronome();
+        
+        const countdownDuration = scheduleCountdown(AppState.activeTimeSignature, () => {
+            AppState.isCountingDown = false;
+            AppState.isPlaying = true;
+            updatePlaybackButtons(true);
+            disablePlaybackControls(true);
+            updateMessage("A tocar...");
+        });
 
-        for (let i = 0; i < beats; i++) {
-            const time = i * singleBeatDuration;
-            AppState.transportEventIds.push(Tone.Transport.scheduleOnce(t => {
-                Tone.Draw.schedule(() => updateCountdownDisplay(beats - i), t);
-            }, time));
-        }
-
-        AppState.transportEventIds.push(Tone.Transport.scheduleOnce(t => {
-            Tone.Draw.schedule(() => {
-                updateCountdownDisplay("");
-                AppState.isCountingDown = false;
-                AppState.isPlaying = true;
-                updatePlaybackButtons(true);
-                disablePlaybackControls(true);
-                updateMessage("A tocar...");
-            }, t);
-        }, countdownDuration - 0.05));
+        schedulePlayback(countdownDuration);
 
         Tone.Transport.start(Tone.now());
 
@@ -203,39 +216,61 @@ function scheduleMetronome() {
 }
 
 /**
- * Toca um padrão rítmico específico (para o ditado) sem feedback visual.
+ * Toca um padrão rítmico (para o ditado) com uma contagem inicial.
  */
-export function playDictationPattern(pattern) {
+export async function playDictationPatternWithCountdown(pattern) {
     if (AppState.isPlaying || AppState.isCountingDown || !pattern || pattern.length === 0) return;
+    
+    disablePlaybackControls();
 
-    stopRhythmExecution();
-    AppState.isPlaying = true;
+    try {
+        if (Tone.context.state !== 'running') await Tone.start();
 
-    const userInputBpm = parseInt(document.getElementById('tempo-display').textContent);
-    Tone.Transport.bpm.value = userInputBpm;
-
-    let currentTime = 0;
-    const timeSig = { beats: 4, beatType: 4 }; // O ditado inicial será sempre 4/4
-    const beatTypeDurationSeconds = Tone.Time(`${timeSig.beatType}n`).toSeconds();
-
-    pattern.forEach((item) => {
-        if (item.type === 'note') {
-            const soundDurationSeconds = getBeatValue(item.duration, timeSig) * beatTypeDurationSeconds;
-            AppState.transportEventIds.push(Tone.Transport.scheduleOnce(t => {
-                AppState.synths.noteSynth.triggerAttackRelease("C5", soundDurationSeconds, t);
-                AppState.synths.attackSynth.triggerAttackRelease("C6", "16n", t);
-            }, currentTime));
-        }
-        const noteDurationInSeconds = getBeatValue(item.duration, timeSig) * beatTypeDurationSeconds;
-        currentTime += noteDurationInSeconds;
-    });
-
-    // Adiciona um evento para parar a execução quando terminar
-    AppState.transportEventIds.push(Tone.Transport.scheduleOnce(() => {
+        initializeSynths();
         stopRhythmExecution();
-    }, currentTime + 0.5));
+        AppState.isCountingDown = true;
+        updateMessage("Prepare-se para ouvir...");
 
-    Tone.Transport.start();
+        const userInputBpm = parseInt(document.getElementById('tempo-display').textContent);
+        Tone.Transport.bpm.value = userInputBpm;
+        
+        const timeSig = { beats: 4, beatType: 4 };
+        Tone.Transport.timeSignature = [timeSig.beats, timeSig.beatType];
+        scheduleMetronome();
+        
+        const countdownDuration = scheduleCountdown(timeSig, () => {
+             AppState.isCountingDown = false;
+             AppState.isPlaying = true;
+             updateMessage("A ouvir...");
+        });
+        
+        let currentTime = countdownDuration;
+        const beatTypeDurationSeconds = Tone.Time(`${timeSig.beatType}n`).toSeconds();
+
+        pattern.forEach((item) => {
+            if (item.type === 'note') {
+                const soundDurationSeconds = getBeatValue(item.duration, timeSig) * beatTypeDurationSeconds;
+                AppState.transportEventIds.push(Tone.Transport.scheduleOnce(t => {
+                    AppState.synths.noteSynth.triggerAttackRelease("C5", soundDurationSeconds, t);
+                    AppState.synths.attackSynth.triggerAttackRelease("C6", "16n", t);
+                }, currentTime));
+            }
+            const noteDurationInSeconds = getBeatValue(item.duration, timeSig) * beatTypeDurationSeconds;
+            currentTime += noteDurationInSeconds;
+        });
+
+        AppState.transportEventIds.push(Tone.Transport.scheduleOnce(() => {
+            stopRhythmExecution();
+            updateMessage("Agora é a sua vez! Recrie o ritmo.");
+        }, currentTime + 0.5));
+
+        Tone.Transport.start();
+
+    } catch(error) {
+        console.error("Erro ao tocar ditado:", error);
+        showErrorModal(`Ocorreu um erro ao tocar o ditado: ${error.message}`);
+        stopRhythmExecution();
+    }
 }
 
 

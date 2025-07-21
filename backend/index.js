@@ -19,14 +19,17 @@ mongoose.connect(process.env.MONGO_URI, {
 
 const app = express();
 
+// --- NOVO: Middleware para interpretar o corpo das requisições como JSON ---
+app.use(express.json());
+
 // Confiar no proxy para que os cookies seguros funcionem corretamente
 app.set('trust proxy', 1);
 
 // Usar o cors ANTES de qualquer outra configuração de sessão ou rotas
 app.use(
     cors({
-        origin: 'http://localhost:5500', // ALTERADO: Permite que o seu frontend a partir de localhost faça requisições
-        credentials: true
+        origin: 'http://localhost:5500', // Permite que o seu frontend faça requisições
+        credentials: true // Permite que o frontend envie cookies
     })
 );
 
@@ -37,10 +40,10 @@ app.use(
         resave: false,
         saveUninitialized: false,
         cookie: {
-            secure: process.env.NODE_ENV === 'production', // Cookie seguro em produção (HTTPS)
-            httpOnly: true, // Impede acesso via JavaScript no frontend
-            maxAge: 24 * 60 * 60 * 1000, // Duração de 24 horas
-            sameSite: 'lax' // --- ESTA É A ADIÇÃO CRUCIAL ---
+            secure: process.env.NODE_ENV === 'production',
+            httpOnly: true,
+            maxAge: 24 * 60 * 60 * 1000,
+            sameSite: 'lax'
         }
     })
 );
