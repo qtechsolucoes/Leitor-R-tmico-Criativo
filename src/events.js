@@ -1,4 +1,5 @@
 // events.js
+
 import { startCountdownAndPlay, togglePauseResume, stopRhythmExecution, exportWavOffline, playDictationPatternWithCountdown } from './audio.js';
 import { AppState } from './state.js';
 import { updateActivePatternAndTimeSignature, handlePaletteFigureClick, handleFigureSelectionForEditing, generateDictation, checkDictation, getCurrentDictationPattern } from './core.js';
@@ -38,6 +39,27 @@ async function addPointsAndUpdateUI(points) {
     }
 }
 
+// NOVO: Salvamento automático de rascunhos
+function startAutoSave() {
+    // Limpa qualquer intervalo existente
+    if (AppState.autoSaveInterval) {
+        clearInterval(AppState.autoSaveInterval);
+    }
+
+    // Configura um novo intervalo para salvar a cada 30 segundos
+    AppState.autoSaveInterval = setInterval(() => {
+        if (AppState.currentMode === 'freeCreate' && AppState.customPattern.length > 0) {
+            const draft = {
+                pattern: AppState.customPattern,
+                timeSignature: AppState.activeTimeSignature,
+                timestamp: new Date().toISOString()
+            };
+            localStorage.setItem('lrc_autoDraft', JSON.stringify(draft));
+            AppState.lastSavedDraft = draft;
+            console.log("Rascunho salvo automaticamente.");
+        }
+    }, 30000); // 30 segundos
+}
 
 function handleSaveRhythm() {
     if (!AppState.user.currentUser) {
@@ -323,7 +345,8 @@ export function setupEventListeners() {
         if (btnText === "Repetir Áudio") {
             playDictationPatternWithCountdown(getCurrentDictationPattern());
         } else { // "Ouvir Ditado" ou "Próximo Ditado"
-            const { pattern, figuresUsed } = generateDictation();
+            // Gera o ditado com base no nível atual
+            const { pattern, figuresUsed } = generateDictation(AppState.currentGameLevel);
             playDictationPatternWithCountdown(pattern);
             
             AppState.customPattern = [];
@@ -350,7 +373,13 @@ export function setupEventListeners() {
         gameFeedbackEl.classList.add(result.score > 0 ? 'feedback-correct' : 'feedback-incorrect');
         gameFeedbackEl.classList.remove('hidden');
         
-        // Renderiza a resposta do utilizador com as anotações (verde/vermelho)
+        // Atualiza o nível exibido
+        const levelDisplay = document.getElementById('game-level-display');
+        if (levelDisplay) {
+            levelDisplay.textContent = `Nível: ${AppState.currentGameLevel}`;
+        }
+        
+        // Renderiza a resposta do utilizador com as anotações
         AppState.activePattern = result.annotatedPattern;
         renderRhythm();
         
@@ -358,4 +387,7 @@ export function setupEventListeners() {
         checkDictationBtn.classList.add('hidden');
         updateMessage("Compare a sua resposta. Clique em 'Próximo Ditado' para continuar.");
     });
+    
+    // NOVO: Iniciar salvamento automático
+    startAutoSave();
 }

@@ -12,7 +12,6 @@ export const AppState = {
     // Estado do playback de áudio
     isPlaying: false,
     isCountingDown: false,
-    // A flag metronomeOnlyMode foi REMOVIDA
     transportEventIds: [],
     metronomeEventId: null,
 
@@ -26,5 +25,12 @@ export const AppState = {
     user: {
         currentUser: null,
         savedRhythms: {}
-    }
+    },
+    
+    // NOVO: Salvamento automático
+    autoSaveInterval: null,
+    lastSavedDraft: null,
+    
+    // NOVO: Progresso no jogo
+    currentGameLevel: 1
 };

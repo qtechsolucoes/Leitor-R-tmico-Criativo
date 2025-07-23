@@ -1,5 +1,4 @@
 // audio.js
-
 import { AppState } from './state.js';
 import { getBeatValue } from './core.js';
 import { highlightActiveVisualElement, updatePlaybackButtons, enableAllControls, disablePlaybackControls, updateMessage, updateCountdownDisplay, showErrorModal } from './ui.js';
@@ -36,6 +35,29 @@ export function initializeSynths() {
     } catch (e) {
         console.error("ERRO CRÍTICO em initializeSynths:", e);
         showErrorModal("Não foi possível inicializar os componentes de áudio. Por favor, atualize a página e tente novamente.");
+    }
+}
+
+// NOVA FUNÇÃO: Preview sonoro para figuras
+export function playFigurePreview(figure) {
+    if (!figure || figure.isControl) return;
+    
+    try {
+        const context = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = context.createOscillator();
+        const gainNode = context.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(context.destination);
+        
+        oscillator.type = 'triangle';
+        oscillator.frequency.value = figure.type === 'note' ? 440 : 220;
+        gainNode.gain.value = 0.3;
+        
+        oscillator.start();
+        oscillator.stop(context.currentTime + 0.3);
+    } catch (error) {
+        console.error("Erro ao tocar preview:", error);
     }
 }
 
@@ -83,13 +105,11 @@ function isCompound(beats, beatType) {
     return beatType >= 8 && beats % 3 === 0 && beats > 3;
 }
 
-// --- FUNÇÃO DE CONTAGEM REUTILIZÁVEL ---
 function scheduleCountdown(timeSig, onComplete) {
     const { beats, beatType } = timeSig;
     const singleBeatDuration = Tone.Time(`${beatType}n`).toSeconds();
     const countdownDuration = singleBeatDuration * beats;
 
-    // Agenda os números da contagem
     for (let i = 0; i < beats; i++) {
         const time = i * singleBeatDuration;
         AppState.transportEventIds.push(Tone.Transport.scheduleOnce(t => {
@@ -97,7 +117,6 @@ function scheduleCountdown(timeSig, onComplete) {
         }, time));
     }
 
-    // Agenda a conclusão da contagem
     AppState.transportEventIds.push(Tone.Transport.scheduleOnce(t => {
         Tone.Draw.schedule(() => {
             updateCountdownDisplay("");
@@ -215,9 +234,6 @@ function scheduleMetronome() {
     AppState.metronomeEventId.loopEnd = "1m"; 
 }
 
-/**
- * Toca um padrão rítmico (para o ditado) com uma contagem inicial.
- */
 export async function playDictationPatternWithCountdown(pattern) {
     if (AppState.isPlaying || AppState.isCountingDown || !pattern || pattern.length === 0) return;
     

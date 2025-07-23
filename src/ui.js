@@ -1,8 +1,9 @@
 // ui.js
 
 import { AppState } from './state.js';
-import { rhythmicFigures, lessons } from './config.js';
+import { rhythmicFigures, lessons, difficultyLevels } from './config.js';
 import { getBeatValue, getDurationText, getFractionalNotation, handlePaletteFigureClick, handleFigureSelectionForEditing, updateActivePatternAndTimeSignature } from './core.js';
+import { playFigurePreview } from './audio.js'; // NOVO IMPORT
 
 const rhythmDisplayEl = document.getElementById('rhythm-display');
 const figureFocusDisplayEl = document.getElementById('figure-focus-display');
@@ -290,7 +291,6 @@ function renderFigure(item, index, beatContext) {
     noteItemElement.innerHTML = item.baseSymbol || item.symbol;
     if(item.isControl) noteItemElement.classList.add('control-item');
 
-    // --- LÓGICA DE FEEDBACK VISUAL ---
     if (typeof item.isCorrect === 'boolean') {
         noteItemElement.classList.add(item.isCorrect ? 'feedback-correct' : 'feedback-incorrect');
     }
@@ -477,6 +477,13 @@ export function switchMode(mode) {
         updateMessage("Jogo: Ditado Rítmico. Clique em 'Ouvir Ditado'.");
         document.getElementById('start-dictation-btn').textContent = "Ouvir Ditado";
         document.getElementById('check-dictation-btn').classList.add('hidden');
+        
+        // NOVO: Mostrar nível atual
+        const levelDisplay = document.createElement('div');
+        levelDisplay.id = 'game-level-display';
+        levelDisplay.className = 'text-center mb-2 text-cyan-300';
+        levelDisplay.textContent = `Nível: ${AppState.currentGameLevel}`;
+        gamePanel.insertBefore(levelDisplay, gamePanel.querySelector('.game-instructions'));
     }
 
     updateActivePatternAndTimeSignature();
@@ -522,6 +529,7 @@ export function populateLessonModal() {
     }
 }
 
+// ATUALIZADO: Com preview sonoro
 export function populateFigurePalette() {
     const figurePaletteDiv = document.getElementById('figure-palette');
     if (!figurePaletteDiv) return;
@@ -535,6 +543,12 @@ export function populateFigurePalette() {
         button.innerHTML = fig.symbol; 
         button.title = fig.name;
         
+        // Preview sonoro ao passar o mouse
+        button.addEventListener('mouseenter', () => {
+            playFigurePreview(fig);
+        });
+
+        // Ação principal ao clicar
         button.addEventListener('click', () => {
             const result = handlePaletteFigureClick({ ...fig });
             if (result.success) {
@@ -544,6 +558,7 @@ export function populateFigurePalette() {
                 updateMessage(result.message, 'error');
             }
         });
+        
         figurePaletteDiv.appendChild(button);
     });
 }

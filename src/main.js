@@ -10,7 +10,6 @@ import { lessons } from './config.js';
  */
 async function fetchCurrentUser() {
     try {
-        // ALTERADO: Use a URL completa do backend com localhost
         const res = await fetch('http://localhost:5000/api/current_user', {
             credentials: 'include'
         });
@@ -38,6 +37,18 @@ async function init() {
     // Busca o usuário atual do backend ANTES de carregar a interface principal
     await fetchCurrentUser(); 
     
+    // NOVO: Recuperar rascunho salvo automaticamente
+    const savedDraft = JSON.parse(localStorage.getItem('lrc_autoDraft'));
+    if (savedDraft) {
+        if (confirm('Deseja restaurar seu rascunho não salvo?')) {
+            AppState.customPattern = savedDraft.pattern;
+            AppState.activeTimeSignature = savedDraft.timeSignature;
+            // Atualiza a UI
+            updateActivePatternAndTimeSignature();
+            renderRhythm();
+        }
+    }
+
     // Define o modo inicial e carrega a primeira lição por padrão
     switchMode('lessons');
     

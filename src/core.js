@@ -1,7 +1,7 @@
 // core.js
 
 import { AppState } from './state.js';
-import { lessons, rhythmicFigures } from './config.js';
+import { lessons, rhythmicFigures, difficultyLevels } from './config.js';
 
 function round(value, decimals = 5) {
     return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
@@ -267,47 +267,34 @@ export function handleFigureSelectionForEditing(index) {
     AppState.selectedIndexForEditing = (AppState.selectedIndexForEditing === index) ? null : index;
 }
 
-// --- LÓGICA DO JOGO: DITADO RÍTMICO ATUALIZADA ---
-
 let currentDictationPattern = [];
 
-export function generateDictation() {
-    const figuresUsed = [
-        { type: 'note', duration: 1, symbol: '♩' },
-        { type: 'note', duration: 0.5, symbol: '𝅘𝅥𝅮' }
-    ];
-    
+// ATUALIZADO: Geração de ditado com níveis
+export function generateDictation(levelId = 1) {
+    const levelConfig = difficultyLevels.find(level => level.id === levelId) || difficultyLevels[0];
+    const figuresUsed = levelConfig.figures;
+    const totalBeats = levelConfig.measures * 4; // 4/4 por medida
+
     let pattern = [];
     let currentBeats = 0;
-    const totalBeats = 4;
 
     while (currentBeats < totalBeats) {
-        let randomFigure;
-        if (currentBeats <= totalBeats - 1) {
-             randomFigure = figuresUsed[Math.floor(Math.random() * figuresUsed.length)];
-        } else {
-             randomFigure = figuresUsed[1];
-        }
-       
+        const randomFigure = figuresUsed[Math.floor(Math.random() * figuresUsed.length)];
         const figureBeats = getBeatValue(randomFigure.duration, { beats: 4, beatType: 4 });
 
         if (currentBeats + figureBeats <= totalBeats) {
-            pattern.push(randomFigure);
+            pattern.push({ ...randomFigure });
             currentBeats += figureBeats;
         }
     }
-    
+
     currentDictationPattern = pattern;
-    return { pattern, figuresUsed };
+    return { pattern, figuresUsed, level: levelConfig };
 }
 
-/**
- * Compara o padrão do utilizador com o ditado correto e calcula a pontuação.
- * Retorna um objeto com a pontuação, mensagem e o padrão do utilizador anotado.
- */
 export function checkDictation(userPattern) {
     let correctNotes = 0;
-    const annotatedPattern = JSON.parse(JSON.stringify(userPattern)); // Cria uma cópia para anotar
+    const annotatedPattern = JSON.parse(JSON.stringify(userPattern));
 
     const maxLength = Math.max(userPattern.length, currentDictationPattern.length);
 
@@ -329,6 +316,11 @@ export function checkDictation(userPattern) {
     let message = "";
     if (isPerfect) {
         message = `Perfeito! +${score + 50} Pontos!`;
+        // Avança de nível se perfeito
+        if (AppState.currentGameLevel < difficultyLevels.length) {
+            AppState.currentGameLevel++;
+            message += ` Subiu para nível ${AppState.currentGameLevel}!`;
+        }
     } else {
         message = `Você acertou ${correctNotes} de ${currentDictationPattern.length}. +${score} Pontos.`;
     }
@@ -336,7 +328,7 @@ export function checkDictation(userPattern) {
     return { 
         score: isPerfect ? score + 50 : score, 
         message: message,
-        annotatedPattern: annotatedPattern // Retorna o padrão do utilizador com anotações
+        annotatedPattern: annotatedPattern
     };
 }
 

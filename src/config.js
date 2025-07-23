@@ -3,7 +3,6 @@
 import { lessons } from './lessons/index.js';
 
 export const rhythmicFigures = [
-    // ... Figuras existentes ...
     { name: 'Semibreve', symbol: '𝅝', type: 'note', duration: 4},
     { name: 'Pausa de Semibreve', symbol: '𝄻', type: 'rest', duration: 4},
     { name: 'Mínima Pontuada', symbol: '𝅗𝅥.', type: 'note', duration: 3},
@@ -27,3 +26,40 @@ export const rhythmicFigures = [
 ];
 
 export { lessons };
+
+// NOVO: Níveis de dificuldade
+export const difficultyLevels = [
+    {
+        id: 1,
+        name: "Iniciante",
+        figures: [
+            { symbol: '♩', duration: 1, type: 'note' },
+            { symbol: '𝄽', duration: 1, type: 'rest' }
+        ],
+        measures: 1,
+        tempo: 80
+    },
+    {
+        id: 2,
+        name: "Intermediário",
+        figures: [
+            { symbol: '♩', duration: 1, type: 'note' },
+            { symbol: '𝅘𝅥𝅮', duration: 0.5, type: 'note' },
+            { symbol: '𝄾', duration: 0.5, type: 'rest' }
+        ],
+        measures: 2,
+        tempo: 100
+    },
+    {
+        id: 3,
+        name: "Avançado",
+        figures: [
+            { symbol: '♩', duration: 1, type: 'note' },
+            { symbol: '𝅘𝅥𝅮', duration: 0.5, type: 'note' },
+            { symbol: '𝄾', duration: 0.5, type: 'rest' },
+            { symbol: '𝅘𝅥𝅯', duration: 0.25, type: 'note' }
+        ],
+        measures: 2,
+        tempo: 120
+    }
+];
