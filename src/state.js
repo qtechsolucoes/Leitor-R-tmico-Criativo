@@ -14,11 +14,13 @@ export const AppState = {
     isCountingDown: false,
     transportEventIds: [],
     metronomeEventId: null,
+    continuousMetronome: false, // NOVO ESTADO
 
     // Contêiner para os sintetizadores do Tone.js
     synths: {
         noteSynth: null,
-        metronomeSynth: null
+        metronomeSynth: null,
+        attackSynth: null
     },
 
     // Estado de autenticação e dados do utilizador
@@ -27,10 +29,10 @@ export const AppState = {
         savedRhythms: {}
     },
     
-    // NOVO: Salvamento automático
+    // Salvamento automático
     autoSaveInterval: null,
     lastSavedDraft: null,
     
-    // NOVO: Progresso no jogo
+    // Progresso no jogo
     currentGameLevel: 1
 };

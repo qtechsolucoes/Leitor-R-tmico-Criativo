@@ -1,59 +1,46 @@
 // main.js
-
 import { setupEventListeners } from './events.js';
-import { switchMode, updateLoginUI, populateFigurePalette } from './ui.js';
+import { switchMode, updateLoginUI, populateFigurePalette, renderRhythm } from './ui.js';
 import { initializeSynths } from './audio.js';
-import { lessons } from './config.js';
+import { AppState } from './state.js';
+import { updateActivePatternAndTimeSignature } from './core.js';
+import { getCurrentUser } from './api.js';
 
-/**
- * Função assíncrona para buscar o usuário logado no backend.
- */
 async function fetchCurrentUser() {
     try {
-        const res = await fetch('http://localhost:5000/api/current_user', {
-            credentials: 'include'
-        });
-        
-        if (res.ok && res.headers.get("Content-Length") > "0") {
-            const user = await res.json();
-            updateLoginUI(user);
-        } else {
-            updateLoginUI(null);
-        }
+        const user = await getCurrentUser();
+        updateLoginUI(user);
     } catch (error) {
-        console.error('Erro ao buscar usuário: O backend pode estar offline.', error);
+        console.error('Erro ao buscar utilizador: O backend pode estar offline.', error);
         updateLoginUI(null);
     }
 }
 
-/**
- * Função principal que inicializa toda a aplicação.
- */
 async function init() {
     populateFigurePalette();
     setupEventListeners();
     initializeSynths(); 
     
-    // Busca o usuário atual do backend ANTES de carregar a interface principal
     await fetchCurrentUser(); 
     
-    // NOVO: Recuperar rascunho salvo automaticamente
     const savedDraft = JSON.parse(localStorage.getItem('lrc_autoDraft'));
     if (savedDraft) {
         if (confirm('Deseja restaurar seu rascunho não salvo?')) {
             AppState.customPattern = savedDraft.pattern;
             AppState.activeTimeSignature = savedDraft.timeSignature;
-            // Atualiza a UI
+            
+            switchMode('freeCreate');
             updateActivePatternAndTimeSignature();
             renderRhythm();
+            // Limpa o rascunho após restaurar
+            localStorage.removeItem('lrc_autoDraft');
         }
+    } else {
+        // Define o modo inicial e carrega a primeira lição por padrão
+        switchMode('lessons');
     }
-
-    // Define o modo inicial e carrega a primeira lição por padrão
-    switchMode('lessons');
     
-    console.log("Aplicação 'Leitor Rítmico Criativo' (Versão Final) inicializada.");
+    console.log("Aplicação 'Leitor Rítmico Criativo' (Versão Melhorada) inicializada.");
 }
 
-// Inicia a aplicação
 init();

@@ -8,32 +8,32 @@ require('dotenv').config();
 
 // Importa os arquivos de configuração (a ordem é importante)
 require('./models/User');
+require('./models/Rhythm'); // NOVO: Importa o modelo de Ritmo
 require('./services/passport'); 
 const authRoutes = require('./routes/authRoutes');
+const rhythmRoutes = require('./routes/rhythmRoutes'); // NOVO: Importa as rotas de Ritmo
+
 
 // Conexão com o banco de dados
+// AVISO: A opção 'tlsAllowInvalidCertificates' não deve ser usada em produção.
+// Remova-a ou configure certificados válidos para o seu ambiente de produção.
 mongoose.connect(process.env.MONGO_URI, {
-  ssl: true,
-  tlsAllowInvalidCertificates: true
+  ssl: true
 });
 
 const app = express();
 
-// --- NOVO: Middleware para interpretar o corpo das requisições como JSON ---
 app.use(express.json());
 
-// Confiar no proxy para que os cookies seguros funcionem corretamente
 app.set('trust proxy', 1);
 
-// Usar o cors ANTES de qualquer outra configuração de sessão ou rotas
 app.use(
     cors({
-        origin: 'http://localhost:5500', // Permite que o seu frontend faça requisições
-        credentials: true // Permite que o frontend envie cookies
+        origin: process.env.CLIENT_URL || 'http://127.0.0.1:5500', 
+        credentials: true
     })
 );
 
-// Configuração da sessão com opções explícitas para o cookie
 app.use(
     session({
         secret: process.env.COOKIE_KEY,
@@ -42,19 +42,18 @@ app.use(
         cookie: {
             secure: process.env.NODE_ENV === 'production',
             httpOnly: true,
-            maxAge: 24 * 60 * 60 * 1000,
+            maxAge: 24 * 60 * 60 * 1000, // 24 horas
             sameSite: 'lax'
         }
     })
 );
 
-
-// Inicializa o Passport
 app.use(passport.initialize());
 app.use(passport.session());
 
 // Inicia as rotas
 authRoutes(app);
+rhythmRoutes(app); // NOVO: Inicia as rotas de Ritmo
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

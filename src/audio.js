@@ -38,12 +38,11 @@ export function initializeSynths() {
     }
 }
 
-// NOVA FUNÇÃO: Preview sonoro para figuras
 export function playFigurePreview(figure) {
     if (!figure || figure.isControl) return;
     
     try {
-        const context = new (window.AudioContext || window.webkitAudioContext)();
+        const context = Tone.context;
         const oscillator = context.createOscillator();
         const gainNode = context.createGain();
         
@@ -61,7 +60,8 @@ export function playFigurePreview(figure) {
     }
 }
 
-export function stopRhythmExecution() {
+export function stopRhythmExecution(forceStopMetronome = false) {
+    const wasPlaying = AppState.isPlaying;
     AppState.isPlaying = false;
     AppState.isCountingDown = false;
 
@@ -71,16 +71,23 @@ export function stopRhythmExecution() {
     AppState.transportEventIds.forEach(id => Tone.Transport.clear(id));
     AppState.transportEventIds = [];
     
-    if (AppState.metronomeEventId) {
-        AppState.metronomeEventId.dispose();
-        AppState.metronomeEventId = null;
+    if (forceStopMetronome || !AppState.continuousMetronome) {
+        if (AppState.metronomeEventId) {
+            AppState.metronomeEventId.stop(0).dispose();
+            AppState.metronomeEventId = null;
+        }
+    } else {
+        if(AppState.metronomeEventId) {
+            AppState.metronomeEventId.loop = true;
+            AppState.metronomeEventId.loopEnd = "1m";
+        }
     }
 
     updatePlaybackButtons(false);
     enableAllControls();
     highlightActiveVisualElement(null);
     updateCountdownDisplay("");
-    if(Tone.Transport.state !== 'stopped') {
+    if(wasPlaying) {
         updateMessage("Reprodução parada.");
     }
 }
@@ -89,12 +96,14 @@ export function togglePauseResume() {
     if (Tone.Transport.state === 'paused') {
         AppState.isPlaying = true;
         Tone.Transport.start();
+        if (AppState.metronomeEventId) AppState.metronomeEventId.start();
         updatePlaybackButtons(true);
         disablePlaybackControls(true);
         updateMessage("A tocar...");
     } else if (AppState.isPlaying) {
         AppState.isPlaying = false;
         Tone.Transport.pause();
+        if (AppState.metronomeEventId) AppState.metronomeEventId.stop(Tone.now());
         updatePlaybackButtons(false);
         enableAllControls();
         updateMessage("Pausado.");
@@ -106,8 +115,8 @@ function isCompound(beats, beatType) {
 }
 
 function scheduleCountdown(timeSig, onComplete) {
-    const { beats, beatType } = timeSig;
-    const singleBeatDuration = Tone.Time(`${beatType}n`).toSeconds();
+    const { beats } = timeSig;
+    const singleBeatDuration = Tone.Time("4n").toSeconds() * (4 / timeSig.beatType);
     const countdownDuration = singleBeatDuration * beats;
 
     for (let i = 0; i < beats; i++) {
@@ -139,7 +148,7 @@ export async function startCountdownAndPlay() {
         if (Tone.context.state !== 'running') await Tone.start();
         
         initializeSynths();
-        stopRhythmExecution(); 
+        stopRhythmExecution(true); 
         AppState.isCountingDown = true;
         updateMessage("A preparar...");
 
@@ -163,7 +172,7 @@ export async function startCountdownAndPlay() {
     } catch (error) {
         console.error("Erro ao iniciar playback:", error);
         showErrorModal(`Ocorreu um erro ao tentar iniciar a reprodução: ${error.message}`);
-        stopRhythmExecution();
+        stopRhythmExecution(true);
     }
 }
 
@@ -186,10 +195,9 @@ function schedulePlayback(offset = 0) {
         }
         
         const noteDurationInBeats = getBeatValue(item.duration, timeSig);
-        const roundedBeatValue = Math.round(noteDurationInBeats);
         
-        if (noteDurationInBeats >= 1 && Math.abs(noteDurationInBeats - roundedBeatValue) < tolerance) {
-            for (let i = 0; i < roundedBeatValue; i++) {
+        if (noteDurationInBeats >= 1 && Math.abs(noteDurationInBeats - Math.round(noteDurationInBeats)) < tolerance) {
+            for (let i = 0; i < Math.round(noteDurationInBeats); i++) {
                 const beatHighlightTime = currentTime + (i * beatTypeDurationSeconds);
                 AppState.transportEventIds.push(Tone.Transport.scheduleOnce(t => {
                     Tone.Draw.schedule(() => highlightActiveVisualElement(originalIndex, i), t);
@@ -206,7 +214,7 @@ function schedulePlayback(offset = 0) {
     });
 
     AppState.transportEventIds.push(Tone.Transport.scheduleOnce(() => {
-        stopRhythmExecution();
+        stopRhythmExecution(false);
         updateMessage("Lição concluída!", "success");
     }, currentTime + 0.5));
 }
@@ -217,12 +225,12 @@ function scheduleMetronome() {
     }
     const { beats, beatType } = AppState.activeTimeSignature;
     const isComp = isCompound(beats, beatType);
-    const subdivision = isComp ? 3 : beats;
+    const subdivision = isComp ? 3 : 1;
     const events = [];
 
     for (let i = 0; i < beats; i++) {
         const time = `0:${i}`; 
-        const note = (i % subdivision === 0) ? "G5" : "C5";
+        const note = (i % (beats / subdivision) === 0) ? "G5" : "C5";
         events.push({ time, note });
     }
 
@@ -243,7 +251,7 @@ export async function playDictationPatternWithCountdown(pattern) {
         if (Tone.context.state !== 'running') await Tone.start();
 
         initializeSynths();
-        stopRhythmExecution();
+        stopRhythmExecution(true);
         AppState.isCountingDown = true;
         updateMessage("Prepare-se para ouvir...");
 
@@ -276,7 +284,7 @@ export async function playDictationPatternWithCountdown(pattern) {
         });
 
         AppState.transportEventIds.push(Tone.Transport.scheduleOnce(() => {
-            stopRhythmExecution();
+            stopRhythmExecution(false);
             updateMessage("Agora é a sua vez! Recrie o ritmo.");
         }, currentTime + 0.5));
 
@@ -285,7 +293,7 @@ export async function playDictationPatternWithCountdown(pattern) {
     } catch(error) {
         console.error("Erro ao tocar ditado:", error);
         showErrorModal(`Ocorreu um erro ao tocar o ditado: ${error.message}`);
-        stopRhythmExecution();
+        stopRhythmExecution(true);
     }
 }
 
@@ -303,7 +311,7 @@ export async function exportWavOffline() {
     const singleBeatDuration = 60 / bpm * (4 / timeSig.beatType);
     
     let totalDurationSeconds = AppState.activePattern
-        .filter(item => !item.isControl && !item.isTiedContinuation)
+        .filter(item => !item.isControl)
         .reduce((sum, item) => sum + getBeatValue(item.duration, timeSig) * singleBeatDuration, 0);
     
     totalDurationSeconds += 1.0;

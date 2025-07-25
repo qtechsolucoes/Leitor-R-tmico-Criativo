@@ -7,7 +7,9 @@ const userSchema = new Schema({
     displayName: String,
     email: String,
     photo: String,
-    points: { type: Number, default: 0 } // Campo para a pontuação
+    points: { type: Number, default: 0 },
+    createdAt: { type: Date, default: Date.now },
+    lessonsCompleted: [Number]
 });
 
 mongoose.model('users', userSchema);

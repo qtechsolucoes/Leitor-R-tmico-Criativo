@@ -1,15 +1,15 @@
 // events.js
-
-import { startCountdownAndPlay, togglePauseResume, stopRhythmExecution, exportWavOffline, playDictationPatternWithCountdown } from './audio.js';
+import * as api from './api.js';
+import { startCountdownAndPlay, togglePauseResume, stopRhythmExecution, playDictationPatternWithCountdown } from './audio.js';
 import { AppState } from './state.js';
-import { updateActivePatternAndTimeSignature, handlePaletteFigureClick, handleFigureSelectionForEditing, generateDictation, checkDictation, getCurrentDictationPattern } from './core.js';
-import { switchMode, renderRhythm, updateMessage, updateLoginUI, showModal, hideAllModals, populateLoadRhythmModal, hideEditPopover, updateFigureFocusDisplay, populateLessonModal } from './ui.js';
-import { lessons } from './config.js';
+import { updateActivePatternAndTimeSignature, generateDictation, checkDictation, getCurrentDictationPattern, processPattern } from './core.js';
+import { switchMode, renderRhythm, updateMessage, updateLoginUI, showModal, hideAllModals, populateLoadRhythmModal, hideEditPopover, updateFigureFocusDisplay, populateLessonModal, renderDictationFeedback } from './ui.js';
 
 const saveRhythmModal = document.getElementById('save-rhythm-modal');
 const loadRhythmModal = document.getElementById('load-rhythm-modal');
 const lessonModal = document.getElementById('lesson-modal');
 const rhythmNameInput = document.getElementById('rhythm-name-input');
+const continuousMetronomeToggle = document.getElementById('continuous-metronome-toggle');
 
 async function addPointsAndUpdateUI(points) {
     if (!AppState.user.currentUser || points <= 0) {
@@ -17,36 +17,20 @@ async function addPointsAndUpdateUI(points) {
     }
 
     try {
-        const res = await fetch('http://localhost:5000/api/add_points', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-            body: JSON.stringify({ points: points }),
-        });
-
-        if (res.ok) {
-            const updatedUser = await res.json();
+        const updatedUser = await api.addPoints(points);
+        if (updatedUser) {
             updateLoginUI(updatedUser);
-        } else {
-            console.error('Falha ao atualizar os pontos no servidor.');
-            updateMessage("Erro de rede ao salvar pontos.", "error");
         }
     } catch (error) {
         console.error('Erro de rede ao tentar adicionar pontos:', error);
-        updateMessage("Erro de rede ao salvar pontos.", "error");
+        updateMessage(error.message || "Erro de rede ao salvar pontos.", "error");
     }
 }
 
-// NOVO: Salvamento automático de rascunhos
 function startAutoSave() {
-    // Limpa qualquer intervalo existente
     if (AppState.autoSaveInterval) {
         clearInterval(AppState.autoSaveInterval);
     }
-
-    // Configura um novo intervalo para salvar a cada 30 segundos
     AppState.autoSaveInterval = setInterval(() => {
         if (AppState.currentMode === 'freeCreate' && AppState.customPattern.length > 0) {
             const draft = {
@@ -55,86 +39,82 @@ function startAutoSave() {
                 timestamp: new Date().toISOString()
             };
             localStorage.setItem('lrc_autoDraft', JSON.stringify(draft));
-            AppState.lastSavedDraft = draft;
             console.log("Rascunho salvo automaticamente.");
         }
-    }, 30000); // 30 segundos
+    }, 30000);
 }
 
-function handleSaveRhythm() {
+async function handleSaveRhythm() {
     if (!AppState.user.currentUser) {
         updateMessage("Faça login para salvar.", "error");
         hideAllModals();
         return;
     }
-    if(!AppState.customPattern || AppState.customPattern.length === 0) {
+    if (!AppState.customPattern || AppState.customPattern.length === 0) {
         updateMessage("Não há ritmo para salvar.", "error");
         hideAllModals();
         return;
     }
     const rhythmName = rhythmNameInput.value.trim();
     if (rhythmName) {
-        const userId = AppState.user.currentUser.googleId;
-        const savedRhythms = JSON.parse(localStorage.getItem('lrc_savedRhythms')) || {};
-        if (!savedRhythms[userId]) {
-            savedRhythms[userId] = [];
+        try {
+            const rhythmData = {
+                name: rhythmName,
+                pattern: AppState.customPattern,
+                timeSignature: AppState.activeTimeSignature
+            };
+            await api.saveRhythm(rhythmData);
+            updateMessage(`Ritmo "${rhythmName}" salvo com sucesso.`, "success");
+            hideAllModals();
+            rhythmNameInput.value = '';
+        } catch (error) {
+            updateMessage(error.message || "Erro ao salvar o ritmo.", "error");
         }
-        savedRhythms[userId].push({
-            name: rhythmName,
-            pattern: AppState.customPattern,
-            timeSignature: AppState.activeTimeSignature
-        });
-        localStorage.setItem('lrc_savedRhythms', JSON.stringify(savedRhythms));
-        updateMessage(`Ritmo "${rhythmName}" salvo.`, "success");
-        hideAllModals();
-        rhythmNameInput.value = '';
     } else {
         updateMessage("Por favor, dê um nome para o seu ritmo.", "error");
     }
 }
 
-function handleLoadRhythm(index) {
-    const userId = AppState.user.currentUser.googleId;
-    const savedRhythms = JSON.parse(localStorage.getItem('lrc_savedRhythms')) || {};
-    const userRhythms = savedRhythms[userId];
-
-    if (userRhythms && !isNaN(index) && index >= 0 && index < userRhythms.length) {
-        const rhythm = userRhythms[index];
-        AppState.customPattern = JSON.parse(JSON.stringify(rhythm.pattern));
-        
-        const beatsSelect = document.getElementById('custom-beats-select');
-        const typeSelect = document.getElementById('custom-type-select');
-
-        const newBeatOption = beatsSelect.querySelector(`.custom-option[data-value="${rhythm.timeSignature.beats}"]`);
-        if(newBeatOption) {
-            beatsSelect.querySelector('.custom-option.selected')?.classList.remove('selected');
-            newBeatOption.classList.add('selected');
-            beatsSelect.querySelector('.custom-select-trigger').textContent = newBeatOption.textContent;
-        }
-
-        const newTypeOption = typeSelect.querySelector(`.custom-option[data-value="${rhythm.timeSignature.beatType}"]`);
-         if(newTypeOption) {
-            typeSelect.querySelector('.custom-option.selected')?.classList.remove('selected');
-            newTypeOption.classList.add('selected');
-            typeSelect.querySelector('.custom-select-trigger').textContent = newTypeOption.textContent;
-        }
-        
-        switchMode('freeCreate'); 
-        updateActivePatternAndTimeSignature();
-        renderRhythm();
-        updateMessage(`Ritmo "${rhythm.name}" carregado.`, "success");
-        hideAllModals();
-
-    } else {
+function handleLoadRhythm(rhythm) {
+    if (!rhythm) {
         updateMessage("Seleção inválida.", "error");
+        return;
     }
+
+    AppState.customPattern = JSON.parse(JSON.stringify(rhythm.pattern));
+    
+    const beatsSelect = document.getElementById('custom-beats-select');
+    const typeSelect = document.getElementById('custom-type-select');
+
+    const newBeatOption = beatsSelect.querySelector(`.custom-option[data-value="${rhythm.timeSignature.beats}"]`);
+    if(newBeatOption) {
+        beatsSelect.querySelector('.custom-option.selected')?.classList.remove('selected');
+        newBeatOption.classList.add('selected');
+        beatsSelect.querySelector('.custom-select-trigger').textContent = newBeatOption.textContent;
+    }
+
+    const newTypeOption = typeSelect.querySelector(`.custom-option[data-value="${rhythm.timeSignature.beatType}"]`);
+    if(newTypeOption) {
+        typeSelect.querySelector('.custom-option.selected')?.classList.remove('selected');
+        newTypeOption.classList.add('selected');
+        typeSelect.querySelector('.custom-select-trigger').textContent = newTypeOption.textContent;
+    }
+    
+    switchMode('freeCreate'); 
+    updateActivePatternAndTimeSignature();
+    renderRhythm();
+    updateMessage(`Ritmo "${rhythm.name}" carregado.`, "success");
+    hideAllModals();
 }
+
 
 function setupCustomSelect(selectElement, panelElement, onSelectCallback) {
      selectElement.addEventListener('click', (e) => {
         e.stopPropagation();
         const isOpen = selectElement.classList.toggle('open');
-        panelElement.classList.toggle('panel-on-top', isOpen);
+        if (panelElement) {
+            panelElement.classList.toggle('panel-on-top', isOpen);
+        }
     });
 
     selectElement.querySelectorAll('.custom-option').forEach(option => {
@@ -148,7 +128,9 @@ function setupCustomSelect(selectElement, panelElement, onSelectCallback) {
             selectElement.querySelector('.custom-select-trigger').textContent = selectedText;
 
             selectElement.classList.remove('open');
-            panelElement.classList.remove('panel-on-top');
+            if (panelElement) {
+                panelElement.classList.remove('panel-on-top');
+            }
             
             if (onSelectCallback) {
                 onSelectCallback(selectedValue);
@@ -169,7 +151,7 @@ export function setupEventListeners() {
 
     const onTimeSignatureChange = () => {
          if (AppState.currentMode === 'freeCreate') {
-            stopRhythmExecution();
+            stopRhythmExecution(true);
             updateActivePatternAndTimeSignature();
             renderRhythm();
         }
@@ -205,7 +187,16 @@ export function setupEventListeners() {
         }
     });
 
-    document.getElementById('reset-button').addEventListener('click', stopRhythmExecution);
+    document.getElementById('reset-button').addEventListener('click', () => {
+        stopRhythmExecution(true);
+    });
+    
+    continuousMetronomeToggle.addEventListener('change', (e) => {
+        AppState.continuousMetronome = e.target.checked;
+        if (!e.target.checked && AppState.metronomeEventId && !AppState.isPlaying) {
+            stopRhythmExecution(true);
+        }
+    });
 
     document.getElementById('clear-custom-rhythm').addEventListener('click', () => {
         if(confirm("Tem a certeza que deseja limpar o padrão atual?")) {
@@ -219,19 +210,21 @@ export function setupEventListeners() {
     });
     
     document.getElementById('save-rhythm-button').addEventListener('click', () => showModal(saveRhythmModal));
-    document.getElementById('load-rhythms-button').addEventListener('click', () => {
-        const userId = AppState.user.currentUser?.googleId;
-        if (!userId) {
+    
+    document.getElementById('load-rhythms-button').addEventListener('click', async () => {
+        if (!AppState.user.currentUser) {
             updateMessage("Faça login para carregar ritmos.", "error");
             return;
         }
-        const savedRhythms = JSON.parse(localStorage.getItem('lrc_savedRhythms')) || {};
-        const userRhythms = savedRhythms[userId];
-        populateLoadRhythmModal(userRhythms);
-        showModal(loadRhythmModal);
+        try {
+            const userRhythms = await api.getRhythms();
+            AppState.user.savedRhythms = userRhythms;
+            populateLoadRhythmModal(userRhythms);
+            showModal(loadRhythmModal);
+        } catch (error) {
+            updateMessage(error.message || "Erro ao carregar ritmos.", "error");
+        }
     });
-
-    document.getElementById('export-wav-button').addEventListener('click', exportWavOffline);
     
     document.getElementById('save-confirm-button').addEventListener('click', handleSaveRhythm);
     document.getElementById('save-cancel-button').addEventListener('click', hideAllModals);
@@ -239,9 +232,11 @@ export function setupEventListeners() {
     document.getElementById('error-ok-button').addEventListener('click', hideAllModals);
 
     document.getElementById('load-rhythm-list').addEventListener('click', (e) => {
-        if (e.target && e.target.classList.contains('load-item-button')) {
-            const index = parseInt(e.target.dataset.index);
-            handleLoadRhythm(index);
+        const button = e.target.closest('.load-item-button');
+        if (button) {
+            const index = parseInt(button.dataset.index);
+            const rhythmToLoad = AppState.user.savedRhythms[index];
+            handleLoadRhythm(rhythmToLoad);
         }
     });
 
@@ -250,19 +245,15 @@ export function setupEventListeners() {
     });
 
     const rhythmDisplayContainer = document.getElementById('rhythm-display-container');
-
-    rhythmDisplayContainer.addEventListener('click', () => {
-        if (AppState.selectedIndexForEditing !== null) {
+    rhythmDisplayContainer.addEventListener('click', (e) => {
+        if (e.target === rhythmDisplayContainer && AppState.selectedIndexForEditing !== null) {
             AppState.selectedIndexForEditing = null;
             renderRhythm();
         }
     });
 
     let lastHoveredIndex = null;
-    let hideInfoBoxTimer = null;
-
     rhythmDisplayContainer.addEventListener('mouseover', (e) => {
-        clearTimeout(hideInfoBoxTimer);
         const figureContainer = e.target.closest('.figure-container');
 
         if (figureContainer) {
@@ -274,14 +265,9 @@ export function setupEventListeners() {
                     updateFigureFocusDisplay(item);
                 }
             }
-        } else {
-            lastHoveredIndex = null;
-            hideInfoBoxTimer = setTimeout(() => {
-                updateFigureFocusDisplay(null);
-            }, 100);
         }
     });
-
+    
     rhythmDisplayContainer.addEventListener('mouseleave', () => {
         lastHoveredIndex = null;
         updateFigureFocusDisplay(null);
@@ -290,10 +276,8 @@ export function setupEventListeners() {
     document.getElementById('popover-delete-button').addEventListener('click', (e) => {
         e.stopPropagation();
         if (AppState.selectedIndexForEditing === null) return;
-        
         AppState.customPattern.splice(AppState.selectedIndexForEditing, 1);
         AppState.selectedIndexForEditing = null;
-        
         updateActivePatternAndTimeSignature();
         renderRhythm();
         updateMessage("Figura apagada.");
@@ -302,7 +286,6 @@ export function setupEventListeners() {
     document.getElementById('popover-tie-button').addEventListener('click', (e) => {
         e.stopPropagation();
         if (AppState.selectedIndexForEditing === null) return;
-
         const result = handlePaletteFigureClick({ name: 'Ligadura' });
         updateMessage(result.message, result.success ? 'info' : 'error');
         if(result.success) {
@@ -317,35 +300,46 @@ export function setupEventListeners() {
     });
 
     document.getElementById('close-lesson-modal-button').addEventListener('click', hideAllModals);
-
     document.getElementById('lesson-modal-content').addEventListener('click', (e) => {
-        if (e.target.classList.contains('accordion-module-header')) {
-            const list = e.target.nextElementSibling;
-            list.style.display = list.style.display === 'block' ? 'none' : 'block';
+        const moduleHeader = e.target.closest('.accordion-module-header');
+        if (moduleHeader) {
+            const list = moduleHeader.nextElementSibling;
+            const icon = moduleHeader.querySelector('i');
+            const wasOpen = list.classList.contains('open');
+            
+            document.querySelectorAll('.accordion-lessons-list.open').forEach(openList => {
+                if (openList !== list) {
+                    openList.classList.remove('open');
+                    openList.previousElementSibling.querySelector('i').classList.replace('fa-chevron-up', 'fa-chevron-down');
+                }
+            });
+            
+            list.classList.toggle('open', !wasOpen);
+            icon.classList.toggle('fa-chevron-down', wasOpen);
+            icon.classList.toggle('fa-chevron-up', !wasOpen);
         }
 
-        if (e.target.classList.contains('accordion-lesson-item')) {
-            const lessonIndex = parseInt(e.target.dataset.index);
+        const lessonItem = e.target.closest('.accordion-lesson-item');
+        if (lessonItem) {
+            const lessonIndex = parseInt(lessonItem.dataset.index);
             AppState.currentLessonIndex = lessonIndex;
-            updateActivePatternAndTimeSignature();
-            renderRhythm();
+            switchMode('lessons');
             hideAllModals();
         }
     });
 
-    // --- LÓGICA DE EVENTOS DO JOGO ATUALIZADA ---
     const startDictationBtn = document.getElementById('start-dictation-btn');
     const checkDictationBtn = document.getElementById('check-dictation-btn');
     const gameFeedbackEl = document.getElementById('game-feedback');
     const gameFigureHintEl = document.getElementById('game-figure-hint');
 
     startDictationBtn.addEventListener('click', () => {
-        const btnText = startDictationBtn.textContent;
+        document.getElementById('rhythm-display-container').innerHTML = '<div id="rhythm-display"></div>';
+        gameFeedbackEl.classList.add('hidden');
 
-        if (btnText === "Repetir Áudio") {
+        if (startDictationBtn.textContent === "Repetir Áudio") {
             playDictationPatternWithCountdown(getCurrentDictationPattern());
-        } else { // "Ouvir Ditado" ou "Próximo Ditado"
-            // Gera o ditado com base no nível atual
+        } else {
             const { pattern, figuresUsed } = generateDictation(AppState.currentGameLevel);
             playDictationPatternWithCountdown(pattern);
             
@@ -353,7 +347,6 @@ export function setupEventListeners() {
             renderRhythm();
             
             checkDictationBtn.classList.remove('hidden');
-            gameFeedbackEl.classList.add('hidden');
             
             gameFigureHintEl.innerHTML = 'Figuras neste exercício: ' + figuresUsed.map(f => `<span>${f.symbol}</span>`).join(' ');
             gameFigureHintEl.classList.remove('hidden');
@@ -373,21 +366,15 @@ export function setupEventListeners() {
         gameFeedbackEl.classList.add(result.score > 0 ? 'feedback-correct' : 'feedback-incorrect');
         gameFeedbackEl.classList.remove('hidden');
         
-        // Atualiza o nível exibido
         const levelDisplay = document.getElementById('game-level-display');
-        if (levelDisplay) {
-            levelDisplay.textContent = `Nível: ${AppState.currentGameLevel}`;
-        }
+        if (levelDisplay) levelDisplay.textContent = `Nível: ${AppState.currentGameLevel}`;
         
-        // Renderiza a resposta do utilizador com as anotações
-        AppState.activePattern = result.annotatedPattern;
-        renderRhythm();
+        renderDictationFeedback(result.annotatedPattern, getCurrentDictationPattern());
         
         startDictationBtn.textContent = "Próximo Ditado";
         checkDictationBtn.classList.add('hidden');
         updateMessage("Compare a sua resposta. Clique em 'Próximo Ditado' para continuar.");
     });
     
-    // NOVO: Iniciar salvamento automático
     startAutoSave();
 }

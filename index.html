@@ -20,7 +20,6 @@
         <div class="blur-3"></div>
     </div>
 
-    <!-- Novo cabeçalho unificado -->
     <header class="app-header">
         <div class="header-left">
             <h1 class="app-title">Leitor Rítmico Criativo</h1>
@@ -43,9 +42,9 @@
                         <span id="user-name"></span>
                         <span id="user-points" class="user-points"></span>
                     </div>
-                    <button id="user-expand-button" class="btn-action">
-                        <i class="fas fa-chevron-down"></i>
-                    </button>
+                    <a href="/api/logout" id="logout-button" class="btn-action">
+                        <i class="fas fa-sign-out-alt"></i> Sair
+                    </a>
                 </div>
             </div>
         </div>
@@ -54,6 +53,7 @@
     <div class="app-container">
         <aside class="control-panel">
             <div class="panel playback-panel">
+                <h3 class="panel-title">Playback</h3>
                 <div class="flex flex-col items-center mb-4">
                     <label class="tempo-label">TEMPO (BPM)</label>
                     <div class="flex items-center justify-center space-x-2">
@@ -67,21 +67,7 @@
                     <button id="reset-button" class="btn-action btn-reset btn-main-action"><i class="fas fa-undo"></i> Resetar</button>
                 </div>
             </div>
-
-         <div id="game-panel" class="panel hidden">
-    <h3 class="panel-title">Ditado Rítmico</h3>
-                <!-- NOVO: Display de nível -->
-                <div id="game-level-display" class="text-center mb-2 text-cyan-300">Nível: 1</div>
-                <div id="game-instructions" class="game-instructions">
-                    <p>Ouça o ritmo e o recrie no Painel de Criação.</p>
-                </div>
-                <div class="game-controls">
-                    <button id="start-dictation-btn" class="btn-action">Ouvir Ditado</button>
-                    <button id="check-dictation-btn" class="btn-action btn-confirm hidden">Verificar</button>
-                </div>
-                <div id="game-feedback" class="game-feedback hidden"></div>
-                <div id="game-figure-hint" class="game-figure-hint hidden"></div>
-            </div>
+            
             <div class="panel">
                 <h3 class="panel-title">Modo e Conteúdo</h3>
                 <div class="mb-4">
@@ -103,71 +89,88 @@
                 </div>
             </div>
 
-            <div id="custom-rhythm-creator" class="panel hidden">
-                <h3 class="panel-title">Painel de Criação</h3>
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label class="text-sm font-medium text-slate-300 mb-1">Pulsos:</label>
-                        <div class="custom-select-wrapper">
-                            <div id="custom-beats-select" class="custom-select">
-                                <span class="custom-select-trigger">4</span>
-                                <div class="custom-options">
-                                    <div class="custom-option" data-value="2">2</div>
-                                    <div class="custom-option selected" data-value="3">3</div>
-                                    <div class="custom-option" data-value="4">4</div>
-                                    <div class="custom-option" data-value="5">5</div>
-                                    <div class="custom-option" data-value="6">6</div>
-                                    <div class="custom-option" data-value="7">7</div>
-                                    <div class="custom-option" data-value="9">9</div>
-                                    <div class="custom-option" data-value="12">12</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="text-sm font-medium text-slate-300 mb-1">Unidade:</label>
-                        <div class="custom-select-wrapper">
-                             <div id="custom-type-select" class="custom-select">
-                                <span class="custom-select-trigger">Semínima (♩)</span>
-                                <div class="custom-options">
-                                   <div class="custom-option" data-value="2">Mínima (𝅗𝅥)</div>
-                                   <div class="custom-option selected" data-value="4">Semínima (♩)</div>
-                                   <div class="custom-option" data-value="8">Colcheia (𝅘𝅥𝅮)</div>
-                                   <div class="custom-option" data-value="16">Semicolcheia (𝅘𝅥𝅯)</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            <div id="figure-focus-display" class="panel">
                 </div>
-                <div id="figure-palette" class="flex flex-wrap gap-2 justify-center p-3 bg-slate-900/50 rounded-lg border border-slate-700 mb-4"></div>
-                <div class="flex flex-wrap gap-3 justify-center">
-                    <button id="clear-custom-rhythm" class="btn-action btn-clear">Limpar</button>
-                    </div>
-            </div>
              
             <div class="panel user-actions">
-                <div class="flex flex-wrap gap-3 justify-center">
+                <div class="flex flex-wrap gap-4 justify-center items-center">
                     <button id="save-rhythm-button" class="btn-action hidden">Salvar Ritmo</button>
                     <button id="load-rhythms-button" class="btn-action hidden">Carregar Ritmo</button>
-                    <button id="export-wav-button" class="btn-action">Exportar WAV</button>
+                    
+                    <div class="toggle-switch-container">
+                        <label for="continuous-metronome-toggle" class="toggle-switch-label">Metrônomo Contínuo</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="continuous-metronome-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
                 </div>
             </div>
         </aside>
 
         <main class="main-display">
-            <!-- Área de foco de figuras -->
-            <div id="figure-focus-display" class="panel">
-                </div>
-            
-            <!-- Contagem regressiva -->
             <div id="countdown-display" class="text-center mb-2"></div>
-
-            <!-- Exibição do ritmo -->
             <div id="rhythm-display-container">
-                <div id="rhythm-display">
-                    </div>
+                <div id="rhythm-display"></div>
             </div>
-
+            <div id="game-panel" class="panel hidden">
+                <div class="game-header">
+                    <h3 class="panel-title">Ditado Rítmico</h3>
+                    <div id="game-level-display" class="text-center text-cyan-300">Nível: 1</div>
+                </div>
+                <div id="game-instructions" class="game-instructions">
+                    <p>Ouça o ritmo e o recrie no Painel de Criação abaixo.</p>
+                </div>
+                <div class="game-controls">
+                    <button id="start-dictation-btn" class="btn-action">Ouvir Ditado</button>
+                    <button id="check-dictation-btn" class="btn-action btn-confirm hidden">Verificar</button>
+                </div>
+                <div id="game-feedback" class="game-feedback hidden"></div>
+                <div id="game-figure-hint" class="game-figure-hint hidden"></div>
+            </div>
+            <div id="custom-rhythm-creator" class="panel hidden">
+                <h3 class="panel-title">Painel de Criação</h3>
+                <div class="creation-panel-body">
+                    <div id="figure-palette"></div>
+                    <div class="creation-panel-controls">
+                        <div class="time-signature-controls">
+                            <div>
+                                <label class="text-sm font-medium text-slate-300 mb-1">Pulsos:</label>
+                                <div class="custom-select-wrapper">
+                                    <div id="custom-beats-select" class="custom-select">
+                                        <span class="custom-select-trigger">4</span>
+                                        <div class="custom-options">
+                                            <div class="custom-option" data-value="2">2</div>
+                                            <div class="custom-option" data-value="3">3</div>
+                                            <div class="custom-option selected" data-value="4">4</div>
+                                            <div class="custom-option" data-value="5">5</div>
+                                            <div class="custom-option" data-value="6">6</div>
+                                            <div class="custom-option" data-value="7">7</div>
+                                            <div class="custom-option" data-value="9">9</div>
+                                            <div class="custom-option" data-value="12">12</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-slate-300 mb-1">Unidade:</label>
+                                <div class="custom-select-wrapper">
+                                    <div id="custom-type-select" class="custom-select">
+                                        <span class="custom-select-trigger">Semínima (♩)</span>
+                                        <div class="custom-options">
+                                            <div class="custom-option" data-value="2">Mínima (𝅗𝅥)</div>
+                                            <div class="custom-option selected" data-value="4">Semínima (♩)</div>
+                                            <div class="custom-option" data-value="8">Colcheia (𝅘𝅥𝅮)</div>
+                                            <div class="custom-option" data-value="16">Semicolcheia (𝅘𝅥𝅯)</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button id="clear-custom-rhythm" class="btn-action btn-clear">Limpar</button>
+                    </div>
+                </div>
+            </div>
             <footer class="main-footer">
                 <p class="text-slate-500 text-xs">© 2025 QTech Soluções Tecnológicas. Todos os direitos reservados.</p>
             </footer>
@@ -175,24 +178,12 @@
     </div>
 
     <div id="modal-overlay" class="modal-overlay hidden"></div>
-
     <div id="lesson-modal" class="modal-lessons hidden">
         <div class="modal-lessons-header">
             <h2 class="modal-lessons-title">Selecione uma Lição</h2>
             <button id="close-lesson-modal-button" class="modal-lessons-close">&times;</button>
         </div>
-        <div id="lesson-modal-content" class="modal-lessons-content">
-            </div>
-    </div>
-
-    <div id="login-modal" class="modal hidden">
-        <h3 class="modal-title">Login</h3>
-        <p class="modal-text">Digite seu nome de utilizador para salvar e carregar ritmos.</p>
-        <input type="text" id="username-input" class="modal-input" placeholder="Nome de utilizador">
-        <div class="modal-actions">
-            <button id="login-confirm-button" class="btn-action">Login</button>
-            <button id="login-cancel-button" class="btn-action btn-secondary">Cancelar</button>
-        </div>
+        <div id="lesson-modal-content" class="modal-lessons-content"></div>
     </div>
     <div id="save-rhythm-modal" class="modal hidden">
         <h3 class="modal-title">Salvar Ritmo</h3>
@@ -218,7 +209,6 @@
             <button id="error-ok-button" class="btn-action btn-secondary">OK</button>
         </div>
     </div>
-
     <div id="edit-popover" class="edit-popover hidden">
         <button id="popover-tie-button" class="popover-button" title="Adicionar/Remover Ligadura">&#9900;</button>
         <button id="popover-delete-button" class="popover-button" title="Apagar Figura"><i class="fas fa-trash-alt"></i></button>

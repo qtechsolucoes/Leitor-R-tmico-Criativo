@@ -37,7 +37,8 @@ export function getFractionalNotation(beatValue) {
     return "";
 }
 
-function processPattern(pattern) {
+// ADICIONADO "EXPORT" AQUI
+export function processPattern(pattern) {
     const newPattern = JSON.parse(JSON.stringify(pattern));
 
     newPattern.forEach(fig => {
@@ -269,7 +270,6 @@ export function handleFigureSelectionForEditing(index) {
 
 let currentDictationPattern = [];
 
-// ATUALIZADO: Geração de ditado com níveis
 export function generateDictation(levelId = 1) {
     const levelConfig = difficultyLevels.find(level => level.id === levelId) || difficultyLevels[0];
     const figuresUsed = levelConfig.figures;
@@ -316,7 +316,6 @@ export function checkDictation(userPattern) {
     let message = "";
     if (isPerfect) {
         message = `Perfeito! +${score + 50} Pontos!`;
-        // Avança de nível se perfeito
         if (AppState.currentGameLevel < difficultyLevels.length) {
             AppState.currentGameLevel++;
             message += ` Subiu para nível ${AppState.currentGameLevel}!`;
