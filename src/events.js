@@ -379,6 +379,31 @@ export function setupEventListeners() {
         checkDictationBtn.classList.add('hidden');
         updateMessage("Compare a sua resposta. Clique em 'Próximo Ditado' para continuar.");
     });
+
+    const testApiButton = document.getElementById('test-api-button');
+    if (testApiButton) {
+        testApiButton.addEventListener('click', async () => {
+            console.log("A tentar chamar a API de teste...");
+            try {
+                const response = await fetch('http://localhost:5000/api/current_user', {
+                    method: 'GET',
+                    credentials: 'include', // Importante para cookies
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Erro de rede: ${response.status} - ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log("Sucesso! Resposta da API:", data);
+                alert("A API respondeu com sucesso! Verifique o console.");
+
+            } catch (error) {
+                console.error("Falha no fetch de teste:", error);
+                alert(`A chamada à API falhou. Verifique o console para o erro: ${error.message}`);
+            }
+        });
+    }
     
     startAutoSave();
 }

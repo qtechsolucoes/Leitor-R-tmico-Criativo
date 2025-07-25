@@ -17,21 +17,25 @@ module.exports = app => {
         '/auth/google/callback', 
         passport.authenticate('google'),
         (req, res) => {
-            // Em vez de um valor fixo, use uma variável de ambiente para produção
-            res.redirect(process.env.CLIENT_URL || 'http://127.0.0.1:5500/'); 
+            req.session.save(() => {
+                // CORRIGIDO: Redireciona para a raiz '/' do servidor atual (localhost:5000)
+                res.redirect('/'); 
+            });
         }
     );
 
     app.get('/api/logout', (req, res, next) => {
         req.logout(function(err) {
             if (err) { return next(err); }
-             // Em vez de um valor fixo, use uma variável de ambiente para produção
-            res.redirect(process.env.CLIENT_URL || 'http://127.0.0.1:5500/');
+            req.session.save(() => {
+                // CORRIGIDO: Redireciona para a raiz '/' do servidor atual (localhost:5000)
+                res.redirect('/');
+            });
         });
     });
 
     app.get('/api/current_user', (req, res) => {
-        res.send(req.user);
+        res.send(req.user || null);
     });
 
     app.post('/api/add_points', requireLogin, async (req, res) => {
