@@ -333,18 +333,22 @@ export function setupEventListeners() {
     const gameFeedbackEl = document.getElementById('game-feedback');
     const gameFigureHintEl = document.getElementById('game-figure-hint');
 
-    startDictationBtn.addEventListener('click', () => {
+        startDictationBtn.addEventListener('click', () => {
         document.getElementById('rhythm-display-container').innerHTML = '<div id="rhythm-display"></div>';
         gameFeedbackEl.classList.add('hidden');
 
         if (startDictationBtn.textContent === "Repetir Áudio") {
             playDictationPatternWithCountdown(getCurrentDictationPattern());
-        } else {
+        } else { // Lógica para "Ouvir Ditado" e "Próximo Ditado"
             const { pattern, figuresUsed } = generateDictation(AppState.currentGameLevel);
             playDictationPatternWithCountdown(pattern);
             
-            AppState.customPattern = [];
-            renderRhythm();
+            AppState.customPattern = []; // Limpa os dados do ritmo do utilizador
+            
+            // --- LINHA ADICIONADA PARA CORRIGIR O BUG ---
+            updateActivePatternAndTimeSignature(); // Sincroniza o padrão de exibição com os dados limpos
+            
+            renderRhythm(); // Agora renderiza a pauta corretamente vazia
             
             checkDictationBtn.classList.remove('hidden');
             

@@ -67,6 +67,20 @@
                     <button id="reset-button" class="btn-action btn-reset btn-main-action"><i class="fas fa-undo"></i> Resetar</button>
                 </div>
             </div>
+
+            <div id="game-panel" class="panel hidden">
+                <h3 class="panel-title">Ditado Rítmico</h3>
+                <div id="game-level-display" class="text-center mb-2 text-cyan-300">Nível: 1</div>
+                <div id="game-instructions" class="game-instructions">
+                    <p>Ouça o ritmo e o recrie no Painel de Criação.</p>
+                </div>
+                <div class="game-controls">
+                    <button id="start-dictation-btn" class="btn-action">Ouvir Ditado</button>
+                    <button id="check-dictation-btn" class="btn-action btn-confirm hidden">Verificar</button>
+                </div>
+                <div id="game-feedback" class="game-feedback hidden"></div>
+                <div id="game-figure-hint" class="game-figure-hint hidden"></div>
+            </div>
             
             <div class="panel">
                 <h3 class="panel-title">Modo e Conteúdo</h3>
@@ -96,7 +110,6 @@
                 <div class="flex flex-wrap gap-4 justify-center items-center">
                     <button id="save-rhythm-button" class="btn-action hidden">Salvar Ritmo</button>
                     <button id="load-rhythms-button" class="btn-action hidden">Carregar Ritmo</button>
-                    
                     <div class="toggle-switch-container">
                         <label for="continuous-metronome-toggle" class="toggle-switch-label">Metrônomo Contínuo</label>
                         <label class="toggle-switch">
@@ -113,21 +126,7 @@
             <div id="rhythm-display-container">
                 <div id="rhythm-display"></div>
             </div>
-            <div id="game-panel" class="panel hidden">
-                <div class="game-header">
-                    <h3 class="panel-title">Ditado Rítmico</h3>
-                    <div id="game-level-display" class="text-center text-cyan-300">Nível: 1</div>
-                </div>
-                <div id="game-instructions" class="game-instructions">
-                    <p>Ouça o ritmo e o recrie no Painel de Criação abaixo.</p>
-                </div>
-                <div class="game-controls">
-                    <button id="start-dictation-btn" class="btn-action">Ouvir Ditado</button>
-                    <button id="check-dictation-btn" class="btn-action btn-confirm hidden">Verificar</button>
-                </div>
-                <div id="game-feedback" class="game-feedback hidden"></div>
-                <div id="game-figure-hint" class="game-figure-hint hidden"></div>
-            </div>
+            
             <div id="custom-rhythm-creator" class="panel hidden">
                 <h3 class="panel-title">Painel de Criação</h3>
                 <div class="creation-panel-body">
