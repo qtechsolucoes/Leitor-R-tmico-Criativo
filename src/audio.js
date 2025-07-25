@@ -219,29 +219,50 @@ function schedulePlayback(offset = 0) {
     }, currentTime + 0.5));
 }
 
+// ==========================================================
+// FUNÇÃO DO METRÔNOMO ATUALIZADA
+// ==========================================================
 function scheduleMetronome() {
     if (AppState.metronomeEventId) {
         AppState.metronomeEventId.dispose();
     }
-    const { beats, beatType } = AppState.activeTimeSignature;
-    const isComp = isCompound(beats, beatType);
-    const subdivision = isComp ? 3 : 1;
-    const events = [];
+    const timeSig = AppState.activeTimeSignature;
+    const userInputBpm = parseInt(document.getElementById('tempo-display').textContent);
+    const accent = "G5";
+    const secondaryAccent = "E5";
+    const normal = "C5";
+    
+    // Define a fórmula de compasso no transporte para referência de "1m" se necessário
+    Tone.Transport.timeSignature = [timeSig.beats, timeSig.beatType];
+    // O BPM do transporte principal ainda é útil para a reprodução das notas
+    Tone.Transport.bpm.value = userInputBpm;
 
-    for (let i = 0; i < beats; i++) {
-        const time = `0:${i}`; 
-        const note = (i % (beats / subdivision) === 0) ? "G5" : "C5";
-        events.push({ time, note });
-    }
+    const isComp = isCompound(timeSig);
+    const mainBeats = isComp ? timeSig.beats / 3 : timeSig.beats;
+    
+    // Para compassos compostos, o BPM refere-se à semínima pontuada.
+    // Para simples, refere-se à unidade de tempo (ex: semínima em 4/4).
+    const loopInterval = isComp ? "4n." : `${timeSig.beatType}n`;
 
-    AppState.metronomeEventId = new Tone.Part((time, value) => {
-        AppState.synths.metronomeSynth.triggerAttackRelease(value.note, "32n", time);
-    }, events).start(0);
+    let beatCounter = 0;
 
-    AppState.metronomeEventId.loop = true;
-    AppState.metronomeEventId.loopEnd = "1m"; 
+    AppState.metronomeEventId = new Tone.Loop(time => {
+        // Usa o contexto de áudio para agendamento preciso dentro do loop
+        const beatInMeasure = beatCounter % mainBeats;
+        
+        let note = normal;
+        if (beatInMeasure === 0) {
+            note = accent; // Acento principal no tempo 1
+        } else if (!isComp && timeSig.beats === 4 && beatInMeasure === 2) {
+            note = secondaryAccent; // Acento secundário no tempo 3 do 4/4
+        }
+        
+        // Dispara o som no tempo exato fornecido pelo loop
+        AppState.synths.metronomeSynth.triggerAttackRelease(note, "32n", time);
+
+        beatCounter++;
+    }, loopInterval).start(0);
 }
-
 export async function playDictationPatternWithCountdown(pattern) {
     if (AppState.isPlaying || AppState.isCountingDown || !pattern || pattern.length === 0) return;
     
@@ -259,8 +280,10 @@ export async function playDictationPatternWithCountdown(pattern) {
         Tone.Transport.bpm.value = userInputBpm;
         
         const timeSig = { beats: 4, beatType: 4 };
-        Tone.Transport.timeSignature = [timeSig.beats, timeSig.beatType];
+        const tempState = AppState.activeTimeSignature;
+        AppState.activeTimeSignature = timeSig;
         scheduleMetronome();
+        AppState.activeTimeSignature = tempState;
         
         const countdownDuration = scheduleCountdown(timeSig, () => {
              AppState.isCountingDown = false;

@@ -49,26 +49,28 @@ export function renderDictationFeedback(annotatedPattern, correctPattern) {
 }
 
 export function showModal(modalElement) {
-    modalOverlay.classList.remove('hidden');
-    modalElement.classList.remove('hidden');
+    if (modalOverlay) modalOverlay.classList.remove('hidden');
+    if (modalElement) modalElement.classList.remove('hidden');
 }
 
+// FUNÇÃO CORRIGIDA PARA SER MAIS ROBUSTA
 export function hideAllModals() {
-    modalOverlay.classList.add('hidden');
-    loginModal.classList.add('hidden');
-    saveRhythmModal.classList.add('hidden');
-    loadRhythmModal.classList.add('hidden');
-    errorModal.classList.add('hidden');
-    lessonModal.classList.add('hidden');
+    if (modalOverlay) modalOverlay.classList.add('hidden');
+    if (loginModal) loginModal.classList.add('hidden');
+    if (saveRhythmModal) saveRhythmModal.classList.add('hidden');
+    if (loadRhythmModal) loadRhythmModal.classList.add('hidden');
+    if (errorModal) errorModal.classList.add('hidden');
+    if (lessonModal) lessonModal.classList.add('hidden');
 }
 
 export function showErrorModal(message) {
-    errorModalText.textContent = message;
+    if (errorModalText) errorModalText.textContent = message;
     showModal(errorModal);
 }
 
 export function populateLoadRhythmModal(userRhythms) {
     const listContainer = document.getElementById('load-rhythm-list');
+    if (!listContainer) return;
     listContainer.innerHTML = ''; 
 
     if (!userRhythms || userRhythms.length === 0) {
@@ -86,10 +88,11 @@ export function populateLoadRhythmModal(userRhythms) {
 }
 
 export function hideEditPopover() {
-    editPopover.classList.add('hidden');
+    if (editPopover) editPopover.classList.add('hidden');
 }
 
 export function showEditPopover(figureElement) {
+    if (!editPopover || !rhythmDisplayContainer) return;
     const containerRect = rhythmDisplayContainer.getBoundingClientRect();
     const figureRect = figureElement.getBoundingClientRect();
 
@@ -102,6 +105,7 @@ export function showEditPopover(figureElement) {
 }
 
 export function updateMessage(text, type = 'info') {
+    if (!messageArea) return;
     messageArea.textContent = text;
     messageArea.style.color = '';
     switch (type) {
@@ -112,10 +116,11 @@ export function updateMessage(text, type = 'info') {
 }
 
 export function updateCountdownDisplay(text) {
-    countdownDisplay.textContent = text;
+    if (countdownDisplay) countdownDisplay.textContent = text;
 }
 
 export function updatePlaybackButtons(isPlaying) {
+    if (!playPauseButton) return;
     if (isPlaying) {
         playPauseButton.innerHTML = `<i class="fas fa-pause"></i> Pausar`;
     } else {
@@ -135,11 +140,11 @@ export function disablePlaybackControls(keepPlaybackButtonsEnabled = false) {
         }
     });
     if (keepPlaybackButtonsEnabled) {
-        playPauseButton.style.pointerEvents = 'auto';
-        document.getElementById('reset-button').style.pointerEvents = 'auto';
+        if (playPauseButton) playPauseButton.style.pointerEvents = 'auto';
+        const resetButton = document.getElementById('reset-button');
+        if(resetButton) resetButton.style.pointerEvents = 'auto';
     }
 }
-
 export function highlightActiveVisualElement(patternIndex, activeBeatIndex = 0) {
     document.querySelectorAll('.figure-container.highlight, .figure-container.beat-pulse-glow').forEach(el => {
         el.classList.remove('highlight', 'beat-pulse-glow');
@@ -553,23 +558,31 @@ export function updateLoginUI(user) {
     const isLoggedIn = !!user;
 
     if (isLoggedIn) {
-        loggedInView.classList.remove('hidden');
-        loggedInView.classList.add('visible');
-        loggedOutView.classList.remove('visible');
-        loggedOutView.classList.add('hidden');
-        userNameSpan.textContent = user.displayName;
-        userAvatarImg.src = user.photo;
-        userPointsSpan.textContent = `${user.points || 0} PONTOS`;
+        if (loggedInView) {
+            loggedInView.classList.remove('hidden');
+            loggedInView.classList.add('visible');
+        }
+        if (loggedOutView) {
+            loggedOutView.classList.remove('visible');
+            loggedOutView.classList.add('hidden');
+        }
+        if (userNameSpan) userNameSpan.textContent = user.displayName;
+        if (userAvatarImg) userAvatarImg.src = user.photo;
+        if (userPointsSpan) userPointsSpan.textContent = `${user.points || 0} PONTOS`;
         AppState.user.currentUser = user;
     } else {
-        loggedOutView.classList.remove('hidden');
-        loggedOutView.classList.add('visible');
-        loggedInView.classList.remove('visible');
-        loggedInView.classList.add('hidden');
+        if (loggedOutView) {
+            loggedOutView.classList.remove('hidden');
+            loggedOutView.classList.add('visible');
+        }
+        if (loggedInView) {
+            loggedInView.classList.remove('visible');
+            loggedInView.classList.add('hidden');
+        }
         AppState.user.currentUser = null;
     }
     
     const showUserButtons = isLoggedIn && (AppState.currentMode === 'freeCreate' || AppState.currentMode === 'gameRhythmicDictation');
-    saveRhythmButton.classList.toggle('hidden', !showUserButtons);
-    loadRhythmsButton.classList.toggle('hidden', !showUserButtons);
+    if (saveRhythmButton) saveRhythmButton.classList.toggle('hidden', !showUserButtons);
+    if (loadRhythmsButton) loadRhythmsButton.classList.toggle('hidden', !showUserButtons);
 }
