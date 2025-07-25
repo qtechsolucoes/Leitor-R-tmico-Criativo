@@ -4,6 +4,7 @@ import { AppState } from './state.js';
 import { rhythmicFigures, lessons } from './config.js';
 import { getBeatValue, getDurationText, getFractionalNotation, handlePaletteFigureClick, handleFigureSelectionForEditing, updateActivePatternAndTimeSignature, processPattern } from './core.js';
 import { playFigurePreview } from './audio.js';
+import { theorySections } from './theoryContent.js';
 
 const rhythmDisplayEl = document.getElementById('rhythm-display');
 const rhythmDisplayContainer = document.getElementById('rhythm-display-container');
@@ -19,6 +20,7 @@ const errorModal = document.getElementById('error-modal');
 const errorModalText = document.getElementById('error-modal-text');
 const editPopover = document.getElementById('edit-popover');
 const lessonModal = document.getElementById('lesson-modal');
+const theoryGuideModal = document.getElementById('theory-guide-modal');
 
 export function renderDictationFeedback(annotatedPattern, correctPattern) {
     rhythmDisplayContainer.innerHTML = `
@@ -53,7 +55,6 @@ export function showModal(modalElement) {
     if (modalElement) modalElement.classList.remove('hidden');
 }
 
-// FUNÇÃO CORRIGIDA PARA SER MAIS ROBUSTA
 export function hideAllModals() {
     if (modalOverlay) modalOverlay.classList.add('hidden');
     if (loginModal) loginModal.classList.add('hidden');
@@ -61,6 +62,7 @@ export function hideAllModals() {
     if (loadRhythmModal) loadRhythmModal.classList.add('hidden');
     if (errorModal) errorModal.classList.add('hidden');
     if (lessonModal) lessonModal.classList.add('hidden');
+    if (theoryGuideModal) theoryGuideModal.classList.add('hidden');
 }
 
 export function showErrorModal(message) {
@@ -145,6 +147,7 @@ export function disablePlaybackControls(keepPlaybackButtonsEnabled = false) {
         if(resetButton) resetButton.style.pointerEvents = 'auto';
     }
 }
+
 export function highlightActiveVisualElement(patternIndex, activeBeatIndex = 0) {
     document.querySelectorAll('.figure-container.highlight, .figure-container.beat-pulse-glow').forEach(el => {
         el.classList.remove('highlight', 'beat-pulse-glow');
@@ -486,7 +489,6 @@ export function populateLessonModal() {
     }
 }
 
-// ATUALIZADO: Inclui todas as figuras para a grelha de 2x10
 export function populateFigurePalette() {
     const figurePaletteDiv = document.getElementById('figure-palette');
     if (!figurePaletteDiv) return;
@@ -511,6 +513,27 @@ export function populateFigurePalette() {
             }
         });
         figurePaletteDiv.appendChild(button);
+    });
+}
+
+export function populateTheoryGuideModal() {
+    const contentEl = document.getElementById('theory-guide-content');
+    if (!contentEl) return;
+    contentEl.innerHTML = '';
+
+    theorySections.forEach(section => {
+        const sectionDiv = document.createElement('div');
+        sectionDiv.className = 'theory-section';
+        
+        const title = document.createElement('h3');
+        title.textContent = section.title;
+        
+        const content = document.createElement('div');
+        content.innerHTML = section.content;
+
+        sectionDiv.appendChild(title);
+        sectionDiv.appendChild(content);
+        contentEl.appendChild(sectionDiv);
     });
 }
 

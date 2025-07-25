@@ -3,11 +3,12 @@ import * as api from './api.js';
 import { startCountdownAndPlay, togglePauseResume, stopRhythmExecution, playDictationPatternWithCountdown } from './audio.js';
 import { AppState } from './state.js';
 import { updateActivePatternAndTimeSignature, generateDictation, checkDictation, getCurrentDictationPattern, processPattern } from './core.js';
-import { switchMode, renderRhythm, updateMessage, updateLoginUI, showModal, hideAllModals, populateLoadRhythmModal, hideEditPopover, updateFigureFocusDisplay, populateLessonModal, renderDictationFeedback } from './ui.js';
+import { switchMode, renderRhythm, updateMessage, updateLoginUI, showModal, hideAllModals, populateLoadRhythmModal, hideEditPopover, updateFigureFocusDisplay, populateLessonModal, renderDictationFeedback, populateTheoryGuideModal } from './ui.js';
 
 const saveRhythmModal = document.getElementById('save-rhythm-modal');
 const loadRhythmModal = document.getElementById('load-rhythm-modal');
 const lessonModal = document.getElementById('lesson-modal');
+const theoryGuideModal = document.getElementById('theory-guide-modal');
 const rhythmNameInput = document.getElementById('rhythm-name-input');
 const continuousMetronomeToggle = document.getElementById('continuous-metronome-toggle');
 
@@ -255,7 +256,6 @@ export function setupEventListeners() {
     let lastHoveredIndex = null;
     rhythmDisplayContainer.addEventListener('mouseover', (e) => {
         const figureContainer = e.target.closest('.figure-container');
-
         if (figureContainer) {
             const patternIndex = figureContainer.dataset.patternIndex;
             if (patternIndex !== lastHoveredIndex) {
@@ -300,6 +300,15 @@ export function setupEventListeners() {
     });
 
     document.getElementById('close-lesson-modal-button').addEventListener('click', hideAllModals);
+
+    // NOVO: Listeners para o Guia de Teoria
+    document.getElementById('open-theory-guide-button').addEventListener('click', () => {
+        populateTheoryGuideModal();
+        showModal(theoryGuideModal);
+    });
+
+    document.getElementById('close-theory-guide-button').addEventListener('click', hideAllModals);
+
     document.getElementById('lesson-modal-content').addEventListener('click', (e) => {
         const moduleHeader = e.target.closest('.accordion-module-header');
         if (moduleHeader) {
@@ -333,22 +342,19 @@ export function setupEventListeners() {
     const gameFeedbackEl = document.getElementById('game-feedback');
     const gameFigureHintEl = document.getElementById('game-figure-hint');
 
-        startDictationBtn.addEventListener('click', () => {
+    startDictationBtn.addEventListener('click', () => {
         document.getElementById('rhythm-display-container').innerHTML = '<div id="rhythm-display"></div>';
         gameFeedbackEl.classList.add('hidden');
 
         if (startDictationBtn.textContent === "Repetir Áudio") {
             playDictationPatternWithCountdown(getCurrentDictationPattern());
-        } else { // Lógica para "Ouvir Ditado" e "Próximo Ditado"
+        } else {
             const { pattern, figuresUsed } = generateDictation(AppState.currentGameLevel);
             playDictationPatternWithCountdown(pattern);
             
-            AppState.customPattern = []; // Limpa os dados do ritmo do utilizador
-            
-            // --- LINHA ADICIONADA PARA CORRIGIR O BUG ---
-            updateActivePatternAndTimeSignature(); // Sincroniza o padrão de exibição com os dados limpos
-            
-            renderRhythm(); // Agora renderiza a pauta corretamente vazia
+            AppState.customPattern = [];
+            updateActivePatternAndTimeSignature();
+            renderRhythm();
             
             checkDictationBtn.classList.remove('hidden');
             
@@ -379,31 +385,6 @@ export function setupEventListeners() {
         checkDictationBtn.classList.add('hidden');
         updateMessage("Compare a sua resposta. Clique em 'Próximo Ditado' para continuar.");
     });
-
-    const testApiButton = document.getElementById('test-api-button');
-    if (testApiButton) {
-        testApiButton.addEventListener('click', async () => {
-            console.log("A tentar chamar a API de teste...");
-            try {
-                const response = await fetch('http://localhost:5000/api/current_user', {
-                    method: 'GET',
-                    credentials: 'include', // Importante para cookies
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Erro de rede: ${response.status} - ${response.statusText}`);
-                }
-                
-                const data = await response.json();
-                console.log("Sucesso! Resposta da API:", data);
-                alert("A API respondeu com sucesso! Verifique o console.");
-
-            } catch (error) {
-                console.error("Falha no fetch de teste:", error);
-                alert(`A chamada à API falhou. Verifique o console para o erro: ${error.message}`);
-            }
-        });
-    }
     
     startAutoSave();
 }

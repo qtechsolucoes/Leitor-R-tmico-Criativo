@@ -99,16 +99,19 @@
                 </div>
                 <div id="lesson-selector-container">
                     <label class="block text-sm font-medium text-slate-300 mb-2">Conteúdo:</label>
-                    <button id="open-lesson-modal-button" class="btn-action btn-secondary w-full">Selecionar Lição</button>
+                    <div class="flex flex-col gap-2">
+                        <button id="open-lesson-modal-button" class="btn-action btn-secondary w-full">Selecionar Lição</button>
+                        <button id="open-theory-guide-button" class="btn-action btn-secondary w-full">Guia de Teoria</button>
+                    </div>
                 </div>
             </div>
 
             <div id="figure-focus-display" class="panel">
-                </div>
+                <div class="focus-placeholder">Passe o mouse sobre uma figura para ver os detalhes.</div>
+            </div>
              
             <div class="panel user-actions">
                 <div class="flex flex-wrap gap-4 justify-center items-center">
-                     <button id="test-api-button" class="btn-action">Testar API</button>
                     <button id="save-rhythm-button" class="btn-action hidden">Salvar Ritmo</button>
                     <button id="load-rhythms-button" class="btn-action hidden">Carregar Ritmo</button>
                     <div class="toggle-switch-container">
@@ -178,6 +181,7 @@
     </div>
 
     <div id="modal-overlay" class="modal-overlay hidden"></div>
+
     <div id="lesson-modal" class="modal-lessons hidden">
         <div class="modal-lessons-header">
             <h2 class="modal-lessons-title">Selecione uma Lição</h2>
@@ -185,6 +189,16 @@
         </div>
         <div id="lesson-modal-content" class="modal-lessons-content"></div>
     </div>
+    
+    <div id="theory-guide-modal" class="modal-theory hidden">
+        <div class="modal-theory-header">
+            <h2 class="modal-theory-title">Guia de Teoria Musical</h2>
+            <button id="close-theory-guide-button" class="modal-theory-close">&times;</button>
+        </div>
+        <div id="theory-guide-content" class="modal-theory-content">
+            </div>
+    </div>
+
     <div id="save-rhythm-modal" class="modal hidden">
         <h3 class="modal-title">Salvar Ritmo</h3>
         <p class="modal-text">Dê um nome para o seu ritmo personalizado.</p>
