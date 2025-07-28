@@ -12,9 +12,20 @@ export const AppState = {
     // Estado do playback de áudio
     isPlaying: false,
     isCountingDown: false,
+    isPracticing: false, // <-- NOVO: Indica se o modo "Exercitar" está ativo
     transportEventIds: [],
     metronomeEventId: null,
-    continuousMetronome: false, // NOVO ESTADO
+    continuousMetronome: false, 
+    
+    // NOVO: Guarda as configurações de prática
+    practiceSettings: {
+        metronome: true,
+        beatCounters: true,
+        syllables: true
+    },
+    
+    // NOVO: Guarda os tempos exatos (início e fim) de cada nota da lição
+    targetNoteTimes: [],
 
     // Contêiner para os sintetizadores do Tone.js
     synths: {

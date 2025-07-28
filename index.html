@@ -53,7 +53,7 @@
     <div class="app-container">
         <aside class="control-panel">
             <div class="panel playback-panel">
-                <h3 class="panel-title">Playback</h3>
+                <h3 class="panel-title">Controlo da Lição</h3>
                 <div class="flex flex-col items-center mb-4">
                     <label class="tempo-label">TEMPO (BPM)</label>
                     <div class="flex items-center justify-center space-x-2">
@@ -63,8 +63,44 @@
                     </div>
                 </div>
                  <div class="flex items-center justify-center space-x-4">
-                    <button id="play-pause-button" class="btn-action btn-play btn-main-action"><i class="fas fa-play"></i> Tocar</button>
-                    <button id="reset-button" class="btn-action btn-reset btn-main-action"><i class="fas fa-undo"></i> Resetar</button>
+                    <button id="listen-button" class="btn-action btn-listen btn-main-action"><i class="fas fa-volume-up"></i> Ouvir</button>
+                    <button id="practice-button" class="btn-action btn-practice btn-main-action"><i class="fas fa-microphone-alt"></i> Exercitar</button>
+                </div>
+                <div class="flex items-center justify-center space-x-4 mt-4">
+                     <button id="reset-button" class="btn-action btn-reset btn-secondary"><i class="fas fa-undo"></i> Resetar</button>
+                </div>
+            </div>
+            <div id="volume-meter-container" class="mt-4 hidden">
+    <label class="text-sm text-slate-400">Volume do Microfone:</label>
+    <div class="w-full bg-slate-700 rounded-full h-2.5">
+        <div id="volume-meter-bar" class="bg-cyan-400 h-2.5 rounded-full" style="width: 0%"></div>
+         </div>
+            </div>
+
+            <div id="practice-settings-panel" class="panel hidden">
+                <h3 class="panel-title">Ajustes do Exercício</h3>
+                <div class="flex flex-col gap-3">
+                    <div class="flex justify-between items-center">
+                        <label for="metronome-toggle" class="toggle-switch-label text-base">Metrônomo</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="metronome-toggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <label for="beat-counter-toggle" class="toggle-switch-label text-base">Contagem dos Tempos</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="beat-counter-toggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <label for="syllable-toggle" class="toggle-switch-label text-base">Solfejo Rítmico</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="syllable-toggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
                 </div>
             </div>
 
@@ -221,6 +257,16 @@
         <p id="error-modal-text" class="modal-text"></p>
         <div class="modal-actions">
             <button id="error-ok-button" class="btn-action btn-secondary">OK</button>
+        </div>
+    </div>
+    <div id="results-modal" class="modal hidden">
+        <h3 id="results-modal-title" class="modal-title"></h3>
+        <p id="results-modal-text" class="modal-text"></p>
+        <div class="text-center text-4xl font-bold text-white my-4">
+            <span id="results-score"></span>%
+        </div>
+        <div class="modal-actions">
+            <button id="results-ok-button" class="btn-action">OK</button>
         </div>
     </div>
     <div id="edit-popover" class="edit-popover hidden">

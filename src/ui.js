@@ -11,9 +11,7 @@ const rhythmDisplayContainer = document.getElementById('rhythm-display-container
 const figureFocusDisplayEl = document.getElementById('figure-focus-display');
 const messageArea = document.getElementById('message-area');
 const countdownDisplay = document.getElementById('countdown-display');
-const playPauseButton = document.getElementById('play-pause-button');
 const modalOverlay = document.getElementById('modal-overlay');
-const loginModal = document.getElementById('login-modal');
 const saveRhythmModal = document.getElementById('save-rhythm-modal');
 const loadRhythmModal = document.getElementById('load-rhythm-modal');
 const errorModal = document.getElementById('error-modal');
@@ -21,6 +19,30 @@ const errorModalText = document.getElementById('error-modal-text');
 const editPopover = document.getElementById('edit-popover');
 const lessonModal = document.getElementById('lesson-modal');
 const theoryGuideModal = document.getElementById('theory-guide-modal');
+const resultsModal = document.getElementById('results-modal');
+
+/**
+ * Exibe o modal com o resultado final do exercício de prática.
+ * @param {number} score - A pontuação final (de 0 a 100).
+ */
+export function showPracticeResults(score) {
+    const titleEl = document.getElementById('results-modal-title');
+    const textEl = document.getElementById('results-modal-text');
+    const scoreEl = document.getElementById('results-score');
+
+    scoreEl.textContent = Math.round(score);
+
+    if (score >= 90) {
+        titleEl.textContent = 'Parabéns!';
+        textEl.textContent = 'Você concluiu a lição com excelente precisão!';
+        titleEl.style.color = 'var(--glow-green)';
+    } else {
+        titleEl.textContent = 'Tente Novamente!';
+        textEl.textContent = 'Continue a praticar para melhorar a sua precisão. Você consegue!';
+        titleEl.style.color = 'var(--glow-yellow)';
+    }
+    showModal(resultsModal);
+}
 
 export function renderDictationFeedback(annotatedPattern, correctPattern) {
     rhythmDisplayContainer.innerHTML = `
@@ -57,12 +79,9 @@ export function showModal(modalElement) {
 
 export function hideAllModals() {
     if (modalOverlay) modalOverlay.classList.add('hidden');
-    if (loginModal) loginModal.classList.add('hidden');
-    if (saveRhythmModal) saveRhythmModal.classList.add('hidden');
-    if (loadRhythmModal) loadRhythmModal.classList.add('hidden');
-    if (errorModal) errorModal.classList.add('hidden');
-    if (lessonModal) lessonModal.classList.add('hidden');
-    if (theoryGuideModal) theoryGuideModal.classList.add('hidden');
+    document.querySelectorAll('.modal, .modal-lessons, .modal-theory').forEach(modal => {
+        if(modal) modal.classList.add('hidden');
+    });
 }
 
 export function showErrorModal(message) {
@@ -122,11 +141,15 @@ export function updateCountdownDisplay(text) {
 }
 
 export function updatePlaybackButtons(isPlaying) {
-    if (!playPauseButton) return;
-    if (isPlaying) {
-        playPauseButton.innerHTML = `<i class="fas fa-pause"></i> Pausar`;
-    } else {
-        playPauseButton.innerHTML = `<i class="fas fa-play"></i> Tocar`;
+    const listenButton = document.getElementById('listen-button');
+    const practiceButton = document.getElementById('practice-button');
+    // Esta função pode ser adaptada para mostrar um estado de "a tocar" em ambos os botões
+    if(listenButton && practiceButton){
+        if(isPlaying){
+            // Poderia, por exemplo, desativá-los
+        } else {
+            // E reativá-los
+        }
     }
 }
 
@@ -135,17 +158,12 @@ export function enableAllControls() {
     updateLoginUI(AppState.user.currentUser);
 }
 
-export function disablePlaybackControls(keepPlaybackButtonsEnabled = false) {
+export function disablePlaybackControls() {
     document.querySelectorAll('button, .custom-select').forEach(el => {
-        if (!el.closest('.playback-panel')) {
+        if (!el.closest('.playback-panel') && !el.closest('#practice-settings-panel')) {
             el.style.pointerEvents = 'none';
         }
     });
-    if (keepPlaybackButtonsEnabled) {
-        if (playPauseButton) playPauseButton.style.pointerEvents = 'auto';
-        const resetButton = document.getElementById('reset-button');
-        if(resetButton) resetButton.style.pointerEvents = 'auto';
-    }
 }
 
 export function highlightActiveVisualElement(patternIndex, activeBeatIndex = 0) {
@@ -254,7 +272,7 @@ function renderFigure(item, index, beatContext) {
             e.stopPropagation();
             handleFigureSelectionForEditing(index);
             renderRhythm();
-            const newFigureElement = rhythmDisplayEl.querySelector(`.figure-container[data-pattern-index="${index}"]`);
+            const newFigureElement = document.querySelector(`.figure-container[data-pattern-index="${index}"]`);
             if (newFigureElement && AppState.selectedIndexForEditing === index) {
                 showEditPopover(newFigureElement);
             }
@@ -265,29 +283,31 @@ function renderFigure(item, index, beatContext) {
     }
 
     const beatCounterElement = document.createElement('div');
-    beatCounterElement.className = 'beat-counter-text';
-    if (beatContext && !item.isControl && beatContext.currentBeatsInMeasure >= 0) {
-        const { currentBeatsInMeasure, timeSig, tolerance } = beatContext;
-        const beatValue = getBeatValue(item.duration, timeSig);
-        let beatHTML = '';
-        if (beatValue >= 1 && Math.abs(beatValue - Math.round(beatValue)) < tolerance) {
-            const roundedBeatValue = Math.round(beatValue);
-            for (let i = 0; i < roundedBeatValue; i++) {
-                const beatNumber = Math.floor(currentBeatsInMeasure + tolerance) + 1 + i;
-                beatHTML += `<span data-beat-index="${i}">${beatNumber}</span>`;
+    if (AppState.practiceSettings.beatCounters) {
+        beatCounterElement.className = 'beat-counter-text';
+        if (beatContext && !item.isControl && beatContext.currentBeatsInMeasure >= 0) {
+            const { currentBeatsInMeasure, timeSig, tolerance } = beatContext;
+            const beatValue = getBeatValue(item.duration, timeSig);
+            let beatHTML = '';
+            if (beatValue >= 1 && Math.abs(beatValue - Math.round(beatValue)) < tolerance) {
+                const roundedBeatValue = Math.round(beatValue);
+                for (let i = 0; i < roundedBeatValue; i++) {
+                    const beatNumber = Math.floor(currentBeatsInMeasure + tolerance) + 1 + i;
+                    beatHTML += `<span data-beat-index="${i}">${beatNumber}</span>`;
+                }
+            } else {
+                const beatNumber = Math.floor(currentBeatsInMeasure + tolerance) + 1;
+                const fraction = currentBeatsInMeasure - Math.floor(currentBeatsInMeasure + tolerance);
+                let beatDisplay = '';
+                if (Math.abs(fraction) < tolerance) beatDisplay = String(beatNumber);
+                else if (Math.abs(fraction - 0.5) < tolerance) beatDisplay = 'e';
+                else if (Math.abs(fraction - 0.25) < tolerance) beatDisplay = '+';
+                else if (Math.abs(fraction - 0.75) < tolerance) beatDisplay = 'a';
+                else if (item.isTupletChild && Math.abs(fraction) > tolerance) beatDisplay = '&';
+                beatHTML = `<span data-beat-index="0">${beatDisplay || '&nbsp;'}</span>`;
             }
-        } else {
-            const beatNumber = Math.floor(currentBeatsInMeasure + tolerance) + 1;
-            const fraction = currentBeatsInMeasure - Math.floor(currentBeatsInMeasure + tolerance);
-            let beatDisplay = '';
-            if (Math.abs(fraction) < tolerance) beatDisplay = String(beatNumber);
-            else if (Math.abs(fraction - 0.5) < tolerance) beatDisplay = 'e';
-            else if (Math.abs(fraction - 0.25) < tolerance) beatDisplay = '+';
-            else if (Math.abs(fraction - 0.75) < tolerance) beatDisplay = 'a';
-            else if (item.isTupletChild && Math.abs(fraction) > tolerance) beatDisplay = '&';
-            beatHTML = `<span data-beat-index="0">${beatDisplay || '&nbsp;'}</span>`;
+            beatCounterElement.innerHTML = beatHTML;
         }
-        beatCounterElement.innerHTML = beatHTML;
     }
 
     const noteItemElement = document.createElement('div');
@@ -300,7 +320,11 @@ function renderFigure(item, index, beatContext) {
 
     const syllableElement = document.createElement('div');
     syllableElement.className = 'syllable-text';
-    syllableElement.innerHTML = item.syllable || '&nbsp;';
+    if (AppState.practiceSettings.syllables) {
+        syllableElement.innerHTML = item.syllable || '&nbsp;';
+    } else {
+        syllableElement.innerHTML = '&nbsp;';
+    }
     
     figureContainer.append(beatCounterElement, noteItemElement, syllableElement);
     return figureContainer;
@@ -308,6 +332,8 @@ function renderFigure(item, index, beatContext) {
 
 export function renderRhythm(targetElement = null) {
     const displayEl = targetElement || document.getElementById('rhythm-display');
+    if (!displayEl) return;
+    
     const containerEl = targetElement ? displayEl.closest('.feedback-section, #rhythm-display-container') : rhythmDisplayContainer;
     
     displayEl.innerHTML = '';
@@ -451,6 +477,7 @@ export function populateLessonModal() {
     const contentEl = document.getElementById('lesson-modal-content');
     if (!contentEl) return;
     contentEl.innerHTML = '';
+    const completed = AppState.user.currentUser ? AppState.user.currentUser.completedLessons || [] : [];
     const modules = {};
     lessons.forEach((lesson, index) => {
         const moduleName = lesson.name.split(' - ')[0];
@@ -459,30 +486,50 @@ export function populateLessonModal() {
         }
         modules[moduleName].push({ ...lesson, originalIndex: index });
     });
+    let previousModuleCompleted = true;
+    let unlockedModules = [];
     for (const moduleName in modules) {
+        if (previousModuleCompleted) {
+            unlockedModules.push(moduleName);
+            const lessonsInModule = modules[moduleName];
+            const allLessonsInModuleCompleted = lessonsInModule.every(l => completed.includes(l.originalIndex));
+            previousModuleCompleted = allLessonsInModuleCompleted;
+        }
+    }
+    for (const moduleName in modules) {
+        const isLocked = !unlockedModules.includes(moduleName);
         const moduleContainer = document.createElement('div');
         const header = document.createElement('div');
         header.className = 'accordion-module-header';
-        header.innerHTML = `<span>${moduleName}</span><i class="fas fa-chevron-down"></i>`;
+        header.innerHTML = `<span>${moduleName} ${isLocked ? '<i class="fas fa-lock"></i>' : ''}</span><i class="fas fa-chevron-down"></i>`;
+        if (isLocked) {
+            header.style.cursor = 'not-allowed';
+            header.style.opacity = '0.6';
+        }
         const list = document.createElement('div');
         list.className = 'accordion-lessons-list';
-        modules[moduleName].forEach(lesson => {
-            const item = document.createElement('div');
-            item.className = 'accordion-lesson-item';
-            item.dataset.index = lesson.originalIndex;
-            let difficultyHTML = '<div class="lesson-difficulty">';
-            for (let i = 1; i <= 3; i++) {
-                difficultyHTML += `<span class="${i <= (lesson.difficulty || 1) ? 'active' : ''}"></span>`;
-            }
-            difficultyHTML += '</div>';
-            item.innerHTML = `
-                <div class="lesson-item-title">${lesson.name.split(': ')[1]}</div>
-                <div class="lesson-item-meta">
-                    <span>${lesson.timeSignature.beats}/${lesson.timeSignature.beatType}</span>
-                    ${difficultyHTML}
-                </div>`;
-            list.appendChild(item);
-        });
+        if (!isLocked) {
+            modules[moduleName].forEach(lesson => {
+                const isCompleted = completed.includes(lesson.originalIndex);
+                const item = document.createElement('div');
+                item.className = 'accordion-lesson-item';
+                item.dataset.index = lesson.originalIndex;
+                let difficultyHTML = '<div class="lesson-difficulty">';
+                for (let i = 1; i <= 3; i++) {
+                    difficultyHTML += `<span class="${i <= (lesson.difficulty || 1) ? 'active' : ''}"></span>`;
+                }
+                difficultyHTML += '</div>';
+                const completedIcon = isCompleted ? '<i class="fas fa-star" style="color: var(--glow-yellow);"></i>' : '';
+                item.innerHTML = `
+                    <div class="lesson-item-title">${lesson.name.split(': ')[1]}</div>
+                    <div class="lesson-item-meta">
+                        <span>${lesson.timeSignature.beats}/${lesson.timeSignature.beatType}</span>
+                        ${difficultyHTML}
+                        ${completedIcon}
+                    </div>`;
+                list.appendChild(item);
+            });
+        }
         moduleContainer.appendChild(header);
         moduleContainer.appendChild(list);
         contentEl.appendChild(moduleContainer);
@@ -544,11 +591,15 @@ export function switchMode(mode) {
     const lessonSelectorContainer = document.getElementById('lesson-selector-container');
     const customRhythmCreatorDiv = document.getElementById('custom-rhythm-creator');
     const gameFigureHintEl = document.getElementById('game-figure-hint');
+    const practiceSettingsPanel = document.getElementById('practice-settings-panel');
+
     rhythmDisplayContainer.innerHTML = '<div id="rhythm-display"></div>';
     gamePanel.classList.add('hidden');
     lessonSelectorContainer.style.display = 'none';
     customRhythmCreatorDiv.classList.add('hidden');
     gameFigureHintEl.classList.add('hidden');
+    practiceSettingsPanel.classList.add('hidden');
+    
     AppState.customPattern = [];
     if (mode === 'lessons') {
         lessonSelectorContainer.style.display = 'block';

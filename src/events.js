@@ -1,14 +1,17 @@
-// events.js
+// src/events.js
+
 import * as api from './api.js';
-import { startCountdownAndPlay, togglePauseResume, stopRhythmExecution, playDictationPatternWithCountdown } from './audio.js';
+import { startListeningMode, startPracticeMode, stopRhythmExecution } from './audio.js';
 import { AppState } from './state.js';
 import { updateActivePatternAndTimeSignature, generateDictation, checkDictation, getCurrentDictationPattern, processPattern } from './core.js';
 import { switchMode, renderRhythm, updateMessage, updateLoginUI, showModal, hideAllModals, populateLoadRhythmModal, hideEditPopover, updateFigureFocusDisplay, populateLessonModal, renderDictationFeedback, populateTheoryGuideModal } from './ui.js';
+import { startAudioAnalysis, stopAudioAnalysis } from './analysis.js';
 
 const saveRhythmModal = document.getElementById('save-rhythm-modal');
 const loadRhythmModal = document.getElementById('load-rhythm-modal');
 const lessonModal = document.getElementById('lesson-modal');
 const theoryGuideModal = document.getElementById('theory-guide-modal');
+const resultsModal = document.getElementById('results-modal');
 const rhythmNameInput = document.getElementById('rhythm-name-input');
 const continuousMetronomeToggle = document.getElementById('continuous-metronome-toggle');
 
@@ -179,19 +182,45 @@ export function setupEventListeners() {
 
     document.getElementById('tempo-decrease').addEventListener('click', () => updateTempo(Math.max(30, parseInt(tempoDisplay.textContent) - 5)));
     document.getElementById('tempo-increase').addEventListener('click', () => updateTempo(Math.min(280, parseInt(tempoDisplay.textContent) + 5)));
+    
+    // -- LISTENERS DE CONTROLO CORRIGIDOS --
+    document.getElementById('listen-button').addEventListener('click', () => {
+        stopAudioAnalysis(); // Garante que o microfone está desligado ao ouvir
+        startListeningMode();
+    });
 
-    document.getElementById('play-pause-button').addEventListener('click', () => {
-        if (AppState.isPlaying || Tone.Transport.state === 'paused') {
-            togglePauseResume();
-        } else {
-            startCountdownAndPlay();
+    // CORREÇÃO PRINCIPAL AQUI:
+    // 1. A função do listener agora é 'async'
+    document.getElementById('practice-button').addEventListener('click', async () => {
+        // 2. 'await' espera que a permissão do microfone seja dada (ou negada)
+        const micReady = await startAudioAnalysis(); 
+        
+        // 3. Só inicia o exercício se o microfone estiver pronto
+        if (micReady) {
+            startPracticeMode();
         }
     });
 
     document.getElementById('reset-button').addEventListener('click', () => {
         stopRhythmExecution(true);
+        stopAudioAnalysis();
+        renderRhythm();
+        document.getElementById('practice-settings-panel').classList.add('hidden');
     });
-    
+
+    // -- LISTENERS PARA AS CONFIGURAÇÕES DE PRÁTICA --
+    document.getElementById('metronome-toggle').addEventListener('change', (e) => {
+        AppState.practiceSettings.metronome = e.target.checked;
+    });
+    document.getElementById('beat-counter-toggle').addEventListener('change', (e) => {
+        AppState.practiceSettings.beatCounters = e.target.checked;
+        renderRhythm();
+    });
+    document.getElementById('syllable-toggle').addEventListener('change', (e) => {
+        AppState.practiceSettings.syllables = e.target.checked;
+        renderRhythm();
+    });
+
     continuousMetronomeToggle.addEventListener('change', (e) => {
         AppState.continuousMetronome = e.target.checked;
         if (!e.target.checked && AppState.metronomeEventId && !AppState.isPlaying) {
@@ -231,6 +260,7 @@ export function setupEventListeners() {
     document.getElementById('save-cancel-button').addEventListener('click', hideAllModals);
     document.getElementById('load-cancel-button').addEventListener('click', hideAllModals);
     document.getElementById('error-ok-button').addEventListener('click', hideAllModals);
+    document.getElementById('results-ok-button').addEventListener('click', hideAllModals);
 
     document.getElementById('load-rhythm-list').addEventListener('click', (e) => {
         const button = e.target.closest('.load-item-button');
@@ -301,7 +331,6 @@ export function setupEventListeners() {
 
     document.getElementById('close-lesson-modal-button').addEventListener('click', hideAllModals);
 
-    // NOVO: Listeners para o Guia de Teoria
     document.getElementById('open-theory-guide-button').addEventListener('click', () => {
         populateTheoryGuideModal();
         showModal(theoryGuideModal);
@@ -311,21 +340,27 @@ export function setupEventListeners() {
 
     document.getElementById('lesson-modal-content').addEventListener('click', (e) => {
         const moduleHeader = e.target.closest('.accordion-module-header');
+        if (moduleHeader && !moduleHeader.parentElement.querySelector('.accordion-lessons-list').children.length) {
+            return;
+        }
         if (moduleHeader) {
             const list = moduleHeader.nextElementSibling;
-            const icon = moduleHeader.querySelector('i');
+            const icon = moduleHeader.querySelector('i.fa-chevron-down, i.fa-chevron-up');
             const wasOpen = list.classList.contains('open');
             
             document.querySelectorAll('.accordion-lessons-list.open').forEach(openList => {
                 if (openList !== list) {
                     openList.classList.remove('open');
-                    openList.previousElementSibling.querySelector('i').classList.replace('fa-chevron-up', 'fa-chevron-down');
+                    const otherIcon = openList.previousElementSibling.querySelector('i.fa-chevron-up');
+                    if (otherIcon) otherIcon.classList.replace('fa-chevron-up', 'fa-chevron-down');
                 }
             });
             
             list.classList.toggle('open', !wasOpen);
-            icon.classList.toggle('fa-chevron-down', wasOpen);
-            icon.classList.toggle('fa-chevron-up', !wasOpen);
+            if (icon) {
+                icon.classList.toggle('fa-chevron-down', wasOpen);
+                icon.classList.toggle('fa-chevron-up', !wasOpen);
+            }
         }
 
         const lessonItem = e.target.closest('.accordion-lesson-item');

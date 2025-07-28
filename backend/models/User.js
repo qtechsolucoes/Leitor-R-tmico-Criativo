@@ -1,4 +1,5 @@
-// /models/User.js
+// backend/models/User.js
+
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
@@ -8,8 +9,7 @@ const userSchema = new Schema({
     email: String,
     photo: String,
     points: { type: Number, default: 0 },
-    createdAt: { type: Date, default: Date.now },
-    lessonsCompleted: [Number]
+    completedLessons: [{ type: Number }] 
 });
 
 mongoose.model('users', userSchema);

@@ -1,7 +1,9 @@
-// audio.js
+// src/audio.js
+
 import { AppState } from './state.js';
 import { getBeatValue } from './core.js';
-import { highlightActiveVisualElement, updatePlaybackButtons, enableAllControls, disablePlaybackControls, updateMessage, updateCountdownDisplay, showErrorModal } from './ui.js';
+import { highlightActiveVisualElement, updatePlaybackButtons, enableAllControls, disablePlaybackControls, updateMessage, updateCountdownDisplay, showErrorModal, updateLoginUI, showPracticeResults } from './ui.js';
+import { completeLesson } from './api.js';
 
 let offlineContext;
 
@@ -64,6 +66,7 @@ export function stopRhythmExecution(forceStopMetronome = false) {
     const wasPlaying = AppState.isPlaying;
     AppState.isPlaying = false;
     AppState.isCountingDown = false;
+    AppState.isPracticing = false;
 
     Tone.Transport.stop();
     Tone.Transport.cancel(0);
@@ -83,7 +86,6 @@ export function stopRhythmExecution(forceStopMetronome = false) {
         }
     }
 
-    updatePlaybackButtons(false);
     enableAllControls();
     highlightActiveVisualElement(null);
     updateCountdownDisplay("");
@@ -92,26 +94,10 @@ export function stopRhythmExecution(forceStopMetronome = false) {
     }
 }
 
-export function togglePauseResume() {
-    if (Tone.Transport.state === 'paused') {
-        AppState.isPlaying = true;
-        Tone.Transport.start();
-        if (AppState.metronomeEventId) AppState.metronomeEventId.start();
-        updatePlaybackButtons(true);
-        disablePlaybackControls(true);
-        updateMessage("A tocar...");
-    } else if (AppState.isPlaying) {
-        AppState.isPlaying = false;
-        Tone.Transport.pause();
-        if (AppState.metronomeEventId) AppState.metronomeEventId.stop(Tone.now());
-        updatePlaybackButtons(false);
-        enableAllControls();
-        updateMessage("Pausado.");
-    }
-}
-
-function isCompound(beats, beatType) {
-    return beatType >= 8 && beats % 3 === 0 && beats > 3;
+function isCompound(timeSig) {
+    if (!timeSig) return false;
+    const { beats, beatType } = timeSig;
+    return beatType >= 8 && beats > 3 && beats % 3 === 0;
 }
 
 function scheduleCountdown(timeSig, onComplete) {
@@ -138,20 +124,33 @@ function scheduleCountdown(timeSig, onComplete) {
     return countdownDuration;
 }
 
+export async function startListeningMode() {
+    if (AppState.isPlaying || AppState.isCountingDown || AppState.isPracticing) return;
+    await setupAndPlay(false);
+}
 
-export async function startCountdownAndPlay() {
-    if (AppState.isPlaying || AppState.isCountingDown || !AppState.activePattern || AppState.activePattern.length === 0) return;
-    
+export async function startPracticeMode() {
+    if (AppState.isPlaying || AppState.isCountingDown || AppState.isPracticing) return;
+    await setupAndPlay(true);
+}
+
+async function setupAndPlay(isPracticeMode) {
+    if (!AppState.activePattern || AppState.activePattern.length === 0) {
+        updateMessage("Nenhuma lição ou ritmo para tocar.", "error");
+        return;
+    }
     disablePlaybackControls();
-
     try {
         if (Tone.context.state !== 'running') await Tone.start();
         
         initializeSynths();
         stopRhythmExecution(true); 
-        AppState.isCountingDown = true;
-        updateMessage("A preparar...");
 
+        AppState.isCountingDown = true;
+        AppState.isPracticing = isPracticeMode;
+        AppState.targetNoteTimes = [];
+
+        updateMessage("A preparar...");
         const userInputBpm = parseInt(document.getElementById('tempo-display').textContent);
         Tone.Transport.bpm.value = userInputBpm;
         
@@ -160,38 +159,53 @@ export async function startCountdownAndPlay() {
         const countdownDuration = scheduleCountdown(AppState.activeTimeSignature, () => {
             AppState.isCountingDown = false;
             AppState.isPlaying = true;
-            updatePlaybackButtons(true);
-            disablePlaybackControls(true);
-            updateMessage("A tocar...");
+            updateMessage(isPracticeMode ? "Exercite agora!" : "A ouvir...");
+            if(isPracticeMode) {
+                 document.getElementById('practice-settings-panel').classList.remove('hidden');
+            }
         });
 
-        schedulePlayback(countdownDuration);
+        schedulePlayback(countdownDuration, !isPracticeMode);
 
         Tone.Transport.start(Tone.now());
 
     } catch (error) {
-        console.error("Erro ao iniciar playback:", error);
-        showErrorModal(`Ocorreu um erro ao tentar iniciar a reprodução: ${error.message}`);
+        console.error("Erro ao iniciar:", error);
+        showErrorModal(`Ocorreu um erro: ${error.message}`);
         stopRhythmExecution(true);
     }
 }
 
-function schedulePlayback(offset = 0) {
+function schedulePlayback(offset = 0, playSound) {
     let currentTime = offset;
     const timeSig = AppState.activeTimeSignature;
     const beatTypeDurationSeconds = Tone.Time(`${timeSig.beatType}n`).toSeconds();
     const tolerance = 0.001;
 
+    const notesToPractice = AppState.isPracticing ? AppState.activePattern.filter(item => item.type === 'note' && !item.isTiedContinuation) : [];
+    let correctNotesCount = 0;
+
     AppState.activePattern.forEach((item, originalIndex) => {
-        if (item.isControl) return;
+        const noteDurationInSeconds = getBeatValue(item.duration, timeSig) * beatTypeDurationSeconds;
         
         if (item.type === 'note' && !item.isTiedContinuation) {
             const soundDurationSeconds = getBeatValue(item.totalTiedDuration || item.duration, timeSig) * beatTypeDurationSeconds;
             
-            AppState.transportEventIds.push(Tone.Transport.scheduleOnce(t => {
-                AppState.synths.noteSynth.triggerAttackRelease("C5", soundDurationSeconds, t);
-                AppState.synths.attackSynth.triggerAttackRelease("C6", "16n", t);
-            }, currentTime));
+            AppState.targetNoteTimes.push({
+                startTime: currentTime,
+                endTime: currentTime + soundDurationSeconds,
+                duration: soundDurationSeconds,
+                patternIndex: originalIndex,
+                checked: false,
+                isCorrect: null
+            });
+
+            if (playSound) {
+                AppState.transportEventIds.push(Tone.Transport.scheduleOnce(t => {
+                    AppState.synths.noteSynth.triggerAttackRelease("C5", soundDurationSeconds, t);
+                    AppState.synths.attackSynth.triggerAttackRelease("C6", "16n", t);
+                }, currentTime));
+            }
         }
         
         const noteDurationInBeats = getBeatValue(item.duration, timeSig);
@@ -209,60 +223,72 @@ function schedulePlayback(offset = 0) {
             }, currentTime));
         }
         
-        const noteDurationInSeconds = noteDurationInBeats * beatTypeDurationSeconds;
         currentTime += noteDurationInSeconds;
     });
 
-    AppState.transportEventIds.push(Tone.Transport.scheduleOnce(() => {
+    AppState.transportEventIds.push(Tone.Transport.scheduleOnce(async () => {
+        if (AppState.isPracticing) {
+            correctNotesCount = AppState.targetNoteTimes.filter(note => note.isCorrect).length;
+            const score = notesToPractice.length > 0 ? (correctNotesCount / notesToPractice.length) * 100 : 100;
+            
+            showPracticeResults(score);
+            
+            if (score >= 90 && AppState.currentMode === 'lessons' && AppState.user.currentUser) {
+                try {
+                    const updatedUser = await completeLesson(AppState.currentLessonIndex);
+                    if (updatedUser) {
+                        AppState.user.currentUser = updatedUser;
+                        updateLoginUI(updatedUser);
+                    }
+                } catch (error) { console.error("Erro ao salvar progresso:", error); }
+            }
+        } else {
+             updateMessage("Lição concluída!", "success");
+        }
         stopRhythmExecution(false);
-        updateMessage("Lição concluída!", "success");
-    }, currentTime + 0.5));
+        document.getElementById('practice-settings-panel').classList.add('hidden');
+
+    }, currentTime + 1.0));
 }
 
-// ==========================================================
-// FUNÇÃO DO METRÔNOMO ATUALIZADA
-// ==========================================================
 function scheduleMetronome() {
     if (AppState.metronomeEventId) {
         AppState.metronomeEventId.dispose();
     }
+    if(AppState.isPracticing && !AppState.practiceSettings.metronome) {
+        return;
+    }
+
     const timeSig = AppState.activeTimeSignature;
     const userInputBpm = parseInt(document.getElementById('tempo-display').textContent);
     const accent = "G5";
     const secondaryAccent = "E5";
     const normal = "C5";
     
-    // Define a fórmula de compasso no transporte para referência de "1m" se necessário
     Tone.Transport.timeSignature = [timeSig.beats, timeSig.beatType];
-    // O BPM do transporte principal ainda é útil para a reprodução das notas
     Tone.Transport.bpm.value = userInputBpm;
 
     const isComp = isCompound(timeSig);
     const mainBeats = isComp ? timeSig.beats / 3 : timeSig.beats;
-    
-    // Para compassos compostos, o BPM refere-se à semínima pontuada.
-    // Para simples, refere-se à unidade de tempo (ex: semínima em 4/4).
     const loopInterval = isComp ? "4n." : `${timeSig.beatType}n`;
 
     let beatCounter = 0;
 
     AppState.metronomeEventId = new Tone.Loop(time => {
-        // Usa o contexto de áudio para agendamento preciso dentro do loop
         const beatInMeasure = beatCounter % mainBeats;
         
         let note = normal;
         if (beatInMeasure === 0) {
-            note = accent; // Acento principal no tempo 1
+            note = accent;
         } else if (!isComp && timeSig.beats === 4 && beatInMeasure === 2) {
-            note = secondaryAccent; // Acento secundário no tempo 3 do 4/4
+            note = secondaryAccent;
         }
         
-        // Dispara o som no tempo exato fornecido pelo loop
         AppState.synths.metronomeSynth.triggerAttackRelease(note, "32n", time);
-
         beatCounter++;
     }, loopInterval).start(0);
 }
+
 export async function playDictationPatternWithCountdown(pattern) {
     if (AppState.isPlaying || AppState.isCountingDown || !pattern || pattern.length === 0) return;
     
