@@ -43,23 +43,18 @@ export function initializeSynths() {
 export function playFigurePreview(figure) {
     if (!figure || figure.isControl) return;
     
-    try {
-        const context = Tone.context;
-        const oscillator = context.createOscillator();
-        const gainNode = context.createGain();
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(context.destination);
-        
-        oscillator.type = 'triangle';
-        oscillator.frequency.value = figure.type === 'note' ? 440 : 220;
-        gainNode.gain.value = 0.3;
-        
-        oscillator.start();
-        oscillator.stop(context.currentTime + 0.3);
-    } catch (error) {
-        console.error("Erro ao tocar preview:", error);
-    }
+    // Inicia o contexto de áudio se ainda não tiver sido iniciado por uma ação do usuário
+    Tone.start();
+
+    // Cria um oscilador do Tone.js
+    const osc = new Tone.Oscillator({
+        type: "triangle",
+        frequency: figure.type === 'note' ? 440 : 220,
+        volume: -12 // Ajuste o volume se necessário
+    }).toDestination();
+    
+    // Inicia o som e para-o após 0.2 segundos
+    osc.start().stop("+0.2");
 }
 
 export function stopRhythmExecution(forceStopMetronome = false) {

@@ -1,9 +1,9 @@
 // src/events.js
 
 import * as api from './api.js';
-import { startListeningMode, startPracticeMode, stopRhythmExecution } from './audio.js';
+import { startListeningMode, startPracticeMode, stopRhythmExecution, playDictationPatternWithCountdown } from './audio.js';
 import { AppState } from './state.js';
-import { updateActivePatternAndTimeSignature, generateDictation, checkDictation, getCurrentDictationPattern, processPattern } from './core.js';
+import { updateActivePatternAndTimeSignature, generateDictation, checkDictation, getCurrentDictationPattern } from './core.js';
 import { switchMode, renderRhythm, updateMessage, updateLoginUI, showModal, hideAllModals, populateLoadRhythmModal, hideEditPopover, updateFigureFocusDisplay, populateLessonModal, renderDictationFeedback, populateTheoryGuideModal } from './ui.js';
 import { startAudioAnalysis, stopAudioAnalysis } from './analysis.js';
 
@@ -146,8 +146,7 @@ function setupCustomSelect(selectElement, panelElement, onSelectCallback) {
 export function setupEventListeners() {
     
     const customModeSelect = document.getElementById('custom-mode-select');
-    const modePanel = customModeSelect.closest('.panel');
-    setupCustomSelect(customModeSelect, modePanel, switchMode);
+    setupCustomSelect(customModeSelect, null, switchMode);
 
     const customBeatsSelect = document.getElementById('custom-beats-select');
     const customTypeSelect = document.getElementById('custom-type-select');
@@ -183,19 +182,14 @@ export function setupEventListeners() {
     document.getElementById('tempo-decrease').addEventListener('click', () => updateTempo(Math.max(30, parseInt(tempoDisplay.textContent) - 5)));
     document.getElementById('tempo-increase').addEventListener('click', () => updateTempo(Math.min(280, parseInt(tempoDisplay.textContent) + 5)));
     
-    // -- LISTENERS DE CONTROLO CORRIGIDOS --
     document.getElementById('listen-button').addEventListener('click', () => {
-        stopAudioAnalysis(); // Garante que o microfone está desligado ao ouvir
+        stopAudioAnalysis();
         startListeningMode();
     });
 
-    // CORREÇÃO PRINCIPAL AQUI:
-    // 1. A função do listener agora é 'async'
     document.getElementById('practice-button').addEventListener('click', async () => {
-        // 2. 'await' espera que a permissão do microfone seja dada (ou negada)
         const micReady = await startAudioAnalysis(); 
         
-        // 3. Só inicia o exercício se o microfone estiver pronto
         if (micReady) {
             startPracticeMode();
         }
@@ -208,7 +202,6 @@ export function setupEventListeners() {
         document.getElementById('practice-settings-panel').classList.add('hidden');
     });
 
-    // -- LISTENERS PARA AS CONFIGURAÇÕES DE PRÁTICA --
     document.getElementById('metronome-toggle').addEventListener('change', (e) => {
         AppState.practiceSettings.metronome = e.target.checked;
     });

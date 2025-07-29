@@ -7,12 +7,12 @@ require('dotenv').config();
 const User = mongoose.model('users');
 
 passport.serializeUser((user, done) => {
-    done(null, user.id); // Salva o ID do usuário do nosso DB na sessão
+    done(null, user.id);
 });
 
 passport.deserializeUser((id, done) => {
     User.findById(id).then(user => {
-        done(null, user); // Recupera o usuário completo a partir do ID da sessão
+        done(null, user);
     });
 });
 
@@ -25,20 +25,24 @@ passport.use(
             proxy: true
         },
         async (accessToken, refreshToken, profile, done) => {
-            // Esta função é chamada quando o Google retorna os dados do usuário
+            const userEmail = profile.emails[0].value;
             const existingUser = await User.findOne({ googleId: profile.id });
 
             if (existingUser) {
-                // Já temos um usuário com este ID
+                // Se o usuário já existe, atualiza a sua função caso o email de admin tenha mudado
+                existingUser.role = userEmail === process.env.ADMIN_EMAIL ? 'admin' : 'user';
+                await existingUser.save();
                 return done(null, existingUser);
             }
 
-            // Não temos, então criamos um novo
+            // Se for um novo usuário, define a sua função na criação
             const user = await new User({ 
                 googleId: profile.id,
                 displayName: profile.displayName,
-                email: profile.emails[0].value,
-                photo: profile.photos[0].value
+                email: userEmail,
+                photo: profile.photos[0].value,
+                // Define a função com base no email
+                role: userEmail === process.env.ADMIN_EMAIL ? 'admin' : 'user'
             }).save();
             done(null, user);
         }

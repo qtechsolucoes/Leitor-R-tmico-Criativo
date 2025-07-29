@@ -143,7 +143,6 @@ export function updateCountdownDisplay(text) {
 export function updatePlaybackButtons(isPlaying) {
     const listenButton = document.getElementById('listen-button');
     const practiceButton = document.getElementById('practice-button');
-    // Esta função pode ser adaptada para mostrar um estado de "a tocar" em ambos os botões
     if(listenButton && practiceButton){
         if(isPlaying){
             // Poderia, por exemplo, desativá-los
@@ -473,10 +472,15 @@ export function renderRhythm(targetElement = null) {
     });
 }
 
+// ESTA É A FUNÇÃO ATUALIZADA COM A LÓGICA DE ADMIN
 export function populateLessonModal() {
     const contentEl = document.getElementById('lesson-modal-content');
     if (!contentEl) return;
     contentEl.innerHTML = '';
+    
+    // Verifica se o usuário atual é admin
+    const isAdmin = AppState.user.currentUser && AppState.user.currentUser.role === 'admin';
+    
     const completed = AppState.user.currentUser ? AppState.user.currentUser.completedLessons || [] : [];
     const modules = {};
     lessons.forEach((lesson, index) => {
@@ -489,7 +493,8 @@ export function populateLessonModal() {
     let previousModuleCompleted = true;
     let unlockedModules = [];
     for (const moduleName in modules) {
-        if (previousModuleCompleted) {
+        // Se for admin, todos os módulos estão desbloqueados desde o início.
+        if (previousModuleCompleted || isAdmin) {
             unlockedModules.push(moduleName);
             const lessonsInModule = modules[moduleName];
             const allLessonsInModuleCompleted = lessonsInModule.every(l => completed.includes(l.originalIndex));
@@ -497,7 +502,8 @@ export function populateLessonModal() {
         }
     }
     for (const moduleName in modules) {
-        const isLocked = !unlockedModules.includes(moduleName);
+        // Se for admin, nenhum módulo fica bloqueado.
+        const isLocked = !unlockedModules.includes(moduleName) && !isAdmin;
         const moduleContainer = document.createElement('div');
         const header = document.createElement('div');
         header.className = 'accordion-module-header';
@@ -535,6 +541,7 @@ export function populateLessonModal() {
         contentEl.appendChild(moduleContainer);
     }
 }
+
 
 export function populateFigurePalette() {
     const figurePaletteDiv = document.getElementById('figure-palette');
