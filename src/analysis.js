@@ -7,17 +7,13 @@ let audioContext;
 let microphoneStream;
 let scriptProcessor;
 
-// --- NOVOS PARÂMETROS DE CALIBRAÇÃO (ATAQUE E SUSTENTAÇÃO) ---
-// Limiar para o "ataque" inicial da nota. Deve ser um valor alto.
-const ATTACK_THRESHOLD = 5.0; 
-// Limiar para a "sustentação". Deve ser um valor baixo, apenas acima do ruído de fundo.
-const SUSTAIN_THRESHOLD = 0.1;
-// Percentagem de duração da nota que precisa de ter som para ser considerada correta.
-const REQUIRED_HIT_PERCENTAGE = 0.7; // 70%
+// --- PARÂMETROS FINAIS DE CALIBRAÇÃO ---
+const ATTACK_THRESHOLD = 3.0; 
+const SUSTAIN_THRESHOLD = 0.02;
+const REQUIRED_HIT_PERCENTAGE = 0.6; // 60%
 
 const ANALYSIS_INTERVAL = 50;
 let analysisIntervalId = null;
-
 let previousEnergy = 0;
 
 const volumeMeterContainer = document.getElementById('volume-meter-container');
@@ -41,7 +37,16 @@ function checkPerformance() {
         if (transportTime > note.endTime && !note.checked) {
             note.checked = true;
             
-            const numberOfFrames = note.duration / (scriptProcessor.bufferSize / audioContext.sampleRate);
+            if (!note.attacked) {
+                note.isCorrect = false;
+                updateNoteFeedback(note.patternIndex, false);
+                return;
+            }
+
+            if (!scriptProcessor || !audioContext) return; 
+            
+            const bufferDuration = scriptProcessor.bufferSize / audioContext.sampleRate;
+            const numberOfFrames = note.duration / bufferDuration;
             const hitPercentage = (note.hits || 0) / numberOfFrames;
             
             note.isCorrect = hitPercentage >= REQUIRED_HIT_PERCENTAGE;
@@ -51,6 +56,15 @@ function checkPerformance() {
 }
 
 export async function startAudioAnalysis() {
+    if (AppState.targetNoteTimes) {
+        AppState.targetNoteTimes.forEach(note => {
+            note.attacked = false;
+            note.hits = 0;
+            note.checked = false;
+            note.isCorrect = null;
+        });
+    }
+
     if (scriptProcessor && scriptProcessor.context.state === 'running') {
         return true;
     }
@@ -91,9 +105,6 @@ export async function startAudioAnalysis() {
             const energyRatio = currentEnergy / (previousEnergy + 0.0001);
             previousEnergy = currentEnergy;
 
-            // Debug:
-            console.log(`Energia: ${currentEnergy.toFixed(4)}, Rácio: ${energyRatio.toFixed(2)}`);
-            
             if (volumeMeterBar) {
                 const volumePercentage = Math.min(currentEnergy * 5000, 100);
                 volumeMeterBar.style.width = `${volumePercentage}%`;
@@ -107,26 +118,20 @@ export async function startAudioAnalysis() {
             );
 
             if (activeNote) {
-                // Lógica de Deteção de Início e Sustentação
-                const isAttack = energyRatio > ATTACK_THRESHOLD && !activeNote.attacked;
-                const isSustaining = currentEnergy > SUSTAIN_THRESHOLD;
+                const isAttack = energyRatio > ATTACK_THRESHOLD;
 
-                if (isAttack) {
-                    activeNote.attacked = true; // Marca que o ataque já foi detetado
+                // A lógica agora é muito mais simples e segura:
+                // 1. Só procuramos por um ataque se a nota ainda não teve um.
+                if (!activeNote.attacked) {
+                    if (isAttack) {
+                        activeNote.attacked = true; // Trava para não detetar mais ataques
+                    }
                 }
-
-                // A nota precisa de ter tido um ataque E estar a ser sustentada
-                if (activeNote.attacked && isSustaining) {
+                
+                // 2. Se a nota já teve seu ataque, apenas verificamos a sustentação.
+                if (activeNote.attacked && currentEnergy > SUSTAIN_THRESHOLD) {
                     if (!activeNote.hits) activeNote.hits = 0;
                     activeNote.hits++;
-                    
-                    // Feedback visual em tempo real
-                    const numberOfFrames = activeNote.duration / (scriptProcessor.bufferSize / audioContext.sampleRate);
-                    const hitPercentage = activeNote.hits / numberOfFrames;
-                    if(hitPercentage >= REQUIRED_HIT_PERCENTAGE && !activeNote.isCorrect){
-                       activeNote.isCorrect = true;
-                       updateNoteFeedback(activeNote.patternIndex, true);
-                    }
                 }
             }
         };
